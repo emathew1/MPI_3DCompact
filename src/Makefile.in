@@ -1,0 +1,13 @@
+CC=mpic++
+
+# CFLAGS will be the options passed to the compiler.
+CFLAGS= -Wall -O3
+
+AR = ar rv
+RANLIB = ar -ts
+
+LIB =  
+LIBF = -lstdc++
+INC = 
+
+DECOMP_DIR = ./C2Decomp
