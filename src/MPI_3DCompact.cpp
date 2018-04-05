@@ -80,14 +80,28 @@ int main(int argc, char *argv[]){
 
     C2Decomp *c2d;
     c2d = new C2Decomp(Nx, Ny, Nz, pRow, pCol, periodicBC);
-
+  
     IF_RANK0 cout << " > Successfully initialized! " << endl;
+    IF_RANK0 cout << " > Handing some decomp info back to the domain object... " << endl;
+    d->setPencilDecompInfo(c2d->xSize,  c2d->ySize,  c2d->zSize,
+				  c2d->xStart, c2d->yStart, c2d->zStart,
+				  c2d->xEnd,   c2d->yEnd,   c2d->zEnd);
+     
 
     //Initialize derivative objects for testing...
     Derivatives *derivX = new Derivatives(d, bc->bcXType, Derivatives::DIRX);
     Derivatives *derivY = new Derivatives(d, bc->bcYType, Derivatives::DIRY);
     Derivatives *derivZ = new Derivatives(d, bc->bcZType, Derivatives::DIRZ);
 
+
+    double *u1, *u2, *u3;
+    c2d->allocX(u1);
+    c2d->allocX(u2);
+    c2d->allocX(u3);
+
+    c2d->deallocXYZ(u1);
+    c2d->deallocXYZ(u2);
+    c2d->deallocXYZ(u3);
 
     //Now lets kill MPI
     MPI_Finalize();

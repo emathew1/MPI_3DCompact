@@ -3,6 +3,8 @@
 
 #define IF_RANK0 if(!mpiRank)
 
+#define FOR_I3 for(int i = 0; i < 3; i++)
+
 //Need to be sure that Nx,Ny,Nz are defined within scope to use these
 //General indexing...
 #define GET3DINDEX_XYZ k*Nx*Ny + j*Nx + i

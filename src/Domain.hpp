@@ -2,6 +2,7 @@
 #define _DOMAINH_
 
 #include <iostream>
+#include "Macros.hpp"
 
 class Domain{
 
@@ -62,7 +63,25 @@ class Domain{
 	    std::cout << " > Total Points: " << gNx*gNy*gNz << std::endl; 
 	}
     }
+  
+    void setPencilDecompInfo(int xSize[3], int ySize[3], int zSize[3], int xStart[3], int yStart[3], int zStart[3], int xEnd[3], int yEnd[3], int zEnd[3]){
+	FOR_I3 pxSize[i] = xSize[i];
+	FOR_I3 pySize[i] = ySize[i];
+	FOR_I3 pzSize[i] = zSize[i];
+
+	FOR_I3 pxStart[i] = xStart[i];
+	FOR_I3 pyStart[i] = yStart[i];
+	FOR_I3 pzStart[i] = zStart[i];
+
+	FOR_I3 pxEnd[i] = xEnd[i];
+	FOR_I3 pyEnd[i] = yEnd[i];
+	FOR_I3 pzEnd[i] = zEnd[i];
+	
+    } 
+
 
 };
+
+
 
 #endif
