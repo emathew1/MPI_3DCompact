@@ -4,12 +4,18 @@
 #define IF_RANK0 if(!mpiRank)
 
 #define FOR_I3 for(int i = 0; i < 3; i++)
+#define FOR_J3 for(int j = 0; j < 3; j++)
+#define FOR_K3 for(int k = 0; k < 3; k++)
 
 //Need to be sure that Nx,Ny,Nz are defined within scope to use these
 //General indexing...
-#define GET3DINDEX_XYZ k*Nx*Ny + j*Nx + i
-#define GET3DINDEX_YZX i*Nz*Ny + k*Ny + j
-#define GET3DINDEX_ZXY j*Nx*Nz + i*Nz + k
+#define GETMAJIND_XPEN k*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETMAJIND_YPEN i*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_ZPEN j*pzSize[0]*pzSize[2] + i*pzSize[2] + k
+
+#define GETIND_XPEN k*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETIND_YPEN k*pySize[0]*pySize[1] + j*pySize[0] + i
+#define GETIND_ZPEN k*pzSize[0]*pzSize[1] + j*pzSize[0] + i
 
 //For pulling data for Neumann BC's
 #define GET3DINDEX_XYZ_Xp1 k*Nx*Ny + j*Nx + i+1
@@ -52,19 +58,50 @@
 #define GET3DINDEX_XYZ_Zm6 (k-6)*Nx*Ny + j*Nx + i
 
 //Loops
-#define FOR_X for(int i = 0; i < Nx; i++)
-#define FOR_Y for(int j = 0; j < Ny; j++)
-#define FOR_Z for(int k = 0; k < Nz; k++)
-#define FOR_XYZ for(int ip = 0; ip < Nx*Ny*Nz; ip++) 
+#define FOR_X_XPEN for(int i = 0; i < pxSize[0]; i++)
+#define FOR_Y_XPEN for(int j = 0; j < pxSize[1]; j++)
+#define FOR_Z_XPEN for(int k = 0; k < pxSize[2]; k++)
+#define FOR_XYZ_XPEN for(int ip = 0; ip < pxSize[0]*pxSize[1]*pxSize[2]; ip++) 
 
+#define FOR_X_YPEN for(int i = 0; i < pySize[0]; i++)
+#define FOR_Y_YPEN for(int j = 0; j < pySize[1]; j++)
+#define FOR_Z_YPEN for(int k = 0; k < pySize[2]; k++)
+#define FOR_XYZ_YPEN for(int ip = 0; ip < pySize[0]*pySize[1]*pySize[2]; ip++) 
+
+#define FOR_X_ZPEN for(int i = 0; i < pzSize[0]; i++)
+#define FOR_Y_ZPEN for(int j = 0; j < pzSize[1]; j++)
+#define FOR_Z_ZPEN for(int k = 0; k < pzSize[2]; k++)
+#define FOR_XYZ_ZPEN for(int ip = 0; ip < pzSize[0]*pzSize[1]*pzSize[2]; ip++) 
 
 //Need to close off each of these macros with their corresponding END_FOR macros'
-#define FOR_X0 for(int k = 0; k < Nz; k++){for(int j = 0; j < Ny; j++){int i = 0; int ip = GET3DINDEX_XYZ; 
-#define FOR_X1 for(int k = 0; k < Nz; k++){for(int j = 0; j < Ny; j++){int i = Nx-1; int ip = GET3DINDEX_XYZ; 
-#define FOR_Y0 for(int k = 0; k < Nz; k++){for(int i = 0; i < Nx; i++){int j = 0; int ip = GET3DINDEX_XYZ; 
-#define FOR_Y1 for(int k = 0; k < Nz; k++){for(int i = 0; i < Nx; i++){int j = Ny-1; int ip = GET3DINDEX_XYZ; 
-#define FOR_Z0 for(int j = 0; j < Ny; j++){for(int i = 0; i < Nx; i++){int k = 0; int ip = GET3DINDEX_XYZ; 
-#define FOR_Z1 for(int j = 0; j < Ny; j++){for(int i = 0; i < Nx; i++){int k = Nz-1; int ip = GET3DINDEX_XYZ; 
+#define FOR_X0_XPEN for(int k = 0; k < pxSize[2]; k++){for(int j = 0; j < pxSize[1]; j++){int i = 0; int ip = GETIND_XPEN; 
+#define FOR_X1_XPEN for(int k = 0; k < pxSize[2]; k++){for(int j = 0; j < pxSize[1]; j++){int i = pxSize[0]-1; int ip = GETIND_XPEN; 
+#define FOR_Y0_XPEN for(int k = 0; k < pxSize[2]; k++){for(int i = 0; i < pxSize[0]; i++){int j = 0; int ip = GETIND_XPEN; 
+#define FOR_Y1_XPEN for(int k = 0; k < pxSize[2]; k++){for(int i = 0; i < pxSize[0]; i++){int j = pxSize[1]-1; int ip = GETIND_XPEN; 
+#define FOR_Z0_XPEN for(int j = 0; j < pxSize[1]; j++){for(int i = 0; i < pxSize[0]; i++){int k = 0; int ip = GETIND_XPEN; 
+#define FOR_Z1_XPEN for(int j = 0; j < pxSize[1]; j++){for(int i = 0; i < pxSize[0]; i++){int k = pxSize[2]-1; int ip = GETIND_XPEN; 
+
+#define FOR_X0_XPEN_MAJ FOR_X0_XPEN 
+#define FOR_X1_XPEN_MAJ FOR_X0_XPEN
+#define FOR_Y0_XPEN_MAJ FOR_Y0_XPEN
+#define FOR_Y1_XPEN_MAJ FOR_Y1_XPEN
+#define FOR_Z0_XPEN_MAJ FOR_Z0_XPEN
+#define FOR_Z1_XPEN_MAJ FOR_Z1_XPEN
+
+#define FOR_X0_YPEN for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = 0; int ip = GETIND_YPEN; 
+#define FOR_X1_YPEN for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = pySize[0]-1; int ip = GETIND_YPEN; 
+#define FOR_Y0_YPEN for(int k = 0; k < pySize[2]; k++){for(int i = 0; i < pySize[0]; i++){int j = 0; int ip = GETIND_YPEN; 
+#define FOR_Y1_YPEN for(int k = 0; k < pySize[2]; k++){for(int i = 0; i < pySize[0]; i++){int j = pySize[1]-1; int ip = GETIND_YPEN; 
+#define FOR_Z0_YPEN for(int j = 0; j < pySize[1]; j++){for(int i = 0; i < pySize[0]; i++){int k = 0; int ip = GETIND_YPEN; 
+#define FOR_Z1_YPEN for(int j = 0; j < pySize[1]; j++){for(int i = 0; i < pySize[0]; i++){int k = pySize[2]-1; int ip = GETIND_YPEN; 
+
+
+#define FOR_X0_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = 0; int ip = GETIND_YPEN_MAJ; 
+#define FOR_X1_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = pySize[0]-1; int ip = GETIND_YPEN_MAJ; 
+#define FOR_Y0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = 0; int ip = GETIND_YPEN_MAJ; 
+#define FOR_Y1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = pySize[1]-1; int ip = GETIND_YPEN_MAJ; 
+#define FOR_Z0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = 0; int ip = GETIND_YPEN_MAJ; 
+#define FOR_Z1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = pySize[2]-1; int ip = GETIND_YPEN_MAJ; 
 
 #define END_FORX0 }}
 #define END_FORX1 }}
