@@ -59,7 +59,7 @@ test_halo.exe:  $(HALOTEST_OBJECTS) $(BASE_OBJECTS)
 
 libc2decomp.a: $(BASE_OBJECTS)
 	$(AR) $@ $^
-	$(AR) $@  
+	$(RANLIB) $@  
 
 
 
