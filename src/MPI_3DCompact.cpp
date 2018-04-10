@@ -13,6 +13,7 @@ using namespace std;
 #include "Macros.hpp"
 #include "Domain.hpp"
 #include "BC.hpp" 
+#include "Filter.hpp"
 #include "Derivatives.hpp"
 
 int main(int argc, char *argv[]){
@@ -47,6 +48,20 @@ int main(int argc, char *argv[]){
            Ly = 19.0,
            Lz = 19.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
+
+
+    ////////////////////////////////////
+    //Time Stepping info intialization//
+    ////////////////////////////////////
+//    TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
+    double CFL       = 0.8;
+    int maxTimeStep  = 25000;
+    double maxTime   = 3000.0;
+    int filterStep   = 5;
+    int checkStep    = 1;
+    int dumpStep     = 2500;
+//    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep);
+
 
     ///////////////////////////
     //Boundary Condition Info//
@@ -90,6 +105,17 @@ int main(int argc, char *argv[]){
     int pxStart[3], pyStart[3], pzStart[3];
     int pxEnd[3], pyEnd[3], pzEnd[3];
     d->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
+
+
+    /////////////////////////
+    //Initialize the Solver//
+    /////////////////////////
+    double alphaF  = 0.495;
+    double mu_ref  = 0.00375;
+    int blocksize  = 16;
+    bool useTiming = false;
+//    AbstractCSolver *cs;
+//    cs = new CSolver_AWS(dom, bc, ts, alphaF, mu_ref, blocksize, useTiming);
      
 
     //Initialize derivative objects for testing...
@@ -97,6 +123,11 @@ int main(int argc, char *argv[]){
     Derivatives *derivY = new Derivatives(d, bc->bcYType, Derivatives::DIRY);
     Derivatives *derivZ = new Derivatives(d, bc->bcZType, Derivatives::DIRZ);
 
+    //Initialize filter objects for testing...
+    Filter *filtX = new Filter(alphaF, d, bc->bcXType, Derivatives::DIRX);
+    Filter *filtY = new Filter(alphaF, d, bc->bcYType, Derivatives::DIRY);
+    Filter *filtZ = new Filter(alphaF, d, bc->bcZType, Derivatives::DIRZ);
+   
 
     double *u1, *v1, *w1;
     double *du1dx;
@@ -129,8 +160,8 @@ int main(int argc, char *argv[]){
 		int kk = GETGLOBALZIND_XPEN; 
 
 		u1[ip] = (double)ii;
-		v1[ip] = (double)jj;
-		w1[ip] = (double)kk;
+		v1[ip] = 2*(double)jj;
+		w1[ip] = 3*(double)kk;
 
 	    }
 	}
@@ -151,7 +182,7 @@ int main(int argc, char *argv[]){
     c2d->transposeZ2Y_MajorIndex(dw3dz, v2);
     c2d->transposeY2Z_MajorIndex(v2, dw1dz);
 
-    IF_RANK0{
+    if(mpiRank == 2){
         FOR_X_XPEN{
 	    FOR_Y_XPEN{
 	        FOR_Z_XPEN{
