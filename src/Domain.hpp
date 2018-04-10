@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Macros.hpp"
+#include "C2Decomp.hpp"
 
 class Domain{
 
@@ -64,21 +65,36 @@ class Domain{
 	}
     }
   
-    void setPencilDecompInfo(int xSize[3], int ySize[3], int zSize[3], int xStart[3], int yStart[3], int zStart[3], int xEnd[3], int yEnd[3], int zEnd[3]){
-	FOR_I3 pxSize[i] = xSize[i];
-	FOR_I3 pySize[i] = ySize[i];
-	FOR_I3 pzSize[i] = zSize[i];
+    void setPencilDecompInfo(C2Decomp *c2d){
+	FOR_I3 pxSize[i] = c2d->xSize[i];
+	FOR_I3 pySize[i] = c2d->ySize[i];
+	FOR_I3 pzSize[i] = c2d->zSize[i];
 
-	FOR_I3 pxStart[i] = xStart[i];
-	FOR_I3 pyStart[i] = yStart[i];
-	FOR_I3 pzStart[i] = zStart[i];
+	FOR_I3 pxStart[i] = c2d->xStart[i];
+	FOR_I3 pyStart[i] = c2d->yStart[i];
+	FOR_I3 pzStart[i] = c2d->zStart[i];
 
-	FOR_I3 pxEnd[i] = xEnd[i];
-	FOR_I3 pyEnd[i] = yEnd[i];
-	FOR_I3 pzEnd[i] = zEnd[i];
+	FOR_I3 pxEnd[i] = c2d->xEnd[i];
+	FOR_I3 pyEnd[i] = c2d->yEnd[i];
+	FOR_I3 pzEnd[i] = c2d->zEnd[i];
 	
     } 
 
+    void getPencilDecompInfo(int xSize[3], int ySize[3], int zSize[3], int xStart[3], int yStart[3], int zStart[3], int xEnd[3], int yEnd[3], int zEnd[3]){
+
+	FOR_I3 xSize[i] = pxSize[i];
+	FOR_I3 ySize[i] = pySize[i];
+	FOR_I3 zSize[i] = pzSize[i];
+
+	FOR_I3 xStart[i] = pxStart[i];
+	FOR_I3 yStart[i] = pyStart[i];
+	FOR_I3 zStart[i] = pzStart[i];
+
+	FOR_I3 xEnd[i] = pxEnd[i];
+	FOR_I3 yEnd[i] = pyEnd[i];
+	FOR_I3 zEnd[i] = pzEnd[i];
+	
+    }
 
 };
 

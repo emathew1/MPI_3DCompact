@@ -63,9 +63,7 @@ class Derivatives{
 	    this->dy = dom->dy;
 	    this->dz = dom->dz;
 
-	    FOR_I3 pxSize[i] = dom->pxSize[i];
-	    FOR_I3 pySize[i] = dom->pySize[i];
-	    FOR_I3 pzSize[i] = dom->pzSize[i];
+	    dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
 	    this->currentDir = currentDir;
 

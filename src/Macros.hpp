@@ -17,6 +17,19 @@
 #define GETIND_YPEN k*pySize[0]*pySize[1] + j*pySize[0] + i
 #define GETIND_ZPEN k*pzSize[0]*pzSize[1] + j*pzSize[0] + i
 
+#define GETGLOBALXIND_XPEN pxStart[0] + i
+#define GETGLOBALYIND_XPEN pxStart[1] + j
+#define GETGLOBALZIND_XPEN pxStart[2] + k
+
+#define GETGLOBALXIND_YPEN pyStart[0] + i
+#define GETGLOBALYIND_YPEN pyStart[1] + j
+#define GETGLOBALZIND_YPEN pyStart[2] + k
+
+#define GETGLOBALXIND_ZPEN pzStart[0] + i
+#define GETGLOBALYIND_ZPEN pzStart[1] + j
+#define GETGLOBALZIND_ZPEN pzStart[2] + k
+
+
 //For pulling data for Neumann BC's
 #define GET3DINDEX_XYZ_Xp1 k*Nx*Ny + j*Nx + i+1
 #define GET3DINDEX_XYZ_Xp2 k*Nx*Ny + j*Nx + i+2
