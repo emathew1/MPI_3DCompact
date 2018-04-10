@@ -5,10 +5,10 @@ void Derivatives::calc1stDerivField(double *dataIn, double *dataOut){
 
     if(currentDir == DIRX){
 
-	FOR_Z{
-	    FOR_Y{
+	FOR_Z_XPEN{
+	    FOR_Y_XPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = k*Nx*Ny + j*Nx;
+	        int ii = k*pxSize[0]*pxSize[1] + j*pxSize[0];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc1stDeriv(dataInLocal, dataOutLocal);
@@ -18,10 +18,10 @@ void Derivatives::calc1stDerivField(double *dataIn, double *dataOut){
 
     }else if(currentDir == DIRY){
 
-	FOR_X{
-	    FOR_Z{
+	FOR_X_YPEN{
+	    FOR_Z_YPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = i*Nz*Ny + k*Ny;
+	        int ii = i*pySize[2]*pySize[1] + k*pySize[1];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc1stDeriv(dataInLocal, dataOutLocal);
@@ -30,10 +30,10 @@ void Derivatives::calc1stDerivField(double *dataIn, double *dataOut){
 
     }else if(currentDir == DIRZ){
 
-	FOR_Y{
-	    FOR_X{
+	FOR_Y_ZPEN{
+	    FOR_X_ZPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = j*Nz*Nx + i*Nz;
+	        int ii = j*pzSize[2]*pzSize[0] + i*pzSize[2];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc1stDeriv(dataInLocal, dataOutLocal);
@@ -49,10 +49,10 @@ void Derivatives::calc2ndDerivField(double *dataIn, double *dataOut){
 
     if(currentDir == DIRX){
 
-	FOR_Z{
-	    FOR_Y{
+	FOR_Z_XPEN{
+	    FOR_Y_XPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = k*Nx*Ny + j*Nx;
+	        int ii = k*pxSize[0]*pxSize[1] + j*pxSize[0];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc2ndDeriv(dataInLocal, dataOutLocal);
@@ -61,10 +61,10 @@ void Derivatives::calc2ndDerivField(double *dataIn, double *dataOut){
 
     }else if(currentDir == DIRY){
 
-	FOR_X{
-	    FOR_Z{
+	FOR_X_YPEN{
+	    FOR_Z_YPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = i*Nz*Ny + k*Ny;
+	        int ii = i*pySize[2]*pySize[1] + k*pySize[1];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc2ndDeriv(dataInLocal, dataOutLocal);
@@ -73,10 +73,10 @@ void Derivatives::calc2ndDerivField(double *dataIn, double *dataOut){
 
     }else if(currentDir == DIRZ){
 
-	FOR_Y{
-	    FOR_X{
+	FOR_Y_ZPEN{
+	    FOR_X_ZPEN{
 		double *dataInLocal, *dataOutLocal;
-	        int ii = j*Nz*Nx + i*Nz;
+	        int ii = j*pzSize[2]*pzSize[0] + i*pzSize[2];
 		dataInLocal  = &dataIn[ii];
 		dataOutLocal = &dataOut[ii];
 		calc2ndDeriv(dataInLocal, dataOutLocal);

@@ -18,6 +18,10 @@ class Derivatives{
 	int i, j, k;
 	double dx, dy, dz, dd;
 
+	int pxSize[3], pySize[3], pzSize[3];
+	int pxStart[3], pyStart[3], pzStart[3];
+	int pxEnd[3], pyEnd[3], pzEnd[3];
+
         //First Derivative
 
         // Interior Coefficients	
@@ -58,6 +62,10 @@ class Derivatives{
 	    this->dx = dom->dx; 
 	    this->dy = dom->dy;
 	    this->dz = dom->dz;
+
+	    FOR_I3 pxSize[i] = dom->pxSize[i];
+	    FOR_I3 pySize[i] = dom->pySize[i];
+	    FOR_I3 pzSize[i] = dom->pzSize[i];
 
 	    this->currentDir = currentDir;
 
