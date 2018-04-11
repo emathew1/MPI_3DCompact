@@ -11,10 +11,13 @@ using namespace std;
 
 #include "C2Decomp.hpp"
 #include "Macros.hpp"
+#include "TimeStepping.hpp"
 #include "Domain.hpp"
 #include "BC.hpp" 
 #include "Filter.hpp"
 #include "Derivatives.hpp"
+#include "SpongeBC.hpp"
+#include "IdealGas.hpp"
 
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
@@ -53,14 +56,14 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
-//    TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
+    TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
     int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 5;
     int checkStep    = 1;
     int dumpStep     = 2500;
-//    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep);
+    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep);
 
 
     ///////////////////////////
@@ -112,7 +115,6 @@ int main(int argc, char *argv[]){
     /////////////////////////
     double alphaF  = 0.495;
     double mu_ref  = 0.00375;
-    int blocksize  = 16;
     bool useTiming = false;
 //    AbstractCSolver *cs;
 //    cs = new CSolver_AWS(dom, bc, ts, alphaF, mu_ref, blocksize, useTiming);
@@ -208,7 +210,12 @@ int main(int argc, char *argv[]){
     c2d->deallocXYZ(dw1dz);
     c2d->deallocXYZ(dw3dz);
     c2d->deallocXYZ(dv2dy);
-    
+   
+
+    //Testing Sponge...
+    IdealGas *ig = new IdealGas(d, mu_ref);
+    SpongeBC *spg = new SpongeBC(d, ig, bc, c2d);
+ 
 
     //Now lets kill MPI
     MPI_Finalize();
