@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver.o
 
 default: MPI_3DCompact
 
@@ -24,7 +24,7 @@ MPI_3DCompact:
 MPI_3DCompact.exe: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
-MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Derivatives.hpp Filter.hpp TimeStepping.hpp SpongeBC.hpp IdealGas.hpp
+MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp AbstractRK.hpp TVDRK3.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 Utils.o: Utils.cpp Domain.hpp Utils.hpp
@@ -36,7 +36,8 @@ Derivatives.o: Derivatives.cpp Derivatives.hpp Domain.hpp BC.hpp Utils.hpp Macro
 Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-
+UniformCSolver.o: UniformCSolver.cpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp
+	$(CC) $(CFLAGS) -c $<
 
 clean: 
 	rm -rf   *.o *.exe *.a

@@ -14,10 +14,11 @@ using namespace std;
 #include "TimeStepping.hpp"
 #include "Domain.hpp"
 #include "BC.hpp" 
-#include "Filter.hpp"
-#include "Derivatives.hpp"
-#include "SpongeBC.hpp"
-#include "IdealGas.hpp"
+
+#include "AbstractCSolver.hpp"
+#include "UniformCSolver.hpp"
+#include "AbstractRK.hpp"
+#include "TVDRK3.hpp"
 
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
@@ -63,7 +64,7 @@ int main(int argc, char *argv[]){
     int filterStep   = 5;
     int checkStep    = 1;
     int dumpStep     = 2500;
-    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep);
+    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep, mpiRank);
 
 
     ///////////////////////////
@@ -116,106 +117,14 @@ int main(int argc, char *argv[]){
     double alphaF  = 0.495;
     double mu_ref  = 0.00375;
     bool useTiming = false;
-//    AbstractCSolver *cs;
-//    cs = new CSolver_AWS(dom, bc, ts, alphaF, mu_ref, blocksize, useTiming);
+    AbstractCSolver *cs;
+    cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      
+    ///////////////////////////////////////////
+    //Initialize Execution Loop and RK Method//
+    ///////////////////////////////////////////
+    AbstractRK *rk;
 
-    //Initialize derivative objects for testing...
-    Derivatives *derivX = new Derivatives(d, bc->bcXType, Derivatives::DIRX);
-    Derivatives *derivY = new Derivatives(d, bc->bcYType, Derivatives::DIRY);
-    Derivatives *derivZ = new Derivatives(d, bc->bcZType, Derivatives::DIRZ);
-
-    //Initialize filter objects for testing...
-    Filter *filtX = new Filter(alphaF, d, bc->bcXType, Derivatives::DIRX);
-    Filter *filtY = new Filter(alphaF, d, bc->bcYType, Derivatives::DIRY);
-    Filter *filtZ = new Filter(alphaF, d, bc->bcZType, Derivatives::DIRZ);
-   
-
-    double *u1, *v1, *w1;
-    double *du1dx;
-    double *v2, *dv2dy, *dv1dy;
-    double *w3, *dw3dz, *dw1dz;
-
-    c2d->allocX(u1); 
-    c2d->allocX(du1dx);
-
-    c2d->allocX(v1);
-    c2d->allocX(dv1dy);
-    
-    c2d->allocX(w1);
-    c2d->allocX(dw1dz);
-
-    c2d->allocY(v2);
-    c2d->allocY(dv2dy);
-
-    c2d->allocZ(w3);
-    c2d->allocZ(dw3dz);
-    
-
-    FOR_X_XPEN{
-	FOR_Y_XPEN{
-	    FOR_Z_XPEN{
-
-		int ip = GETMAJIND_XPEN;
-		int ii = GETGLOBALXIND_XPEN; 
-		int jj = GETGLOBALYIND_XPEN; 
-		int kk = GETGLOBALZIND_XPEN; 
-
-		u1[ip] = (double)ii;
-		v1[ip] = 2*(double)jj;
-		w1[ip] = 3*(double)kk;
-
-	    }
-	}
-    }
-
-    //Getting the X derivative
-    derivX->calc1stDerivField(u1, du1dx); 
- 
-    //Getting the Y derivative
-    c2d->transposeX2Y_MajorIndex(v1, v2);
-    derivY->calc1stDerivField(v2, dv2dy);
-    c2d->transposeY2X_MajorIndex(dv2dy, dv1dy);
-
-    //Getting the Z derivative
-    c2d->transposeX2Y_MajorIndex(w1, v2);
-    c2d->transposeY2Z_MajorIndex(v2, w3);
-    derivZ->calc1stDerivField(w3, dw3dz); 
-    c2d->transposeZ2Y_MajorIndex(dw3dz, v2);
-    c2d->transposeY2Z_MajorIndex(v2, dw1dz);
-
-    if(mpiRank == 2){
-        FOR_X_XPEN{
-	    FOR_Y_XPEN{
-	        FOR_Z_XPEN{
-		    int ip = GETMAJIND_XPEN;
-		    cout << dv1dy[ip] << " "; 
-	        }
-		cout << endl;
-	    }
-	    cout << endl;
-        }
-	cout << endl;
-    }
-
-
-    c2d->deallocXYZ(u1);
-    c2d->deallocXYZ(v1);
-    c2d->deallocXYZ(v2);
-    c2d->deallocXYZ(w1);
-    c2d->deallocXYZ(w3);
-
-    c2d->deallocXYZ(du1dx);
-    c2d->deallocXYZ(dv1dy);
-    c2d->deallocXYZ(dw1dz);
-    c2d->deallocXYZ(dw3dz);
-    c2d->deallocXYZ(dv2dy);
-   
-
-    //Testing Sponge...
-    IdealGas *ig = new IdealGas(d, mu_ref);
-    SpongeBC *spg = new SpongeBC(d, ig, bc, c2d);
- 
 
     //Now lets kill MPI
     MPI_Finalize();

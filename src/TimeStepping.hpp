@@ -18,7 +18,7 @@ class TimeStepping{
 	int dumpStep;
 
 	TimeStepping(TimeSteppingType timeSteppingType, 
-		     double CFL, int maxTimeStep, double maxTime, int filterStep, int checkStep, int dumpStep){
+		     double CFL, int maxTimeStep, double maxTime, int filterStep, int checkStep, int dumpStep, int mpiRank){
 	    this->timeSteppingType = timeSteppingType;
 	    this->CFL = CFL;
 	    this->maxTimeStep = maxTimeStep;
@@ -27,15 +27,17 @@ class TimeStepping{
 	    this->checkStep  = checkStep;
 	    this->dumpStep   = dumpStep;
 
-	    std::cout << std::endl;
-	    std::cout << " > Initializing time dependent options..." << std::endl;
-	    if(timeSteppingType == CONST_CFL){
-		std::cout << " > Using constant CFL timestepping of value " << CFL << std::endl;
-	    }else if(timeSteppingType == CONST_DT){
-		std::cout << " > Using constant dt timestepping of value " << dt << std::endl;
+	    if(mpiRank == 0){
+	        std::cout << std::endl;
+	        std::cout << " > Initializing time dependent options..." << std::endl;
+	        if(timeSteppingType == CONST_CFL){
+		    std::cout << " > Using constant CFL timestepping of value " << CFL << std::endl;
+	        }else if(timeSteppingType == CONST_DT){
+		    std::cout << " > Using constant dt timestepping of value " << dt << std::endl;
+	        }
+	        std::cout << " > Max time steps = " << maxTimeStep << ", max Time = " << maxTime << std::endl;
+	        std::cout << " > Filtering every " << filterStep << " steps" << std::endl;
 	    }
-	    std::cout << " > Max time steps = " << maxTimeStep << ", max Time = " << maxTime << std::endl;
-	    std::cout << " > Filtering every " << filterStep << " steps" << std::endl;
 
 	}
 };

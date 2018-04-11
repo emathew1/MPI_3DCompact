@@ -36,10 +36,11 @@ class SpongeBC{
 	double *spongeRhoWAvg;
 	double *spongeRhoEAvg;
     
-	SpongeBC(Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d){
+	SpongeBC(Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank){
 
-	    std::cout << endl;
-	    std::cout << " > Sponge BC found, initializing Sponge average fields and strength fields..." << std::endl;
+	    
+	    IF_RANK0 std::cout << endl;
+	    IF_RANK0 std::cout << " > Sponge BC found, initializing Sponge average fields and strength fields..." << std::endl;
 	
 	    this->domain = domain;
 	    this->idealGas = idealGas;
@@ -64,9 +65,9 @@ class SpongeBC{
 	    epsP = 0.005;
 	    spongeP = 1.0/idealGas->gamma;
 	    spongeStrength = 6.0;
-	    spongeLX = 0.25*domain->gLx;
-	    spongeLY = 0.125*domain->gLy;
-	    spongeLZ = 0.25*domain->gLz;
+	    spongeLX = 0.1*domain->gLx;
+	    spongeLY = 0.1*domain->gLy;
+	    spongeLZ = 0.1*domain->gLz;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_XPEN sigma[ip] = 0.0;
@@ -164,7 +165,7 @@ class SpongeBC{
 
 
 
-	    std::cout << " > Done initializing sponge!" << std::endl;
+	    IF_RANK0 std::cout << " > Done initializing sponge!" << std::endl;
 
 	}
 
