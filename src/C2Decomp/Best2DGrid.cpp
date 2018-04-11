@@ -34,7 +34,7 @@ void C2Decomp::FindFactor(int num, int *factors, int &nfact){
 void C2Decomp::best2DGrid(int iproc, int &best_pRow, int &best_pCol){
 
     if(!nRank){
-	cout << "C2Decomp: In auto-tuning mode..." << endl;
+	cout << "    C2Decomp: In auto-tuning mode..." << endl;
     }
 
     double best_time = HUGE_VAL;
