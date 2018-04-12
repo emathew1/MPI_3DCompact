@@ -74,11 +74,11 @@ int main(int argc, char *argv[]){
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::SPONGE;
+    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
     BC::BCKind bcX1 = BC::SPONGE;
-    BC::BCKind bcY0 = BC::SPONGE;
+    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
     BC::BCKind bcY1 = BC::SPONGE;
-    BC::BCKind bcZ0 = BC::SPONGE;
+    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
     BC::BCKind bcZ1 = BC::SPONGE;
 
     bool periodicBC[3];

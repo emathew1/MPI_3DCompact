@@ -186,14 +186,14 @@ void UniformCSolver::initializeSolverData(){
 
 
 void UniformCSolver::setInitialConditions(){
-/*
-    if(useTiming) tic();
 
-    cout << endl;
-    cout << " > Setting initial conditions..." << endl; 
+    IF_RANK0{
+        cout << endl;
+        cout << " > Setting initial conditions..." << endl; 
+    }
 
     //just do the simple stuff in a loop...
-    FOR_XYZ{
+    FOR_XYZ_XPEN{
 	rho1[ip] = rho0[ip];
 	U[ip]	 = U0[ip];
 	V[ip] 	 = V0[ip];
@@ -205,14 +205,14 @@ void UniformCSolver::setInitialConditions(){
     }
 
     //Can now release initial condition data...
-    delete[] rho0;
-    delete[] U0;
-    delete[] V0;
-    delete[] W0;
-    delete[] p0;
+    c2d->deallocXYZ(rho0);
+    c2d->deallocXYZ(U0);
+    c2d->deallocXYZ(V0);
+    c2d->deallocXYZ(W0);
+    c2d->deallocXYZ(p0);
 
     //Call the ideal gas relations for the slightly more involved stuff..
-    FOR_XYZ{
+    FOR_XYZ_XPEN{
 	rhoE1[ip] = ig->solverhoE(rho1[ip], p[ip], U[ip], V[ip], W[ip]);
     	T[ip]     = ig->solveT(rho1[ip], p[ip]);
         mu[ip]    = ig->solveMu(T[ip]);
@@ -228,110 +228,166 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X0{
+        FOR_X0_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xp1],
-                                T[GET3DINDEX_XYZ_Xp2],
-                                T[GET3DINDEX_XYZ_Xp3],
-                                T[GET3DINDEX_XYZ_Xp4],
-                                T[GET3DINDEX_XYZ_Xp5],
-                                T[GET3DINDEX_XYZ_Xp6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xp1],
+                                T[GETMAJIND_XPEN_Xp2],
+                                T[GETMAJIND_XPEN_Xp3],
+                                T[GETMAJIND_XPEN_Xp4],
+                                T[GETMAJIND_XPEN_Xp5],
+                                T[GETMAJIND_XPEN_Xp6]);
         }END_FORX0
     }
 
     if(bc->bcX1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X1{
+        FOR_X1_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xm1],
-                                T[GET3DINDEX_XYZ_Xm2],
-                                T[GET3DINDEX_XYZ_Xm3],
-                                T[GET3DINDEX_XYZ_Xm4],
-                                T[GET3DINDEX_XYZ_Xm5],
-                                T[GET3DINDEX_XYZ_Xm6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xm1],
+                                T[GETMAJIND_XPEN_Xm2],
+                                T[GETMAJIND_XPEN_Xm3],
+                                T[GETMAJIND_XPEN_Xm4],
+                                T[GETMAJIND_XPEN_Xm5],
+                                T[GETMAJIND_XPEN_Xm6]);
         }END_FORX1
     }
 
     if(bc->bcY0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y0{
+        FOR_Y0_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Yp1],
-                                T[GET3DINDEX_XYZ_Yp2],
-                                T[GET3DINDEX_XYZ_Yp3],
-                                T[GET3DINDEX_XYZ_Yp4],
-                                T[GET3DINDEX_XYZ_Yp5],
-                                T[GET3DINDEX_XYZ_Yp6]);
         }END_FORY0
+
+	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y0_YPEN{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                 T2[GETMAJIND_YPEN_Yp2],
+                                 T2[GETMAJIND_YPEN_Yp3],
+                                 T2[GETMAJIND_YPEN_Yp4],
+                                 T2[GETMAJIND_YPEN_Yp5],
+                                 T2[GETMAJIND_YPEN_Yp6]);
+	}END_FORY0 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y1{
+        FOR_Y1_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Ym1],
-                                T[GET3DINDEX_XYZ_Ym2],
-                                T[GET3DINDEX_XYZ_Ym3],
-                                T[GET3DINDEX_XYZ_Ym4],
-                                T[GET3DINDEX_XYZ_Ym5],
-                                T[GET3DINDEX_XYZ_Ym6]);
-        }END_FORY1
+       }END_FORY1
+
+	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y1_YPEN{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                 T2[GETMAJIND_YPEN_Ym2],
+                                 T2[GETMAJIND_YPEN_Ym3],
+                                 T2[GETMAJIND_YPEN_Ym4],
+                                 T2[GETMAJIND_YPEN_Ym5],
+                                 T2[GETMAJIND_YPEN_Ym6]);
+ 	}END_FORY1 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z0{
+        FOR_Z0_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zp1],
-                                T[GET3DINDEX_XYZ_Zp2],
-                                T[GET3DINDEX_XYZ_Zp3],
-                                T[GET3DINDEX_XYZ_Zp4],
-                                T[GET3DINDEX_XYZ_Zp5],
-                                T[GET3DINDEX_XYZ_Zp6]);
         }END_FORZ0
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z0_ZPEN{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                 T3[GETMAJIND_ZPEN_Zp2],
+                                 T3[GETMAJIND_ZPEN_Zp3],
+                                 T3[GETMAJIND_ZPEN_Zp4],
+                                 T3[GETMAJIND_ZPEN_Zp5],
+                                 T3[GETMAJIND_ZPEN_Zp6]);
+	}END_FORZ0
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z1{
+        FOR_Z1_XPEN{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zm1],
-                                T[GET3DINDEX_XYZ_Zm2],
-                                T[GET3DINDEX_XYZ_Zm3],
-                                T[GET3DINDEX_XYZ_Zm4],
-                                T[GET3DINDEX_XYZ_Zm5],
-                                T[GET3DINDEX_XYZ_Zm6]);
-        }END_FORZ1
+       }END_FORZ1
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z1_ZPEN{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                 T3[GETMAJIND_ZPEN_Zm2],
+                                 T3[GETMAJIND_ZPEN_Zm3],
+                                 T3[GETMAJIND_ZPEN_Zm4],
+                                 T3[GETMAJIND_ZPEN_Zm5],
+                                 T3[GETMAJIND_ZPEN_Zm6]);
+ 	}END_FORZ1
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+
+
     }
 
     //-------------------------------
@@ -340,110 +396,171 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X0{
+        FOR_X0_XPEN{
             U[ip]  = 0.0;
             V[ip]  = X0WallV;
             W[ip]  = X0WallW;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = rho1[ip]*X0WallV;
             rhoW1[ip] = rho1[ip]*X0WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xp1],
-                                T[GET3DINDEX_XYZ_Xp2],
-                                T[GET3DINDEX_XYZ_Xp3],
-                                T[GET3DINDEX_XYZ_Xp4],
-                                T[GET3DINDEX_XYZ_Xp5],
-                                T[GET3DINDEX_XYZ_Xp6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xp1],
+                                T[GETMAJIND_XPEN_Xp2],
+                                T[GETMAJIND_XPEN_Xp3],
+                                T[GETMAJIND_XPEN_Xp4],
+                                T[GETMAJIND_XPEN_Xp5],
+                                T[GETMAJIND_XPEN_Xp6]);
         }END_FORX0
     }
 
     if(bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X1{
+        FOR_X1_XPEN{
             U[ip]  = 0.0;
             V[ip]  = X1WallV;
             W[ip]  = X1WallW;
             rhoU1[ip] = 0.0;
             rhoV1[ip] = rho1[ip]*X1WallV;
             rhoW1[ip] = rho1[ip]*X1WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xm1],
-                                T[GET3DINDEX_XYZ_Xm2],
-                                T[GET3DINDEX_XYZ_Xm3],
-                                T[GET3DINDEX_XYZ_Xm4],
-                                T[GET3DINDEX_XYZ_Xm5],
-                                T[GET3DINDEX_XYZ_Xm6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xm1],
+                                T[GETMAJIND_XPEN_Xm2],
+                                T[GETMAJIND_XPEN_Xm3],
+                                T[GETMAJIND_XPEN_Xm4],
+                                T[GETMAJIND_XPEN_Xm5],
+                                T[GETMAJIND_XPEN_Xm6]);
         }END_FORX1
     }
 
     if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y0{
+        FOR_Y0_XPEN{
             U[ip]  = Y0WallU;
             V[ip]  = 0.0;
             W[ip]  = Y0WallW;
             rhoU1[ip] = rho1[ip]*Y0WallU;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = rho1[ip]*Y0WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Yp1],
-                                T[GET3DINDEX_XYZ_Yp2],
-                                T[GET3DINDEX_XYZ_Yp3],
-                                T[GET3DINDEX_XYZ_Yp4],
-                                T[GET3DINDEX_XYZ_Yp5],
-                                T[GET3DINDEX_XYZ_Yp6]);
         }END_FORY0
-    }
+
+ 	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y0_YPEN{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                 T2[GETMAJIND_YPEN_Yp2],
+                                 T2[GETMAJIND_YPEN_Yp3],
+                                 T2[GETMAJIND_YPEN_Yp4],
+                                 T2[GETMAJIND_YPEN_Yp5],
+                                 T2[GETMAJIND_YPEN_Yp6]);
+	}END_FORY0 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+
+
+   }
 
     if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y1{
+        FOR_Y1_XPEN{
             U[ip]  = Y1WallU;
             V[ip]  = 0.0;
             W[ip]  = Y1WallW;
             rhoU1[ip] = rho1[ip]*Y1WallU;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = rho1[ip]*Y1WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Ym1],
-                                T[GET3DINDEX_XYZ_Ym2],
-                                T[GET3DINDEX_XYZ_Ym3],
-                                T[GET3DINDEX_XYZ_Ym4],
-                                T[GET3DINDEX_XYZ_Ym5],
-                                T[GET3DINDEX_XYZ_Ym6]);
         }END_FORY1
-    }
+
+
+	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y1_YPEN{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                 T2[GETMAJIND_YPEN_Ym2],
+                                 T2[GETMAJIND_YPEN_Ym3],
+                                 T2[GETMAJIND_YPEN_Ym4],
+                                 T2[GETMAJIND_YPEN_Ym5],
+                                 T2[GETMAJIND_YPEN_Ym6]);
+ 	}END_FORY1 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+
+ 
+   }
 
     if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z0{
+        FOR_Z0_XPEN{
             U[ip]  = Z0WallU;
             V[ip]  = Z0WallV;
             W[ip]  = 0.0;
             rhoU1[ip] = rho1[ip]*Z0WallU;
             rhoV1[ip] = rho1[ip]*Z0WallV;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zp1],
-                                T[GET3DINDEX_XYZ_Zp2],
-                                T[GET3DINDEX_XYZ_Zp3],
-                                T[GET3DINDEX_XYZ_Zp4],
-                                T[GET3DINDEX_XYZ_Zp5],
-                                T[GET3DINDEX_XYZ_Zp6]);
         }END_FORZ0
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z0_ZPEN{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                 T3[GETMAJIND_ZPEN_Zp2],
+                                 T3[GETMAJIND_ZPEN_Zp3],
+                                 T3[GETMAJIND_ZPEN_Zp4],
+                                 T3[GETMAJIND_ZPEN_Zp5],
+                                 T3[GETMAJIND_ZPEN_Zp6]);
+	}END_FORZ0
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+
+
     }
 
     if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z1{
+        FOR_Z1_XPEN{
             U[ip]  = Z1WallU;
             V[ip]  = Z1WallV;
             W[ip]  = 0.0;
             rhoU1[ip] = rho1[ip]*Z1WallU;
             rhoV1[ip] = rho1[ip]*Z1WallV;
             rhoW1[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zm1],
-                                T[GET3DINDEX_XYZ_Zm2],
-                                T[GET3DINDEX_XYZ_Zm3],
-                                T[GET3DINDEX_XYZ_Zm4],
-                                T[GET3DINDEX_XYZ_Zm5],
-                                T[GET3DINDEX_XYZ_Zm6]);
         }END_FORZ1
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z1_ZPEN{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                 T3[GETMAJIND_ZPEN_Zm2],
+                                 T3[GETMAJIND_ZPEN_Zm3],
+                                 T3[GETMAJIND_ZPEN_Zm4],
+                                 T3[GETMAJIND_ZPEN_Zm5],
+                                 T3[GETMAJIND_ZPEN_Zm6]);
+ 	}END_FORZ1
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
     }
 
 
@@ -451,7 +568,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(wallBCFlag == true){
 	//Need to update the pressure, sos, and rhoE fields at the boundaries with walls...
-	FOR_XYZ{
+	FOR_XYZ_XPEN{
 	    p[ip]     = ig->solvep_idealgas(rho1[ip], T[ip]);
 	    sos[ip]   = ig->solveSOS(rho1[ip],p[ip]);
 	    rhoE1[ip] = ig->solverhoE(rho1[ip], p[ip], U[ip], V[ip], W[ip]);
@@ -459,7 +576,7 @@ void UniformCSolver::setInitialConditions(){
     }
 
     if(spongeFlag == true){
-	FOR_XYZ{
+	FOR_XYZ_XPEN{
 	    spg->spongeRhoAvg[ip]  = rho1[ip];
 	    spg->spongeRhoUAvg[ip] = rhoU1[ip];
 	    spg->spongeRhoVAvg[ip] = rhoV1[ip];
@@ -468,13 +585,8 @@ void UniformCSolver::setInitialConditions(){
  	}
     }
 
-    std::cout << " > Finished initialization of flow field " << std::endl;
+    IF_RANK0 std::cout << " > Finished initialization of flow field " << std::endl;
 
-    if(useTiming){
-	cout << " > setInitCond Timing: ";
-	toc();
-    }
-*/
 }
 
 /*

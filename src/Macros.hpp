@@ -31,45 +31,46 @@
 
 
 //For pulling data for Neumann BC's
-#define GET3DINDEX_XYZ_Xp1 k*Nx*Ny + j*Nx + i+1
-#define GET3DINDEX_XYZ_Xp2 k*Nx*Ny + j*Nx + i+2
-#define GET3DINDEX_XYZ_Xp3 k*Nx*Ny + j*Nx + i+3
-#define GET3DINDEX_XYZ_Xp4 k*Nx*Ny + j*Nx + i+4
-#define GET3DINDEX_XYZ_Xp5 k*Nx*Ny + j*Nx + i+5
-#define GET3DINDEX_XYZ_Xp6 k*Nx*Ny + j*Nx + i+6
-#define GET3DINDEX_XYZ_Xm1 k*Nx*Ny + j*Nx + i-1
-#define GET3DINDEX_XYZ_Xm2 k*Nx*Ny + j*Nx + i-2
-#define GET3DINDEX_XYZ_Xm3 k*Nx*Ny + j*Nx + i-3
-#define GET3DINDEX_XYZ_Xm4 k*Nx*Ny + j*Nx + i-4
-#define GET3DINDEX_XYZ_Xm5 k*Nx*Ny + j*Nx + i-5
-#define GET3DINDEX_XYZ_Xm6 k*Nx*Ny + j*Nx + i-6
+#define GETMAJIND_XPEN_Xp1 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+1
+#define GETMAJIND_XPEN_Xp2 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+2
+#define GETMAJIND_XPEN_Xp3 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+3
+#define GETMAJIND_XPEN_Xp4 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+4
+#define GETMAJIND_XPEN_Xp5 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+5
+#define GETMAJIND_XPEN_Xp6 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+6
+#define GETMAJIND_XPEN_Xm1 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-1
+#define GETMAJIND_XPEN_Xm2 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-2
+#define GETMAJIND_XPEN_Xm3 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-3
+#define GETMAJIND_XPEN_Xm4 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-4
+#define GETMAJIND_XPEN_Xm5 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-5
+#define GETMAJIND_XPEN_Xm6 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-6
 
-#define GET3DINDEX_XYZ_Yp1 k*Nx*Ny + (j+1)*Nx + i
-#define GET3DINDEX_XYZ_Yp2 k*Nx*Ny + (j+2)*Nx + i
-#define GET3DINDEX_XYZ_Yp3 k*Nx*Ny + (j+3)*Nx + i
-#define GET3DINDEX_XYZ_Yp4 k*Nx*Ny + (j+4)*Nx + i
-#define GET3DINDEX_XYZ_Yp5 k*Nx*Ny + (j+5)*Nx + i
-#define GET3DINDEX_XYZ_Yp6 k*Nx*Ny + (j+6)*Nx + i
-#define GET3DINDEX_XYZ_Ym1 k*Nx*Ny + (j-1)*Nx + i
-#define GET3DINDEX_XYZ_Ym2 k*Nx*Ny + (j-2)*Nx + i
-#define GET3DINDEX_XYZ_Ym3 k*Nx*Ny + (j-3)*Nx + i
-#define GET3DINDEX_XYZ_Ym4 k*Nx*Ny + (j-4)*Nx + i
-#define GET3DINDEX_XYZ_Ym5 k*Nx*Ny + (j-5)*Nx + i
-#define GET3DINDEX_XYZ_Ym6 k*Nx*Ny + (j-6)*Nx + i
 
-#define GET3DINDEX_XYZ_Zp1 (k+1)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zp2 (k+2)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zp3 (k+3)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zp4 (k+4)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zp5 (k+5)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zp6 (k+6)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm1 (k-1)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm2 (k-2)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm3 (k-3)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm4 (k-4)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm5 (k-5)*Nx*Ny + j*Nx + i
-#define GET3DINDEX_XYZ_Zm6 (k-6)*Nx*Ny + j*Nx + i
+#define GETMAJIND_YPEN_Yp1 i*pySize[2]*pySize[1] + k*pySize[1] + j+1
+#define GETMAJIND_YPEN_Yp2 i*pySize[2]*pySize[1] + k*pySize[1] + j+2
+#define GETMAJIND_YPEN_Yp3 i*pySize[2]*pySize[1] + k*pySize[1] + j+3
+#define GETMAJIND_YPEN_Yp4 i*pySize[2]*pySize[1] + k*pySize[1] + j+4
+#define GETMAJIND_YPEN_Yp5 i*pySize[2]*pySize[1] + k*pySize[1] + j+5
+#define GETMAJIND_YPEN_Yp6 i*pySize[2]*pySize[1] + k*pySize[1] + j+6
+#define GETMAJIND_YPEN_Ym1 i*pySize[2]*pySize[1] + k*pySize[1] + j-1
+#define GETMAJIND_YPEN_Ym2 i*pySize[2]*pySize[1] + k*pySize[1] + j-2
+#define GETMAJIND_YPEN_Ym3 i*pySize[2]*pySize[1] + k*pySize[1] + j-3
+#define GETMAJIND_YPEN_Ym4 i*pySize[2]*pySize[1] + k*pySize[1] + j-4
+#define GETMAJIND_YPEN_Ym5 i*pySize[2]*pySize[1] + k*pySize[1] + j-5
+#define GETMAJIND_YPEN_Ym6 i*pySize[2]*pySize[1] + k*pySize[1] + j-6
 
+
+#define GETMAJIND_ZPEN_Zp1 j*pySize[2]*pySize[0] + i*pzSize[2] + k+1
+#define GETMAJIND_ZPEN_Zp2 j*pySize[2]*pySize[0] + i*pzSize[2] + k+2
+#define GETMAJIND_ZPEN_Zp3 j*pySize[2]*pySize[0] + i*pzSize[2] + k+3
+#define GETMAJIND_ZPEN_Zp4 j*pySize[2]*pySize[0] + i*pzSize[2] + k+4
+#define GETMAJIND_ZPEN_Zp5 j*pySize[2]*pySize[0] + i*pzSize[2] + k+5
+#define GETMAJIND_ZPEN_Zp6 j*pySize[2]*pySize[0] + i*pzSize[2] + k+6
+#define GETMAJIND_ZPEN_Zm1 j*pySize[2]*pySize[0] + i*pzSize[2] + k-1
+#define GETMAJIND_ZPEN_Zm2 j*pySize[2]*pySize[0] + i*pzSize[2] + k-2
+#define GETMAJIND_ZPEN_Zm3 j*pySize[2]*pySize[0] + i*pzSize[2] + k-3
+#define GETMAJIND_ZPEN_Zm4 j*pySize[2]*pySize[0] + i*pzSize[2] + k-4
+#define GETMAJIND_ZPEN_Zm5 j*pySize[2]*pySize[0] + i*pzSize[2] + k-5
+#define GETMAJIND_ZPEN_Zm6 j*pySize[2]*pySize[0] + i*pzSize[2] + k-6
 
 
 //Loops
