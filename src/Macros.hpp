@@ -118,12 +118,12 @@
 #define FOR_Z1_YPEN for(int j = 0; j < pySize[1]; j++){for(int i = 0; i < pySize[0]; i++){int k = pySize[2]-1; int ip = GETIND_YPEN; 
 
 //NOTE: Major indexed are going to have the boundaries definitely included
-#define FOR_X0_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = 0; int ip = GETIND_YPEN_MAJ; 
-#define FOR_X1_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = pySize[0]-1; int ip = GETIND_YPEN_MAJ; 
-#define FOR_Y0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = 0; int ip = GETIND_YPEN_MAJ; 
-#define FOR_Y1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = pySize[1]-1; int ip = GETIND_YPEN_MAJ; 
-#define FOR_Z0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = 0; int ip = GETIND_YPEN_MAJ; 
-#define FOR_Z1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = pySize[2]-1; int ip = GETIND_YPEN_MAJ; 
+#define FOR_X0_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = 0; int ip = GETMAJIND_YPEN; 
+#define FOR_X1_YPEN_MAJ for(int k = 0; k < pySize[2]; k++){for(int j = 0; j < pySize[1]; j++){int i = pySize[0]-1; int ip = GETMAJIND_YPEN; 
+#define FOR_Y0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = 0; int ip = GETMAJIND_YPEN; 
+#define FOR_Y1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int k = 0; k < pySize[2]; k++){int j = pySize[1]-1; int ip = GETMAJIND_YPEN; 
+#define FOR_Z0_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = 0; int ip = GETMAJIND_YPEN; 
+#define FOR_Z1_YPEN_MAJ for(int i = 0; i < pySize[0]; i++){for(int j = 0; j < pySize[1]; j++){int k = pySize[2]-1; int ip = GETMAJIND_YPEN; 
 
 
 //NOTE: These also need another check to see if the Start/End location are at global 0 or N-1
@@ -135,12 +135,12 @@
 #define FOR_Z1_ZPEN for(int j = 0; j < pzSize[1]; j++){for(int i = 0; i < pzSize[0]; i++){int k = pzSize[2]-1; int ip = GETIND_ZPEN; 
 
 //NOTE: Major indexed are going to have the boundaries definitely included
-#define FOR_X0_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int k = 0; k < pzSize[2]; k++){int i = 0; int ip = GETIND_ZPEN_MAJ; 
-#define FOR_X1_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int k = 0; k < pzSize[2]; k++){int i = pzSize[0]-1; int ip = GETIND_ZPEN_MAJ; 
-#define FOR_Y0_ZPEN_MAJ for(int i = 0; i < pzSize[0]; i++){for(int k = 0; k < pzSize[2]; k++){int j = 0; int ip = GETIND_ZPEN_MAJ; 
-#define FOR_Y1_ZPEN_MAJ for(int i = 0; i < pzSize[0]; i++){for(int k = 0; k < pzSize[2]; k++){int j = pzSize[1]-1; int ip = GETIND_ZPEN_MAJ; 
-#define FOR_Z0_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int i = 0; i < pzSize[0]; i++){int k = 0; int ip = GETIND_ZPEN_MAJ; 
-#define FOR_Z1_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int i = 0; i < pzSize[0]; i++){int k = pzSize[2]-1; int ip = GETIND_ZPEN_MAJ; 
+#define FOR_X0_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int k = 0; k < pzSize[2]; k++){int i = 0; int ip = GETMAJIND_ZPEN; 
+#define FOR_X1_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int k = 0; k < pzSize[2]; k++){int i = pzSize[0]-1; int ip = GETMAJIND_ZPEN; 
+#define FOR_Y0_ZPEN_MAJ for(int i = 0; i < pzSize[0]; i++){for(int k = 0; k < pzSize[2]; k++){int j = 0; int ip = GETMAJIND_ZPEN; 
+#define FOR_Y1_ZPEN_MAJ for(int i = 0; i < pzSize[0]; i++){for(int k = 0; k < pzSize[2]; k++){int j = pzSize[1]-1; int ip = GETMAJIND_ZPEN; 
+#define FOR_Z0_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int i = 0; i < pzSize[0]; i++){int k = 0; int ip = GETMAJIND_ZPEN; 
+#define FOR_Z1_ZPEN_MAJ for(int j = 0; j < pzSize[1]; j++){for(int i = 0; i < pzSize[0]; i++){int k = pzSize[2]-1; int ip = GETMAJIND_ZPEN; 
 
 
 

@@ -228,7 +228,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X0_XPEN{
+        FOR_X0_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -246,7 +246,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X1_XPEN{
+        FOR_X1_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -264,7 +264,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcY0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y0_XPEN{
+        FOR_Y0_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -277,7 +277,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->allocY(T2);
 	c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y0_YPEN{
+	FOR_Y0_YPEN_MAJ{
             T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
                                  T2[GETMAJIND_YPEN_Yp2],
                                  T2[GETMAJIND_YPEN_Yp3],
@@ -293,7 +293,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y1_XPEN{
+        FOR_Y1_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -306,7 +306,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->allocY(T2);
 	c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y1_YPEN{
+	FOR_Y1_YPEN_MAJ{
             T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
                                  T2[GETMAJIND_YPEN_Ym2],
                                  T2[GETMAJIND_YPEN_Ym3],
@@ -322,7 +322,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z0_XPEN{
+        FOR_Z0_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -337,7 +337,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->transposeX2Y_MajorIndex(T, T2);
 	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN{
+	FOR_Z0_ZPEN_MAJ{
             T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
                                  T3[GETMAJIND_ZPEN_Zp2],
                                  T3[GETMAJIND_ZPEN_Zp3],
@@ -356,7 +356,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z1_XPEN{
+        FOR_Z1_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = 0.0;
             W[ip]  = 0.0;
@@ -371,7 +371,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->transposeX2Y_MajorIndex(T, T2);
 	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN{
+	FOR_Z1_ZPEN_MAJ{
             T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
                                  T3[GETMAJIND_ZPEN_Zm2],
                                  T3[GETMAJIND_ZPEN_Zm3],
@@ -396,7 +396,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X0_XPEN{
+        FOR_X0_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X0WallV;
             W[ip]  = X0WallW;
@@ -414,7 +414,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_X1_XPEN{
+        FOR_X1_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X1WallV;
             W[ip]  = X1WallW;
@@ -432,7 +432,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y0_XPEN{
+        FOR_Y0_XPEN_MAJ{
             U[ip]  = Y0WallU;
             V[ip]  = 0.0;
             W[ip]  = Y0WallW;
@@ -445,7 +445,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->allocY(T2);
 	c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y0_YPEN{
+	FOR_Y0_YPEN_MAJ{
             T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
                                  T2[GETMAJIND_YPEN_Yp2],
                                  T2[GETMAJIND_YPEN_Yp3],
@@ -463,7 +463,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Y1_XPEN{
+        FOR_Y1_XPEN_MAJ{
             U[ip]  = Y1WallU;
             V[ip]  = 0.0;
             W[ip]  = Y1WallW;
@@ -477,7 +477,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->allocY(T2);
 	c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y1_YPEN{
+	FOR_Y1_YPEN_MAJ{
             T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
                                  T2[GETMAJIND_YPEN_Ym2],
                                  T2[GETMAJIND_YPEN_Ym3],
@@ -495,7 +495,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z0_XPEN{
+        FOR_Z0_XPEN_MAJ{
             U[ip]  = Z0WallU;
             V[ip]  = Z0WallV;
             W[ip]  = 0.0;
@@ -510,7 +510,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->transposeX2Y_MajorIndex(T, T2);
 	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN{
+	FOR_Z0_ZPEN_MAJ{
             T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
                                  T3[GETMAJIND_ZPEN_Zp2],
                                  T3[GETMAJIND_ZPEN_Zp3],
@@ -531,7 +531,7 @@ void UniformCSolver::setInitialConditions(){
 
     if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
-        FOR_Z1_XPEN{
+        FOR_Z1_XPEN_MAJ{
             U[ip]  = Z1WallU;
             V[ip]  = Z1WallV;
             W[ip]  = 0.0;
@@ -546,7 +546,7 @@ void UniformCSolver::setInitialConditions(){
 	c2d->transposeX2Y_MajorIndex(T, T2);
 	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN{
+	FOR_Z1_ZPEN_MAJ{
             T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
                                  T3[GETMAJIND_ZPEN_Zm2],
                                  T3[GETMAJIND_ZPEN_Zm3],
@@ -589,28 +589,30 @@ void UniformCSolver::setInitialConditions(){
 
 }
 
-/*
 void UniformCSolver::calcDtFromCFL(){
     
-    if(useTiming) tic();
 
     //Calculate the wave speed over the local spacings...
-    double *UChar_dx = new double[N];
-    FOR_XYZ{
+    double *UChar_dx;
+    c2d->allocX(UChar_dx);
+
+    FOR_XYZ_XPEN{
 	UChar_dx[ip] = (fabs(U[ip]) + sos[ip])/dom->dx + (fabs(V[ip])+sos[ip])/dom->dy + (fabs(W[ip]) + sos[ip])/dom->dz;
     }
 
     //Get the largest value in the domain
-    double max_UChar_dx = -100000.0;
-    #pragma omp parallel for reduction(max: max_UChar_dx)
-    FOR_XYZ{
-	if(UChar_dx[ip] > max_UChar_dx){
-	    max_UChar_dx = UChar_dx[ip];
+    double lmax_UChar_dx = -100000.0;
+    FOR_XYZ_XPEN{
+	if(UChar_dx[ip] > lmax_UChar_dx){
+	    lmax_UChar_dx = UChar_dx[ip];
 	}
     }
+    
+    double max_UChar_dx;
+    MPI_Allreduce(&lmax_UChar_dx, &max_UChar_dx, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
     //done with UChar_dx
-    delete[] UChar_dx;
+    c2d->deallocXYZ(UChar_dx);
 
     if(ts->CONST_CFL){
 	ts->dt = ts->CFL/max_UChar_dx;
@@ -621,20 +623,16 @@ void UniformCSolver::calcDtFromCFL(){
     if(timeStep == 0){
 	timeStep++;
 	time = 0.0;
-	cout << endl;
+	IF_RANK0 cout << endl;
     }else{
 	timeStep++;
 	time += ts->dt;
     }
 
-    if(useTiming){
-	cout << " > calcDtCFL  Timing: ";
-	toc();
-    }
-
 
 }
 
+/*
 void UniformCSolver::preStepBCHandling(){
 
     if(useTiming) tic();
@@ -1326,271 +1324,206 @@ void UniformCSolver::preStepDerivatives(){
 
 
 }
-
+*/
 
 void UniformCSolver::solveContinuity(){
    
-    if(useTiming) tic();
 
-    #pragma omp parallel
-    {
-        double *rhoP;
-  	if(rkStep == 1){
-            rhoP = rho1;
-        }else{
-            rhoP = rhok;
-        }
+    double *rhoP;
+    if(rkStep == 1){
+        rhoP = rho1;
+    }else{
+        rhoP = rhok;
+    }
 	
-	double spgSource; 
+    double spgSource; 
 
-	#pragma omp for
-        FOR_XYZ{
+    FOR_XYZ_XPEN{
 
-	    if(spongeFlag)
-		spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
-	    else
-		spgSource = 0.0;
+	if(spongeFlag)
+	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
+	else
+	    spgSource = 0.0;
 		
-	    rhok2[ip]  = ts->dt*(-contEulerX[ip] - contEulerY[ip] - contEulerZ[ip] + spgSource);
-	}
+	rhok2[ip]  = ts->dt*(-contEulerX[ip] - contEulerY[ip] - contEulerZ[ip] + spgSource);
     }
-
-    if(useTiming){
-        cout << " > solveCont  Timing: ";
-        toc();
-    }
-
-
 
 }
 
 void UniformCSolver::solveXMomentum(){
 
-    if(useTiming) tic();
 
-	#pragma omp parallel
-	{
-            double *rhoUP;
-            if(rkStep == 1){
-                rhoUP = rhoU1;
-            }else{
-                rhoUP = rhoUk;
-            }
-
-	    double MuX, MuY, MuZ, spgSource;
-	    #pragma omp for
-     	    FOR_XYZ{
-
-
-	        if(spongeFlag)
-	   	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
-	        else
-		    spgSource = 0.0;
-
-		//Calculate the viscosity derivatives
-	        MuX = Amu[ip]*Tx[ip];
-	        MuY = Amu[ip]*Ty[ip];
-	        MuZ = Amu[ip]*Tz[ip];
-
-		//Viscous Terms
-                rhoUk2[ip]  = mu[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip] + (1.0/3.0)*Vxy[ip] + (1.0/3.0)*Wxz[ip]);
-	        rhoUk2[ip] += (4.0/3.0)*MuX*(Ux[ip] - 0.5*Vy[ip] - 0.5*Wz[ip]) + MuY*(Uy[ip] + Vx[ip]) + MuZ*(Wx[ip] + Uz[ip]);
-
-		//Euler Terms
-	        rhoUk2[ip] += -momXEulerX[ip] -momXEulerY[ip] -momXEulerZ[ip] + spgSource;
-		rhoUk2[ip] *= ts->dt;
-	    }
-
-	}
-
-    if(useTiming){
-        cout << " > solveXMom  Timing: ";
-        toc();
+    double *rhoUP;
+    if(rkStep == 1){
+        rhoUP = rhoU1;
+    }else{
+        rhoUP = rhoUk;
     }
 
+    double MuX, MuY, MuZ, spgSource;
+    FOR_XYZ_XPEN{
+
+	if(spongeFlag)
+	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
+	else
+	    spgSource = 0.0;
+
+	//Calculate the viscosity derivatives
+	MuX = Amu[ip]*Tx[ip];
+	MuY = Amu[ip]*Ty[ip];
+	MuZ = Amu[ip]*Tz[ip];
+
+	//Viscous Terms
+        rhoUk2[ip]  = mu[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip] + (1.0/3.0)*Vxy[ip] + (1.0/3.0)*Wxz[ip]);
+	rhoUk2[ip] += (4.0/3.0)*MuX*(Ux[ip] - 0.5*Vy[ip] - 0.5*Wz[ip]) + MuY*(Uy[ip] + Vx[ip]) + MuZ*(Wx[ip] + Uz[ip]);
+
+	//Euler Terms
+	rhoUk2[ip] += -momXEulerX[ip] -momXEulerY[ip] -momXEulerZ[ip] + spgSource;
+	rhoUk2[ip] *= ts->dt;
+    }
 
 
 }
 
 void UniformCSolver::solveYMomentum(){
 
-    if(useTiming) tic();
+    double *rhoVP;
+    if(rkStep == 1){
+        rhoVP = rhoV1;
+    }else{
+        rhoVP = rhoVk;
+    }
 
-    #pragma omp parallel
-    {
+    double MuY, MuX, MuZ, spgSource;
 
-        double *rhoVP;
-        if(rkStep == 1){
-            rhoVP = rhoV1;
-        }else{
-            rhoVP = rhoVk;
-        }
+    FOR_XYZ_XPEN{ 
 
-	double MuY, MuX, MuZ, spgSource;
-
-        #pragma omp for
-        FOR_XYZ{ 
-
-            if(spongeFlag)
-      	        spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
-	    else
-	        spgSource = 0.0;
+        if(spongeFlag)
+            spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
+	else
+	    spgSource = 0.0;
 
 		
-	    MuX = Amu[ip]*Tx[ip];
-	    MuY = Amu[ip]*Ty[ip];
-  	    MuZ = Amu[ip]*Tz[ip];
+	MuX = Amu[ip]*Tx[ip];
+	MuY = Amu[ip]*Ty[ip];
+  	MuZ = Amu[ip]*Tz[ip];
 
-            //Viccous Terms 
-	    rhoVk2[ip]  = mu[ip]*((4.0/3.0)*Vyy[ip] + Vxx[ip] + Vzz[ip] + (1.0/3.0)*Uxy[ip] + (1.0/3.0)*Wyz[ip]);
-	    rhoVk2[ip] += (4.0/3.0)*MuY*(Vy[ip] - 0.5*Ux[ip] - 0.5*Wz[ip]) + MuX*(Uy[ip] + Vx[ip]) + MuZ*(Wy[ip] + Vz[ip]);
-	    //Euler Terms
-	    rhoVk2[ip] += -momYEulerX[ip] -momYEulerY[ip] -momYEulerZ[ip] + spgSource;
-	
-	    rhoVk2[ip] *= ts->dt;
-        }
+        //Viccous Terms 
+	rhoVk2[ip]  = mu[ip]*((4.0/3.0)*Vyy[ip] + Vxx[ip] + Vzz[ip] + (1.0/3.0)*Uxy[ip] + (1.0/3.0)*Wyz[ip]);
+	rhoVk2[ip] += (4.0/3.0)*MuY*(Vy[ip] - 0.5*Ux[ip] - 0.5*Wz[ip]) + MuX*(Uy[ip] + Vx[ip]) + MuZ*(Wy[ip] + Vz[ip]);
+	//Euler Terms
+	rhoVk2[ip] += -momYEulerX[ip] -momYEulerY[ip] -momYEulerZ[ip] + spgSource;
 
-    }
-
-    if(useTiming){
-        cout << " > solveYMom  Timing: ";
-        toc();
-    }
+        rhoVk2[ip] *= ts->dt;
+   }
 
 }
 
 void UniformCSolver::solveZMomentum(){
 
-    if(useTiming) tic();
-
-    #pragma omp parallel
-    {
-
-        double *rhoWP;
-        if(rkStep == 1){
-            rhoWP = rhoW1;
-        }else{
-            rhoWP = rhoWk;
-        }
-
-        double MuY, MuX, MuZ, spgSource;
-
-
-	#pragma omp for
-	FOR_XYZ{
-
-            if(spongeFlag)
-      	        spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
-	    else
-	        spgSource = 0.0;
-
-	    MuZ = Amu[ip]*Tz[ip];
-	    MuX = Amu[ip]*Tx[ip];
-	    MuY = Amu[ip]*Ty[ip];
-
-
-    	    //Viscous Terms
-            rhoWk2[ip]  = mu[ip]*((4.0/3.0)*Wzz[ip] + Wyy[ip] + Wxx[ip] + (1.0/3.0)*Uxz[ip] + (1.0/3.0)*Vyz[ip]);
-	    rhoWk2[ip] += (4.0/3.0)*MuZ*(Wz[ip] - 0.5*Ux[ip] - 0.5*Vy[ip]) + MuX*(Wx[ip] + Uz[ip]) + MuY*(Wy[ip] + Vz[ip]);
-
-	    //Euler Terms
-	    rhoWk2[ip] += -momZEulerX[ip] -momZEulerY[ip] -momZEulerZ[ip] + spgSource;
-
-            rhoWk2[ip] *= ts->dt;
-	}
-
+    double *rhoWP;
+    if(rkStep == 1){
+        rhoWP = rhoW1;
+    }else{
+        rhoWP = rhoWk;
     }
 
-    if(useTiming){
-        cout << " > solveZMom  Timing: ";
-        toc();
-    }
+    double MuY, MuX, MuZ, spgSource;
 
+
+    FOR_XYZ_XPEN{
+
+        if(spongeFlag)
+            spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
+        else
+	    spgSource = 0.0;
+
+	MuZ = Amu[ip]*Tz[ip];
+	MuX = Amu[ip]*Tx[ip];
+	MuY = Amu[ip]*Ty[ip];
+
+
+    	//Viscous Terms
+        rhoWk2[ip]  = mu[ip]*((4.0/3.0)*Wzz[ip] + Wyy[ip] + Wxx[ip] + (1.0/3.0)*Uxz[ip] + (1.0/3.0)*Vyz[ip]);
+	rhoWk2[ip] += (4.0/3.0)*MuZ*(Wz[ip] - 0.5*Ux[ip] - 0.5*Vy[ip]) + MuX*(Wx[ip] + Uz[ip]) + MuY*(Wy[ip] + Vz[ip]);
+
+	//Euler Terms
+	rhoWk2[ip] += -momZEulerX[ip] -momZEulerY[ip] -momZEulerZ[ip] + spgSource;
+
+        rhoWk2[ip] *= ts->dt;
+    }
 
 }
 
 
 void UniformCSolver::solveEnergy(){
 
-    if(useTiming) tic();
 
-    #pragma omp parallel
-    {
-
-        double *rhoEP;
-        if(rkStep == 1){
-            rhoEP = rhoE1;
-        }else{
-            rhoEP = rhoEk;
-        }
-
-	double qtemp, vtemp1, vtemp2, engyEuler;
-	double MuX, MuY, MuZ, spgSource;
-
-	#pragma omp for
-        FOR_XYZ{
-
-            if(spongeFlag)
-                spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
-            else
-                spgSource = 0.0;
-
-	    MuX = Amu[ip]*Tx[ip];
-	    MuY = Amu[ip]*Ty[ip];
-	    MuZ = Amu[ip]*Tz[ip];
-
-    	    //Heat Transfer Terms
-	    qtemp   =  ig->cp/ig->Pr*(MuX*Tx[ip]     + MuY*Ty[ip]     +  MuZ*Tz[ip] + 
-			     	 	  mu[ip]*Txx[ip] + mu[ip]*Tyy[ip] + mu[ip]*Tzz[ip]);
-
-
-
-    	    //Viscous Energy terms w/o viscosity derivatives...
-	    vtemp1  = mu[ip]*(U[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip]) + 
-			          V[ip]*(Vxx[ip] + (4.0/3.0)*Vyy[ip] + Vzz[ip]) + 
-		 	          W[ip]*(Wxx[ip] + Wyy[ip] + (4.0/3.0)*Wzz[ip]) + 
-			(4.0/3.0)*(Ux[ip]*Ux[ip] + Vy[ip]*Vy[ip] + Wz[ip]*Wz[ip]) +
-			           Uy[ip]*Uy[ip] + Uz[ip]*Uz[ip] + 
-			           Vx[ip]*Vx[ip] + Vz[ip]*Vz[ip] + 
-			           Wx[ip]*Wx[ip] + Wy[ip]*Wy[ip] -
-		        (4.0/3.0)*(Ux[ip]*Vy[ip] + Ux[ip]*Wz[ip] + Vy[ip]*Wz[ip]) +
-			      2.0*(Uy[ip]*Vx[ip] + Uz[ip]*Wx[ip] + Vz[ip]*Wy[ip]) +
-			(1.0/3.0)*(U[ip]*Vxy[ip] + U[ip]*Wxz[ip] + V[ip]*Uxy[ip]) +
-			(1.0/3.0)*(V[ip]*Wyz[ip] + W[ip]*Uxz[ip] + W[ip]*Vyz[ip]));
-
-
-    	    //Viscous Energy terms w/ viscosity derivatives...
-	    vtemp2  =  (4.0/3.0)*(U[ip]*MuX*Ux[ip] + V[ip]*MuY*Vy[ip] + W[ip]*MuZ*Wz[ip]) -
-			   (2.0/3.0)* U[ip]*MuX*(Vy[ip] + Wz[ip]) -
-			   (2.0/3.0)* V[ip]*MuY*(Ux[ip] + Wz[ip]) -
-			   (2.0/3.0)* W[ip]*MuZ*(Ux[ip] + Vy[ip]) +
-				      U[ip]*MuY*(Uy[ip] + Vx[ip]) +
-				      U[ip]*MuZ*(Uz[ip] + Wx[ip]) + 
-				      V[ip]*MuX*(Uy[ip] + Vx[ip]) +
-				      V[ip]*MuZ*(Vz[ip] + Wy[ip]) +
-				      W[ip]*MuX*(Uz[ip] + Wx[ip]) +
-				      W[ip]*MuY*(Vz[ip] + Wy[ip]);
-
-
-    	    //Euler terms
-	    engyEuler  = -engyEulerX[ip] - engyEulerY[ip] - engyEulerZ[ip] + spgSource;
-
-
-	    //Put it all together...
-	    rhoEk2[ip] = ts->dt*(qtemp + vtemp1 + vtemp2 + engyEuler + spgSource);
-        }
+    double *rhoEP;
+    if(rkStep == 1){
+        rhoEP = rhoE1;
+    }else{
+        rhoEP = rhoEk;
     }
 
-    if(useTiming){
-        cout << " > solveEnerg Timing: ";
-        toc();
+    double qtemp, vtemp1, vtemp2, engyEuler;
+    double MuX, MuY, MuZ, spgSource;
+
+    FOR_XYZ_XPEN{
+
+        if(spongeFlag)
+            spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
+        else
+            spgSource = 0.0;
+
+        MuX = Amu[ip]*Tx[ip];
+	MuY = Amu[ip]*Ty[ip];
+	MuZ = Amu[ip]*Tz[ip];
+
+    	//Heat Transfer Terms
+	qtemp   =  ig->cp/ig->Pr*(MuX*Tx[ip]     + MuY*Ty[ip]     +  MuZ*Tz[ip] + 
+		     	 	  mu[ip]*Txx[ip] + mu[ip]*Tyy[ip] + mu[ip]*Tzz[ip]);
+
+
+
+    	//Viscous Energy terms w/o viscosity derivatives...
+	vtemp1  = mu[ip]*(U[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip]) + 
+		          V[ip]*(Vxx[ip] + (4.0/3.0)*Vyy[ip] + Vzz[ip]) + 
+		          W[ip]*(Wxx[ip] + Wyy[ip] + (4.0/3.0)*Wzz[ip]) + 
+		(4.0/3.0)*(Ux[ip]*Ux[ip] + Vy[ip]*Vy[ip] + Wz[ip]*Wz[ip]) +
+		           Uy[ip]*Uy[ip] + Uz[ip]*Uz[ip] + 
+		           Vx[ip]*Vx[ip] + Vz[ip]*Vz[ip] + 
+		           Wx[ip]*Wx[ip] + Wy[ip]*Wy[ip] -
+	        (4.0/3.0)*(Ux[ip]*Vy[ip] + Ux[ip]*Wz[ip] + Vy[ip]*Wz[ip]) +
+		      2.0*(Uy[ip]*Vx[ip] + Uz[ip]*Wx[ip] + Vz[ip]*Wy[ip]) +
+		(1.0/3.0)*(U[ip]*Vxy[ip] + U[ip]*Wxz[ip] + V[ip]*Uxy[ip]) +
+		(1.0/3.0)*(V[ip]*Wyz[ip] + W[ip]*Uxz[ip] + W[ip]*Vyz[ip]));
+
+
+    	//Viscous Energy terms w/ viscosity derivatives...
+	vtemp2  =  (4.0/3.0)*(U[ip]*MuX*Ux[ip] + V[ip]*MuY*Vy[ip] + W[ip]*MuZ*Wz[ip]) -
+		   (2.0/3.0)* U[ip]*MuX*(Vy[ip] + Wz[ip]) -
+		   (2.0/3.0)* V[ip]*MuY*(Ux[ip] + Wz[ip]) -
+		   (2.0/3.0)* W[ip]*MuZ*(Ux[ip] + Vy[ip]) +
+			      U[ip]*MuY*(Uy[ip] + Vx[ip]) +
+			      U[ip]*MuZ*(Uz[ip] + Wx[ip]) + 
+			      V[ip]*MuX*(Uy[ip] + Vx[ip]) +
+			      V[ip]*MuZ*(Vz[ip] + Wy[ip]) +
+			      W[ip]*MuX*(Uz[ip] + Wx[ip]) +
+			      W[ip]*MuY*(Vz[ip] + Wy[ip]);
+
+
+    	//Euler terms
+	engyEuler  = -engyEulerX[ip] - engyEulerY[ip] - engyEulerZ[ip] + spgSource;
+
+
+	//Put it all together...
+	rhoEk2[ip] = ts->dt*(qtemp + vtemp1 + vtemp2 + engyEuler + spgSource);
     }
 
 }
-
+/*
 void UniformCSolver::postStepBCHandling(){
-
-    if(useTiming) tic();
 
     double *rhoP, *rhoUP, *rhoVP, *rhoWP, *rhoEP;
     if(rkStep == 1){
@@ -1612,8 +1545,7 @@ void UniformCSolver::postStepBCHandling(){
     ////////////////////////////////
 
     if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_X0{
+	FOR_X0_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerX[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1624,7 +1556,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcX1 == BC::ADIABATIC_WALL  || bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
 	FOR_X1{
 	    rhok2[ip]  = -ts->dt*contEulerX[ip];
 	    rhoUk2[ip] = 0.0;
@@ -1636,7 +1567,6 @@ void UniformCSolver::postStepBCHandling(){
     }   
 
     if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
 	FOR_Y0{
 	    rhok2[ip]  = -ts->dt*contEulerY[ip];
 	    rhoUk2[ip] = 0.0;
@@ -1648,7 +1578,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
 	FOR_Y1{
 	    rhok2[ip]  = -ts->dt*contEulerY[ip];
 	    rhoUk2[ip] = 0.0;
@@ -1660,7 +1589,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
 	FOR_Z0{
 	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
 	    rhoUk2[ip] = 0.0;
@@ -1672,7 +1600,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
-	#pragma omp parallel for
 	FOR_Z1{
 	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
 	    rhoUk2[ip] = 0.0;
@@ -1689,7 +1616,6 @@ void UniformCSolver::postStepBCHandling(){
     /////////////
 
     if(bc->bcX0 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_X0{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1700,7 +1626,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcX1 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_X1{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1711,7 +1636,6 @@ void UniformCSolver::postStepBCHandling(){
     }   
 
     if(bc->bcY0 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_Y0{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1722,7 +1646,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcY1 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_Y1{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1733,7 +1656,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ0 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_Z0{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1744,7 +1666,6 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ1 == BC::SPONGE){
-	#pragma omp parallel for
 	FOR_Z1{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
