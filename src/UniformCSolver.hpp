@@ -23,6 +23,8 @@ class UniformCSolver: public AbstractCSolver{
         int pxEnd[3], pyEnd[3], pzEnd[3];
 
 	int mpiRank, totRank;
+
+	double t1, t2;
 	
 	//Track the current time and timestep
         int timeStep;
@@ -64,6 +66,14 @@ class UniformCSolver: public AbstractCSolver{
 	double *momYEulerX, *momYEulerY, *momYEulerZ;
 	double *momZEulerX, *momZEulerY, *momZEulerZ;
 	double *engyEulerX, *engyEulerY, *engyEulerZ;
+
+	double *tempY1, *tempY2, *tempY3, *tempY4, *tempY5;
+	double *tempY6, *tempY7, *tempY8, *tempY9, *tempY10;
+
+	double *tempZ1, *tempZ2, *tempZ3, *tempZ4, *tempZ5;
+	double *tempZ6, *tempZ7, *tempZ8, *tempZ9, *tempZ10;
+
+
 
 	double *temp, *temp2, *temp3, *temp4;
 	double *transRho, *transRhoU, *transRhoV, *transRhoW, *transRhoE;
@@ -157,6 +167,8 @@ class UniformCSolver: public AbstractCSolver{
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
 
+
+	    t1 = MPI_Wtime();
 	}
 
 	//Functions required from AbstractCSolver...

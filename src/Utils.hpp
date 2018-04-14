@@ -35,6 +35,9 @@ void transposeYZXtoXYZ_Fast(const double *in, int Nx, int Ny, int Nz, double *ou
 //Random number generation
 double fRand(double fMin, double fMax);
 
+
+void getRange(double *phi, string Var, int Nx, int Ny, int Nz, int mpiRank);
+
 //derivatives at boundaries, maybe go somewhere else?
 inline double calcNeumann(double f1, double f2, double f3, double f4, double f5, double f6){
     return (f1*360.0 - f2*450.0 + f3*400.0 - f4*225.0 + f5*72.0 - f6*10.0)/147.0;

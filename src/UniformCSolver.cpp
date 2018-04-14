@@ -137,13 +137,33 @@ void UniformCSolver::initializeSolverData(){
     c2d->allocX(Amu);
     c2d->allocX(sos);
 
-/*  
+  
     //86 
-    temp  = new double[Nx*Ny*Nz];
-    temp2 = new double[Nx*Ny*Nz]; 
-    temp3 = new double[Nx*Ny*Nz]; 
-    temp4 = new double[Nx*Ny*Nz]; 
+    c2d->allocY(tempY1);
+    c2d->allocY(tempY2);
+    c2d->allocY(tempY3);
+    c2d->allocY(tempY4);
+    c2d->allocY(tempY5);
 
+    c2d->allocY(tempY6);
+    c2d->allocY(tempY7);
+    c2d->allocY(tempY8);
+    c2d->allocY(tempY9);
+    c2d->allocY(tempY10);
+
+    c2d->allocZ(tempZ1);
+    c2d->allocZ(tempZ2);
+    c2d->allocZ(tempZ3);
+    c2d->allocZ(tempZ4);
+    c2d->allocZ(tempZ5);
+
+    c2d->allocZ(tempZ6);
+    c2d->allocZ(tempZ7);
+    c2d->allocZ(tempZ8);
+    c2d->allocZ(tempZ9);
+    c2d->allocZ(tempZ10);
+
+/*
     //97
     transRho = new double[Nx*Ny*Nz];
     transRhoU = new double[Nx*Ny*Nz];
@@ -632,10 +652,8 @@ void UniformCSolver::calcDtFromCFL(){
 
 }
 
-/*
-void UniformCSolver::preStepBCHandling(){
 
-    if(useTiming) tic();
+void UniformCSolver::preStepBCHandling(){
 
     double *rhoP, *rhoUP, *rhoVP, *rhoWP, *rhoEP;
     if(rkStep == 1){
@@ -657,20 +675,19 @@ void UniformCSolver::preStepBCHandling(){
     //--------------------------------
 
     if(bc->bcX0 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_X0{
+	FOR_X0_XPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xp1],
-				T[GET3DINDEX_XYZ_Xp2],
-				T[GET3DINDEX_XYZ_Xp3],
-				T[GET3DINDEX_XYZ_Xp4],
-				T[GET3DINDEX_XYZ_Xp5],
-				T[GET3DINDEX_XYZ_Xp6]);
+	    T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xp1],
+				T[GETMAJIND_XPEN_Xp2],
+				T[GETMAJIND_XPEN_Xp3],
+				T[GETMAJIND_XPEN_Xp4],
+				T[GETMAJIND_XPEN_Xp5],
+				T[GETMAJIND_XPEN_Xp6]);
 	   p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	   rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
 	}END_FORX0
@@ -678,100 +695,152 @@ void UniformCSolver::preStepBCHandling(){
     }
 
     if(bc->bcX1 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_X1{
+	FOR_X1_XPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xm1],
-				T[GET3DINDEX_XYZ_Xm2],
-				T[GET3DINDEX_XYZ_Xm3],
-				T[GET3DINDEX_XYZ_Xm4],
-				T[GET3DINDEX_XYZ_Xm5],
-				T[GET3DINDEX_XYZ_Xm6]);
+	    T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xm1],
+				T[GETMAJIND_XPEN_Xm2],
+				T[GETMAJIND_XPEN_Xm3],
+				T[GETMAJIND_XPEN_Xm4],
+				T[GETMAJIND_XPEN_Xm5],
+				T[GETMAJIND_XPEN_Xm6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
 	}END_FORX1
     }   
 
     if(bc->bcY0 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_Y0{
+
+        double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y0_YPEN_MAJ{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                 T2[GETMAJIND_YPEN_Yp2],
+                                 T2[GETMAJIND_YPEN_Yp3],
+                                 T2[GETMAJIND_YPEN_Yp4],
+                                 T2[GETMAJIND_YPEN_Yp5],
+                                 T2[GETMAJIND_YPEN_Yp6]);
+	}END_FORY0
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+	FOR_Y0_XPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Yp1],
-				T[GET3DINDEX_XYZ_Yp2],
-				T[GET3DINDEX_XYZ_Yp3],
-				T[GET3DINDEX_XYZ_Yp4],
-				T[GET3DINDEX_XYZ_Yp5],
-				T[GET3DINDEX_XYZ_Yp6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]);
 	}END_FORY0
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_Y1{
+
+	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y1_YPEN_MAJ{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                 T2[GETMAJIND_YPEN_Ym2],
+                                 T2[GETMAJIND_YPEN_Ym3],
+                                 T2[GETMAJIND_YPEN_Ym4],
+                                 T2[GETMAJIND_YPEN_Ym5],
+                                 T2[GETMAJIND_YPEN_Ym6]);
+ 	}END_FORY1 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+
+	FOR_Y1_XPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Ym1],
-				T[GET3DINDEX_XYZ_Ym2],
-				T[GET3DINDEX_XYZ_Ym3],
-				T[GET3DINDEX_XYZ_Ym4],
-				T[GET3DINDEX_XYZ_Ym5],
-				T[GET3DINDEX_XYZ_Ym6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
 	}END_FORY1
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_Z0{
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z0_ZPEN_MAJ{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                 T3[GETMAJIND_ZPEN_Zp2],
+                                 T3[GETMAJIND_ZPEN_Zp3],
+                                 T3[GETMAJIND_ZPEN_Zp4],
+                                 T3[GETMAJIND_ZPEN_Zp5],
+                                 T3[GETMAJIND_ZPEN_Zp6]);
+	}END_FORZ0
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+
+	FOR_Z0_XPEN{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zp1],
-				T[GET3DINDEX_XYZ_Zp2],
-				T[GET3DINDEX_XYZ_Zp3],
-				T[GET3DINDEX_XYZ_Zp4],
-				T[GET3DINDEX_XYZ_Zp5],
-				T[GET3DINDEX_XYZ_Zp6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
 	}END_FORZ0
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
-	#pragma omp parallel for
-	FOR_Z1{
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z1_ZPEN_MAJ{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                 T3[GETMAJIND_ZPEN_Zm2],
+                                 T3[GETMAJIND_ZPEN_Zm3],
+                                 T3[GETMAJIND_ZPEN_Zm4],
+                                 T3[GETMAJIND_ZPEN_Zm5],
+                                 T3[GETMAJIND_ZPEN_Zm6]);
+ 	}END_FORZ1
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+
+	FOR_Z1_XPEN{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zm1],
-				T[GET3DINDEX_XYZ_Zm2],
-				T[GET3DINDEX_XYZ_Zm3],
-				T[GET3DINDEX_XYZ_Zm4],
-				T[GET3DINDEX_XYZ_Zm5],
-				T[GET3DINDEX_XYZ_Zm6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
 	}END_FORZ1
@@ -782,133 +851,178 @@ void UniformCSolver::preStepBCHandling(){
     //-------------------------------
 
     if(bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_X0{
+        FOR_X0_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X0WallV;
             W[ip]  = X0WallW;
             rhoUP[ip] = 0.0;
             rhoVP[ip] = rhoP[ip]*X0WallV;
             rhoWP[ip] = rhoP[ip]*X0WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xp1],
-                                T[GET3DINDEX_XYZ_Xp2],
-                                T[GET3DINDEX_XYZ_Xp3],
-                                T[GET3DINDEX_XYZ_Xp4],
-                                T[GET3DINDEX_XYZ_Xp5],
-                                T[GET3DINDEX_XYZ_Xp6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xp1],
+                                T[GETMAJIND_XPEN_Xp2],
+                                T[GETMAJIND_XPEN_Xp3],
+                                T[GETMAJIND_XPEN_Xp4],
+                                T[GETMAJIND_XPEN_Xp5],
+                                T[GETMAJIND_XPEN_Xp6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORX0
     }
 
     if(bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_X1{
+        FOR_X1_XPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X1WallV;
             W[ip]  = X1WallW;
             rhoUP[ip] = 0.0;
             rhoVP[ip] = rhoP[ip]*X1WallV;
             rhoWP[ip] = rhoP[ip]*X1WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Xm1],
-                                T[GET3DINDEX_XYZ_Xm2],
-                                T[GET3DINDEX_XYZ_Xm3],
-                                T[GET3DINDEX_XYZ_Xm4],
-                                T[GET3DINDEX_XYZ_Xm5],
-                                T[GET3DINDEX_XYZ_Xm6]);
+            T[ip] = calcNeumann(T[GETMAJIND_XPEN_Xm1],
+                                T[GETMAJIND_XPEN_Xm2],
+                                T[GETMAJIND_XPEN_Xm3],
+                                T[GETMAJIND_XPEN_Xm4],
+                                T[GETMAJIND_XPEN_Xm5],
+                                T[GETMAJIND_XPEN_Xm6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORX1
     }
 
     if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_Y0{
+
+
+ 	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y0_YPEN_MAJ{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                 T2[GETMAJIND_YPEN_Yp2],
+                                 T2[GETMAJIND_YPEN_Yp3],
+                                 T2[GETMAJIND_YPEN_Yp4],
+                                 T2[GETMAJIND_YPEN_Yp5],
+                                 T2[GETMAJIND_YPEN_Yp6]);
+	}END_FORY0 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+        FOR_Y0_XPEN{
             U[ip]  = Y0WallU;
             V[ip]  = 0.0;
             W[ip]  = Y0WallW;
             rhoUP[ip] = rhoP[ip]*Y0WallU;
             rhoVP[ip] = 0.0;
             rhoWP[ip] = rhoP[ip]*Y0WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Yp1],
-                                T[GET3DINDEX_XYZ_Yp2],
-                                T[GET3DINDEX_XYZ_Yp3],
-                                T[GET3DINDEX_XYZ_Yp4],
-                                T[GET3DINDEX_XYZ_Yp5],
-                                T[GET3DINDEX_XYZ_Yp6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORY0
     }
 
     if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_Y1{
+
+	double *T2;
+	c2d->allocY(T2);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+
+	FOR_Y1_YPEN_MAJ{
+            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                 T2[GETMAJIND_YPEN_Ym2],
+                                 T2[GETMAJIND_YPEN_Ym3],
+                                 T2[GETMAJIND_YPEN_Ym4],
+                                 T2[GETMAJIND_YPEN_Ym5],
+                                 T2[GETMAJIND_YPEN_Ym6]);
+ 	}END_FORY1 
+
+	c2d->transposeY2X_MajorIndex(T2, T);
+	c2d->deallocXYZ(T2);
+
+
+        FOR_Y1_XPEN{
             U[ip]  = Y1WallU;
             V[ip]  = 0.0;
             W[ip]  = Y1WallW;
             rhoUP[ip] = rhoP[ip]*Y1WallU;
             rhoVP[ip] = 0.0;
             rhoWP[ip] = rhoP[ip]*Y1WallW;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Ym1],
-                                T[GET3DINDEX_XYZ_Ym2],
-                                T[GET3DINDEX_XYZ_Ym3],
-                                T[GET3DINDEX_XYZ_Ym4],
-                                T[GET3DINDEX_XYZ_Ym5],
-                                T[GET3DINDEX_XYZ_Ym6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORY1
     }
 
     if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_Z0{
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z0_ZPEN_MAJ{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                 T3[GETMAJIND_ZPEN_Zp2],
+                                 T3[GETMAJIND_ZPEN_Zp3],
+                                 T3[GETMAJIND_ZPEN_Zp4],
+                                 T3[GETMAJIND_ZPEN_Zp5],
+                                 T3[GETMAJIND_ZPEN_Zp6]);
+	}END_FORZ0
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+        FOR_Z0_XPEN{
             U[ip]  = Z0WallU;
             V[ip]  = Z0WallV;
             W[ip]  = 0.0;
             rhoUP[ip] = rhoP[ip]*Z0WallU;
             rhoVP[ip] = rhoP[ip]*Z0WallV;
             rhoWP[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zp1],
-                                T[GET3DINDEX_XYZ_Zp2],
-                                T[GET3DINDEX_XYZ_Zp3],
-                                T[GET3DINDEX_XYZ_Zp4],
-                                T[GET3DINDEX_XYZ_Zp5],
-                                T[GET3DINDEX_XYZ_Zp6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORZ0
     }
 
     if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
-        #pragma omp parallel for
-        FOR_Z1{
+
+	double *T2, *T3;
+	c2d->allocY(T2);
+	c2d->allocZ(T3);
+	c2d->transposeX2Y_MajorIndex(T, T2);
+	c2d->transposeY2Z_MajorIndex(T2, T3);
+
+	FOR_Z1_ZPEN_MAJ{
+            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                 T3[GETMAJIND_ZPEN_Zm2],
+                                 T3[GETMAJIND_ZPEN_Zm3],
+                                 T3[GETMAJIND_ZPEN_Zm4],
+                                 T3[GETMAJIND_ZPEN_Zm5],
+                                 T3[GETMAJIND_ZPEN_Zm6]);
+ 	}END_FORZ1
+
+	c2d->transposeZ2Y_MajorIndex(T3, T2);
+	c2d->transposeY2X_MajorIndex(T2, T);
+
+	c2d->deallocXYZ(T2);
+	c2d->deallocXYZ(T3);
+
+        FOR_Z1_XPEN{
             U[ip]  = Z1WallU;
             V[ip]  = Z1WallV;
             W[ip]  = 0.0;
             rhoUP[ip] = rhoP[ip]*Z1WallU;
             rhoVP[ip] = rhoP[ip]*Z1WallV;
             rhoWP[ip] = 0.0;
-            T[ip] = calcNeumann(T[GET3DINDEX_XYZ_Zm1],
-                                T[GET3DINDEX_XYZ_Zm2],
-                                T[GET3DINDEX_XYZ_Zm3],
-                                T[GET3DINDEX_XYZ_Zm4],
-                                T[GET3DINDEX_XYZ_Zm5],
-                                T[GET3DINDEX_XYZ_Zm6]);
 	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
 	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
         }END_FORZ1
     }
 
-    if(useTiming){
-	cout << " > preBCHandl Timing: ";
-	toc();
-    }
-
 }
 
-
+/*
 void UniformCSolver::preStepDerivatives(){
 
     if(useTiming) tic();
@@ -1327,7 +1441,6 @@ void UniformCSolver::preStepDerivatives(){
 */
 
 void UniformCSolver::solveContinuity(){
-   
 
     double *rhoP;
     if(rkStep == 1){
@@ -1522,7 +1635,7 @@ void UniformCSolver::solveEnergy(){
     }
 
 }
-/*
+
 void UniformCSolver::postStepBCHandling(){
 
     double *rhoP, *rhoUP, *rhoVP, *rhoWP, *rhoEP;
@@ -1556,7 +1669,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcX1 == BC::ADIABATIC_WALL  || bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
-	FOR_X1{
+	FOR_X1_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerX[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1567,7 +1680,7 @@ void UniformCSolver::postStepBCHandling(){
     }   
 
     if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
-	FOR_Y0{
+	FOR_Y0_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerY[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1578,7 +1691,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
-	FOR_Y1{
+	FOR_Y1_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerY[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1589,7 +1702,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
-	FOR_Z0{
+	FOR_Z0_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1600,7 +1713,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
-	FOR_Z1{
+	FOR_Z1_XPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1616,7 +1729,7 @@ void UniformCSolver::postStepBCHandling(){
     /////////////
 
     if(bc->bcX0 == BC::SPONGE){
-	FOR_X0{
+	FOR_X0_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1626,7 +1739,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcX1 == BC::SPONGE){
-	FOR_X1{
+	FOR_X1_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1636,7 +1749,7 @@ void UniformCSolver::postStepBCHandling(){
     }   
 
     if(bc->bcY0 == BC::SPONGE){
-	FOR_Y0{
+	FOR_Y0_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1646,7 +1759,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcY1 == BC::SPONGE){
-	FOR_Y1{
+	FOR_Y1_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1656,7 +1769,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ0 == BC::SPONGE){
-	FOR_Z0{
+	FOR_Z0_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1666,7 +1779,7 @@ void UniformCSolver::postStepBCHandling(){
     }
 
     if(bc->bcZ1 == BC::SPONGE){
-	FOR_Z1{
+	FOR_Z1_XPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
@@ -1675,23 +1788,10 @@ void UniformCSolver::postStepBCHandling(){
 	}END_FORZ1
     }
 
-    if(useTiming){
-        cout << " > postBCHand Timing: ";
-        toc();
-    }
-
-
-
 }
 
 
 void UniformCSolver::filterConservedData(){
-
-    if(useTiming) tic();
-
-    const int halfThreadCount = omp_get_num_threads()/NUMTHREADSNEST;
-    omp_set_nested(1);
-
 
     //Need to do round robin of filtering directions...
     if(timeStep%ts->filterStep == 0){
@@ -1704,208 +1804,172 @@ void UniformCSolver::filterConservedData(){
 
             //Here we'll do X->Y->Z     
 
-    	    #pragma omp parallel sections num_threads(halfThreadCount) 
- 	    {
-		#pragma omp section
-		{
                     filtX->filterField(rho2,  rho1);
-                    transposeXYZtoYZX_Fast(rho1,   Nx, Ny, Nz, rho2, blocksize);
-  	            filtY->filterField(rho2,  rho1);
-                    transposeYZXtoZXY_Fast(rho1,   Nx, Ny, Nz, rho2, blocksize);
-                    filtZ->filterField(rho2,  transTempUy);
-                    transposeZXYtoXYZ_Fast(transTempUy,   Nx, Ny, Nz, rho1, blocksize);
-		}
-		#pragma omp section
-		{
-                    filtX->filterField(rhoU2, temp);
-	            transposeXYZtoYZX_Fast(temp,   Nx, Ny, Nz, rhoU2, blocksize);
-                    filtY->filterField(rhoU2, temp);
-                    transposeYZXtoZXY_Fast(temp,   Nx, Ny, Nz, rhoU2, blocksize);
-                    filtZ->filterField(rhoU2, temp);
-                    transposeZXYtoXYZ_Fast(temp,   Nx, Ny, Nz, rhoU1, blocksize);
-		}
-		#pragma omp section
-		{
-                    filtX->filterField(rhoV2, temp2);
-                    transposeXYZtoYZX_Fast(temp2,  Nx, Ny, Nz, rhoV2, blocksize);
-                    filtY->filterField(rhoV2, temp2);
-                    transposeYZXtoZXY_Fast(temp2,  Nx, Ny, Nz, rhoV2, blocksize);
-                    filtZ->filterField(rhoV2, temp2);
-                    transposeZXYtoXYZ_Fast(temp2,  Nx, Ny, Nz, rhoV1, blocksize);
+		    filtX->filterField(rhoU2, rhoU1);
+		    filtX->filterField(rhoV2, rhoV1);
+		    filtX->filterField(rhoW2, rhoW1);
+		    filtX->filterField(rhoE2, rhoE1);
 
-		}
-		#pragma omp section
-		{
-                    filtX->filterField(rhoW2, temp3);
-                    transposeXYZtoYZX_Fast(temp3,  Nx, Ny, Nz, rhoW2, blocksize);
-                    filtY->filterField(rhoW2, temp3);
-                    transposeYZXtoZXY_Fast(temp3,  Nx, Ny, Nz, rhoW2, blocksize);
-                    filtZ->filterField(rhoW2, temp3);
-                    transposeZXYtoXYZ_Fast(temp3,  Nx, Ny, Nz, rhoW1, blocksize);
-		}
-		#pragma omp section
-		{
-                    filtX->filterField(rhoE2, temp4);
-                    transposeXYZtoYZX_Fast(temp4,  Nx, Ny, Nz, rhoE2, blocksize);
-                    filtY->filterField(rhoE2, temp4);
-                    transposeYZXtoZXY_Fast(temp4,  Nx, Ny, Nz, rhoE2, blocksize);
-                    filtZ->filterField(rhoE2, temp4);
-                    transposeZXYtoXYZ_Fast(temp4,  Nx, Ny, Nz, rhoE1, blocksize);
-		}
-	    }
+		    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
+		    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
+		    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
+		    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
+		    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+
+		    filtY->filterField(tempY1, tempY6);
+		    filtY->filterField(tempY2, tempY7);
+		    filtY->filterField(tempY3, tempY8);
+		    filtY->filterField(tempY4, tempY9);
+		    filtY->filterField(tempY5, tempY10);
+
+		    c2d->transposeY2Z_MajorIndex(tempY6,  tempZ1);
+		    c2d->transposeY2Z_MajorIndex(tempY7,  tempZ2);
+		    c2d->transposeY2Z_MajorIndex(tempY8,  tempZ3);
+		    c2d->transposeY2Z_MajorIndex(tempY9,  tempZ4);
+		    c2d->transposeY2Z_MajorIndex(tempY10, tempZ5);
+		  
+	            filtZ->filterField(tempZ1, tempZ6);	
+	            filtZ->filterField(tempZ2, tempZ7);	
+	            filtZ->filterField(tempZ3, tempZ8);	
+	            filtZ->filterField(tempZ4, tempZ9);	
+	            filtZ->filterField(tempZ5, tempZ10);	
+
+		    c2d->transposeZ2Y_MajorIndex(tempZ6,  tempY1);
+		    c2d->transposeZ2Y_MajorIndex(tempZ7,  tempY2);
+		    c2d->transposeZ2Y_MajorIndex(tempZ8,  tempY3);
+		    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
+		    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
+
+		    c2d->transposeY2X_MajorIndex(tempY1, rho1);
+		    c2d->transposeY2X_MajorIndex(tempY2, rhoU1);
+		    c2d->transposeY2X_MajorIndex(tempY3, rhoV1);
+		    c2d->transposeY2X_MajorIndex(tempY4, rhoW1);
+		    c2d->transposeY2X_MajorIndex(tempY5, rhoE1);
 
         }else if(filterTimeStep%3 == 2){
 
             //Here we'll do Y->Z->X     
 
-            //Do the transpose to YZX space first
-      	    #pragma omp parallel sections num_threads(halfThreadCount) 
- 	    { 
-		#pragma omp section
-		{
-                    transposeXYZtoYZX_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-                    filtY->filterField(rho1,  rho2);
-                    transposeYZXtoZXY_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-                    filtZ->filterField(rho1,  rho2);
-                    transposeZXYtoXYZ_Fast(rho2,   Nx, Ny, Nz, transTempUy, blocksize);
-                    filtX->filterField(transTempUy,  rho1);
-		}
-		#pragma omp section
-		{
-                    transposeXYZtoYZX_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtY->filterField(temp,  rhoU2);
-                    transposeYZXtoZXY_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtZ->filterField(temp,  rhoU2);
-                    transposeZXYtoXYZ_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtX->filterField(temp,  rhoU1);
-		}	
-		#pragma omp section
-		{
-                    transposeXYZtoYZX_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtY->filterField(temp2, rhoV2);
-                    transposeYZXtoZXY_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtZ->filterField(temp2, rhoV2);
-                    transposeZXYtoXYZ_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtX->filterField(temp2, rhoV1);
-		}
-		#pragma omp section
-		{ 
-                    transposeXYZtoYZX_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtY->filterField(temp3, rhoW2);
-                    transposeYZXtoZXY_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtZ->filterField(temp3, rhoW2);
-                    transposeZXYtoXYZ_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtX->filterField(temp3, rhoW1);
-		}
-		#pragma omp section
-		{
-                    transposeXYZtoYZX_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtY->filterField(temp4, rhoE2);
-                    transposeYZXtoZXY_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtZ->filterField(temp4, rhoE2);
-                    transposeZXYtoXYZ_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtX->filterField(temp4, rhoE1);
-		}
-	    }	
+	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
+	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
+	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
+	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
+
+	    filtY->filterField(tempY1, tempY6);
+	    filtY->filterField(tempY2, tempY7);
+	    filtY->filterField(tempY3, tempY8);
+	    filtY->filterField(tempY4, tempY9);
+	    filtY->filterField(tempY5, tempY10);
+
+	    c2d->transposeY2Z_MajorIndex(tempY6,  tempZ1);
+	    c2d->transposeY2Z_MajorIndex(tempY7,  tempZ2);
+	    c2d->transposeY2Z_MajorIndex(tempY8,  tempZ3);
+	    c2d->transposeY2Z_MajorIndex(tempY9,  tempZ4);
+	    c2d->transposeY2Z_MajorIndex(tempY10, tempZ5);
+
+	    filtZ->filterField(tempZ1, tempZ6);
+	    filtZ->filterField(tempZ2, tempZ7);
+	    filtZ->filterField(tempZ3, tempZ8);
+	    filtZ->filterField(tempZ4, tempZ9);
+	    filtZ->filterField(tempZ5, tempZ10);
+
+	    c2d->transposeZ2Y_MajorIndex(tempZ6,  tempY1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ7,  tempY2);
+	    c2d->transposeZ2Y_MajorIndex(tempZ8,  tempY3);
+	    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
+	    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
+
+	    c2d->transposeY2X_MajorIndex(tempY1,  rho2);
+	    c2d->transposeY2X_MajorIndex(tempY2,  rhoU2);
+	    c2d->transposeY2X_MajorIndex(tempY3,  rhoV2);
+	    c2d->transposeY2X_MajorIndex(tempY4,  rhoW2);
+	    c2d->transposeY2X_MajorIndex(tempY5,  rhoE2);
+
+	    filtX->filterField(rho2,  rho1);
+	    filtX->filterField(rhoU2, rhoU1);
+	    filtX->filterField(rhoV2, rhoV1);
+	    filtX->filterField(rhoW2, rhoW1);
+	    filtX->filterField(rhoE2, rhoE1);
 
         }else{
 
-            //Here we'll do Z->X->Y     
-            //Do the transpose to ZXY space first
-       	    #pragma omp parallel sections num_threads(halfThreadCount) 
-  	    { 
-		#pragma omp section
-		{
-                    transposeXYZtoZXY_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-                    filtZ->filterField(rho1,  rho2);
-                    transposeZXYtoXYZ_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-                    filtX->filterField(rho1,  rho2);
-                    transposeXYZtoYZX_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-	            filtY->filterField(rho1,  rho2);
-	            transposeYZXtoXYZ_Fast(rho2,   Nx, Ny, Nz, rho1, blocksize);
-		}
-		#pragma omp section
-                {
-		    transposeXYZtoZXY_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtZ->filterField(temp,  rhoU2);
-                    transposeZXYtoXYZ_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtX->filterField(temp,  rhoU2);
-                    transposeXYZtoYZX_Fast(rhoU2,  Nx, Ny, Nz, temp, blocksize);
-                    filtY->filterField(temp,  rhoU2);
-                    transposeYZXtoXYZ_Fast(rhoU2,  Nx, Ny, Nz, rhoU1, blocksize);
-		}
-		#pragma omp section
-                {
-		    transposeXYZtoZXY_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtZ->filterField(temp2, rhoV2);
-                    transposeZXYtoXYZ_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtX->filterField(temp2, rhoV2);
-                    transposeXYZtoYZX_Fast(rhoV2,  Nx, Ny, Nz, temp2, blocksize);
-                    filtY->filterField(temp2, rhoV2);
-                    transposeYZXtoXYZ_Fast(rhoV2,  Nx, Ny, Nz, rhoV1, blocksize);
-		}
-		#pragma omp section
-		{
-                    transposeXYZtoZXY_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtZ->filterField(temp3, rhoW2);
-                    transposeZXYtoXYZ_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtX->filterField(temp3, rhoW2);
-                    transposeXYZtoYZX_Fast(rhoW2,  Nx, Ny, Nz, temp3, blocksize);
-                    filtY->filterField(temp3, rhoW2);
-                    transposeYZXtoXYZ_Fast(rhoW2,  Nx, Ny, Nz, rhoW1, blocksize);
-		}
-		#pragma omp section
-		{
-                    transposeXYZtoZXY_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtZ->filterField(temp4, rhoE2);
-                    transposeZXYtoXYZ_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtX->filterField(temp4, rhoE2);
-                    transposeXYZtoYZX_Fast(rhoE2,  Nx, Ny, Nz, temp4, blocksize);
-                    filtY->filterField(temp4, rhoE2);
-                    transposeYZXtoXYZ_Fast(rhoE2,  Nx, Ny, Nz, rhoE1, blocksize);
-		}
-	    }
+	    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
+	    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
+	    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
+	    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+
+	    c2d->transposeY2Z_MajorIndex(tempY1, tempZ1);
+	    c2d->transposeY2Z_MajorIndex(tempY2, tempZ2);
+	    c2d->transposeY2Z_MajorIndex(tempY3, tempZ3);
+	    c2d->transposeY2Z_MajorIndex(tempY4, tempZ4);
+	    c2d->transposeY2Z_MajorIndex(tempY5, tempZ5);
+
+	    filtZ->filterField(tempZ1, tempZ6);
+	    filtZ->filterField(tempZ2, tempZ7);
+	    filtZ->filterField(tempZ3, tempZ8);
+	    filtZ->filterField(tempZ4, tempZ9);
+	    filtZ->filterField(tempZ5, tempZ10);
+
+	    c2d->transposeZ2Y_MajorIndex(tempZ6,  tempY1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ7,  tempY2);
+	    c2d->transposeZ2Y_MajorIndex(tempZ8,  tempY3);
+	    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
+	    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
+
+	    c2d->transposeY2X_MajorIndex(tempY1,  rho2);
+	    c2d->transposeY2X_MajorIndex(tempY2,  rhoU2);
+	    c2d->transposeY2X_MajorIndex(tempY3,  rhoV2);
+	    c2d->transposeY2X_MajorIndex(tempY4,  rhoW2);
+	    c2d->transposeY2X_MajorIndex(tempY5,  rhoE2);
+
+	    filtX->filterField(rho2,  rho1);
+	    filtX->filterField(rhoU2, rhoU1);
+	    filtX->filterField(rhoV2, rhoV1);
+	    filtX->filterField(rhoW2, rhoW1);
+	    filtX->filterField(rhoE2, rhoE1);
+
+	    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
+	    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
+	    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
+	    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+
+	    filtY->filterField(tempY1, tempY6);
+	    filtY->filterField(tempY2, tempY7);
+	    filtY->filterField(tempY3, tempY8);
+	    filtY->filterField(tempY4, tempY9);
+	    filtY->filterField(tempY5, tempY10);
+
+	    c2d->transposeY2X_MajorIndex(tempY6,  rho1);
+	    c2d->transposeY2X_MajorIndex(tempY7,  rhoU1);
+	    c2d->transposeY2X_MajorIndex(tempY8,  rhoV1);
+	    c2d->transposeY2X_MajorIndex(tempY9,  rhoW1);
+	    c2d->transposeY2X_MajorIndex(tempY10, rhoE1);
 
         }
  
     //If not filtering, need to copy the solution over to the *1 variables
     }else{
-        #pragma omp parallel sections  
-  	{
-
-	    #pragma omp section
-	    memcpy(rho1,  rho2, sizeof(double)*Nx*Ny*Nz);
-	    #pragma omp section
-	    memcpy(rhoU1, rhoU2, sizeof(double)*Nx*Ny*Nz);
-	    #pragma omp section
-	    memcpy(rhoV1, rhoV2, sizeof(double)*Nx*Ny*Nz);
-	    #pragma omp section
-	    memcpy(rhoW1, rhoW2, sizeof(double)*Nx*Ny*Nz);
-	    #pragma omp section
-	    memcpy(rhoE1, rhoE2, sizeof(double)*Nx*Ny*Nz);
-	}
+	    memcpy(rho1,  rho2,  sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
+	    memcpy(rhoU1, rhoU2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
+	    memcpy(rhoV1, rhoV2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
+	    memcpy(rhoW1, rhoW2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
+	    memcpy(rhoE1, rhoE2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
 
     }
 
-
-    omp_set_nested(0);
-
-    if(useTiming){
-        cout << " > filterCons Timing: ";
-        toc();
-    }
 
 
 };
 
-void UniformCSolver::updateNonConservedData(){
 
-    if(useTiming) tic();
+void UniformCSolver::updateNonConservedData(){
 
     if(!rkLast){
 
-        #pragma omp parallel for
-	FOR_XYZ{
+	FOR_XYZ_XPEN{
 	    U[ip]   = ig->solveU(rhok[ip], rhoUk[ip]);
 	    V[ip]   = ig->solveU(rhok[ip], rhoVk[ip]);
 	    W[ip]   = ig->solveU(rhok[ip], rhoWk[ip]);
@@ -1918,8 +1982,7 @@ void UniformCSolver::updateNonConservedData(){
 
     }else if(rkLast){
 
-        #pragma omp parallel for
-	FOR_XYZ{
+	FOR_XYZ_XPEN{
 	    U[ip]   = ig->solveU(rho1[ip], rhoU1[ip]);
 	    V[ip]   = ig->solveU(rho1[ip], rhoV1[ip]);
 	    W[ip]   = ig->solveU(rho1[ip], rhoW1[ip]);
@@ -1931,23 +1994,13 @@ void UniformCSolver::updateNonConservedData(){
 	}
     }
 
-    if(useTiming){
-        cout << " > updNonCons Timing: ";
-        toc();
-    }
-
-
-
 }
 
 void UniformCSolver::updateSponge(){
 
-    if(useTiming) tic();
-
     if(spongeFlag){
 	double eps = 1.0/(spg->avgT/ts->dt + 1.0);
-	#pragma omp parallel for
-	FOR_XYZ{
+	FOR_XYZ_XPEN{
 	    spg->spongeRhoAvg[ip]  += eps*(rho1[ip]  - spg->spongeRhoAvg[ip]);	
 	    spg->spongeRhoUAvg[ip] += eps*(rhoU1[ip] - spg->spongeRhoUAvg[ip]);	
 	    spg->spongeRhoVAvg[ip] += eps*(rhoV1[ip] - spg->spongeRhoVAvg[ip]);	
@@ -1959,8 +2012,7 @@ void UniformCSolver::updateSponge(){
 	}
 	
         if(bc->bcX0 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_X0{
+	    FOR_X0_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1970,8 +2022,7 @@ void UniformCSolver::updateSponge(){
         }
 
         if(bc->bcX1 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_X1{
+	    FOR_X1_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1981,8 +2032,7 @@ void UniformCSolver::updateSponge(){
         }   
 
         if(bc->bcY0 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_Y0{
+	    FOR_Y0_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1992,8 +2042,7 @@ void UniformCSolver::updateSponge(){
         }
 
         if(bc->bcY1 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_Y1{
+	    FOR_Y1_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -2003,8 +2052,7 @@ void UniformCSolver::updateSponge(){
         }
 
         if(bc->bcZ0 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_Z0{
+	    FOR_Z0_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -2015,8 +2063,7 @@ void UniformCSolver::updateSponge(){
         }
 
         if(bc->bcZ1 == BC::SPONGE){
-	    #pragma omp parallel for
-	    FOR_Z1{
+	    FOR_Z1_XPEN{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -2028,14 +2075,8 @@ void UniformCSolver::updateSponge(){
 
     }
 
-    if(useTiming){
-        cout << " > updateSpge Timing: ";
-        toc();
-    }
-
-
 };
-
+/*
 void UniformCSolver::calcTurbulenceQuantities(){
 
     if(useTiming) tic();
@@ -2461,41 +2502,37 @@ void UniformCSolver::shearLayerInfoCalc(){
 
 };
 
-
+*/
 void UniformCSolver::checkSolution(){
 
-    if(useTiming) tic();
 
     if(timeStep%ts->checkStep == 0){
-        t2Save = std::chrono::system_clock::now();
+
+	t2 = MPI_Wtime();
+
 	cout << endl;
         cout << "-------------------------------------------------" << endl;
         cout << " Step = "<< timeStep << ", time = " << time << ", dt = " << ts->dt << endl;
         cout << "-------------------------------------------------" << endl;
-        cout << "  Time since last timestep = " << std::chrono::duration_cast<std::chrono::nanoseconds>(t2Save-t1Save).count()/(double)1000000000 << endl;
-        getRange(rho1, "RHO", Nx, Ny, Nz);
-        getRange(U, "U", Nx, Ny, Nz);
-        getRange(V, "V", Nx, Ny, Nz);
-        getRange(W, "W", Nx, Ny, Nz);
-        getRange(p, "P", Nx, Ny, Nz);
-        getRange(T, "T", Nx, Ny, Nz);
-        getRange(mu, "mu", Nx, Ny, Nz);
-        getRange(rhoE1, "RHOE", Nx, Ny, Nz);
-        getRange(sos, "SOS", Nx, Ny, Nz);
+        cout << "  Time since last timestep = " << t2 - t1  << endl;
+        getRange(rho1, "RHO", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(U, "U", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(V, "V", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(W, "W", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(p, "P", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(T, "T", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(mu, "mu", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(rhoE1, "RHOE", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+        getRange(sos, "SOS", pxSize[0], pxSize[1], pxSize[2], mpiRank);
         cout << endl;
 
-        t1Save = std::chrono::system_clock::now();
-    }
-
-    if(useTiming){
-        cout << " > checkSoln  Timing: ";
-        toc();
+	t1 = MPI_Wtime();
     }
 
 
 };
 
-
+/*
 void UniformCSolver::dumpSolution(){
 
     if(useTiming) tic();
