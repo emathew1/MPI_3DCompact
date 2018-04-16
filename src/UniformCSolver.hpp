@@ -35,11 +35,11 @@ class UniformCSolver: public AbstractCSolver{
         bool done;
 
 	//non-conserved data
-	double  *U, 
-		*V,
-		*W,
-	        *T,
-		*p,
+	double  *U, *U2, *U3, 
+		*V, *V2, *V3, 
+		*W, *W2, *W3,
+	        *T, *T2, *T3, 
+		*p, *p2, *p3,
 	       *mu,
 	      *Amu,
 		*k, 
@@ -67,11 +67,23 @@ class UniformCSolver: public AbstractCSolver{
 	double *momZEulerX, *momZEulerY, *momZEulerZ;
 	double *engyEulerX, *engyEulerY, *engyEulerZ;
 
-	double *tempY1, *tempY2, *tempY3, *tempY4, *tempY5;
-	double *tempY6, *tempY7, *tempY8, *tempY9, *tempY10;
+	double *tempX1,  *tempX2,  *tempX3,  *tempX4;;
 
-	double *tempZ1, *tempZ2, *tempZ3, *tempZ4, *tempZ5;
-	double *tempZ6, *tempZ7, *tempZ8, *tempZ9, *tempZ10;
+	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
+	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
+	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
+	double *tempY16, *tempY17, *tempY18, *tempY19, *tempY20;
+	double *tempY21, *tempY22, *tempY23, *tempY24, *tempY25;
+	double *tempY26, *tempY27, *tempY28;
+
+	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
+	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
+	double *tempZ11, *tempZ12, *tempZ13, *tempZ14, *tempZ15;
+	double *tempZ16, *tempZ17, *tempZ18, *tempZ19, *tempZ20;
+	double *tempZ21, *tempZ22, *tempZ23, *tempZ24, *tempZ25;
+	double *tempZ26, *tempZ27, *tempZ28, *tempZ29, *tempZ30;
+	double *tempZ31, *tempZ32, *tempZ33, *tempZ34;
+
 
 
 

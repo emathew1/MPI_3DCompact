@@ -6,7 +6,7 @@ void UniformCSolver::initializeSolverData(){
         cout << endl;
         cout << " > Allocating Solver Arrays..." << endl;
         double workSize = 0;
-        workSize = 116.0 * (double)N * 8.0;
+        workSize = 157.0 * (double)N * 8.0;
         cout << " > Need " << workSize/1024.0/1024.0/1024.0 << " Gb of memory required to allocate solver arrays " << endl;
     }
 
@@ -127,81 +127,107 @@ void UniformCSolver::initializeSolverData(){
     c2d->allocX(W0);
     c2d->allocX(p0);
 
-    //82 finally, the non-conserved data
+    //76
     c2d->allocX(U);
+    c2d->allocY(U2);
+    c2d->allocZ(U3);
+
+    //79
     c2d->allocX(V);
+    c2d->allocY(V2);
+    c2d->allocZ(V3);
+
+    //82
     c2d->allocX(W);
+    c2d->allocY(W2);
+    c2d->allocZ(W3);
+
+    //85
     c2d->allocX(T);
+    c2d->allocY(T2);
+    c2d->allocZ(T3);
+
+    //88
     c2d->allocX(p);
+    c2d->allocY(p2);
+    c2d->allocZ(p3);
+
+    //91
     c2d->allocX(mu);
     c2d->allocX(Amu);
     c2d->allocX(sos);
 
-  
-    //86 
+    //119
     c2d->allocY(tempY1);
     c2d->allocY(tempY2);
     c2d->allocY(tempY3);
     c2d->allocY(tempY4);
     c2d->allocY(tempY5);
-
     c2d->allocY(tempY6);
     c2d->allocY(tempY7);
     c2d->allocY(tempY8);
     c2d->allocY(tempY9);
     c2d->allocY(tempY10);
+    c2d->allocY(tempY11);
+    c2d->allocY(tempY12);
+    c2d->allocY(tempY13);
+    c2d->allocY(tempY14);
+    c2d->allocY(tempY15);
+    c2d->allocY(tempY16);
+    c2d->allocY(tempY17);
+    c2d->allocY(tempY18);
+    c2d->allocY(tempY19);
+    c2d->allocY(tempY20);
+    c2d->allocY(tempY21);
+    c2d->allocY(tempY22);
+    c2d->allocY(tempY23);
+    c2d->allocY(tempY24);
+    c2d->allocY(tempY25);
+    c2d->allocY(tempY26);
+    c2d->allocY(tempY27);
+    c2d->allocY(tempY28);
 
+    //153
     c2d->allocZ(tempZ1);
     c2d->allocZ(tempZ2);
     c2d->allocZ(tempZ3);
     c2d->allocZ(tempZ4);
     c2d->allocZ(tempZ5);
-
     c2d->allocZ(tempZ6);
     c2d->allocZ(tempZ7);
     c2d->allocZ(tempZ8);
     c2d->allocZ(tempZ9);
     c2d->allocZ(tempZ10);
+    c2d->allocZ(tempZ11);
+    c2d->allocZ(tempZ12);
+    c2d->allocZ(tempZ13);
+    c2d->allocZ(tempZ14);
+    c2d->allocZ(tempZ15);
+    c2d->allocZ(tempZ16);
+    c2d->allocZ(tempZ17);
+    c2d->allocZ(tempZ18);
+    c2d->allocZ(tempZ19);
+    c2d->allocZ(tempZ20);
+    c2d->allocZ(tempZ21);
+    c2d->allocZ(tempZ22);
+    c2d->allocZ(tempZ23);
+    c2d->allocZ(tempZ24);
+    c2d->allocZ(tempZ25);
+    c2d->allocZ(tempZ26);
+    c2d->allocZ(tempZ27);
+    c2d->allocZ(tempZ28);
+    c2d->allocZ(tempZ29);
+    c2d->allocZ(tempZ30);
+    c2d->allocZ(tempZ31);
+    c2d->allocZ(tempZ32);
+    c2d->allocZ(tempZ33);
+    c2d->allocZ(tempZ34);
 
-/*
-    //97
-    transRho = new double[Nx*Ny*Nz];
-    transRhoU = new double[Nx*Ny*Nz];
-    transRhoV = new double[Nx*Ny*Nz];
-    transRhoW = new double[Nx*Ny*Nz];
-    transRhoE = new double[Nx*Ny*Nz];
-    transUx   = new double[Nx*Ny*Nz];
-    transVx   = new double[Nx*Ny*Nz];
-    transWx   = new double[Nx*Ny*Nz];
-    transUy = new double[Nx*Ny*Nz];
-    transVy = new double[Nx*Ny*Nz];
-    transWy = new double[Nx*Ny*Nz];
-
-    //105
-    //New memory added for AWS Solver
-    transTempUy = new double[N]; 
-    transTempVy = new double[N]; 
-    transTempWy = new double[N]; 
-    transTempUyy = new double[N]; 
-    transTempVyy = new double[N]; 
-    transTempWyy = new double[N]; 
-    transTempTy = new double[N]; 
-    transTempTyy = new double[N]; 
-
-    //116
-    transTempUxy = new double[N]; 
-    transTempVxy = new double[N]; 
-    transTempWxy = new double[N]; 
-    transTempUyz = new double[N]; 
-    transTempVyz = new double[N]; 
-    transTempWyz = new double[N]; 
-    transTempContEuler = new double[N]; 
-    transTempXEuler = new double[N]; 
-    transTempYEuler = new double[N]; 
-    transTempZEuler = new double[N]; 
-    transTempEngEuler = new double[N]; 
-*/
-
+    //157
+    c2d->allocX(tempX1);
+    c2d->allocX(tempX2);
+    c2d->allocX(tempX3);
+    c2d->allocX(tempX4);
 }
 
 
@@ -1022,17 +1048,14 @@ void UniformCSolver::preStepBCHandling(){
 
 }
 
-/*
-void UniformCSolver::preStepDerivatives(){
 
-    if(useTiming) tic();
+void UniformCSolver::preStepDerivatives(){
 
     double *rhoP;
     double *rhoUP;
     double *rhoVP;
     double *rhoWP;
     double *rhoEP;
-
 
     if(rkStep == 1){
 	rhoP  = rho1;
@@ -1055,390 +1078,225 @@ void UniformCSolver::preStepDerivatives(){
     //First we'll do all of the X-Direction derivatives since we're in XYZ order
 
     //Calculate the Euler Components of the equations... 
-    #pragma omp parallel for 
-    FOR_XYZ{
-	temp[ip]  = rhoUP[ip]*U[ip] + p[ip];
-    	temp2[ip] = rhoVP[ip]*U[ip];
-    	temp3[ip] = rhoWP[ip]*U[ip];
-    	temp4[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip];
-    }
-    omp_set_nested(1);
-
-    const int halfThreadCount = omp_get_num_threads()/NUMTHREADSNEST;
-
-    #pragma omp parallel sections num_threads(halfThreadCount) 
-    {
-        //Calculate the stuff needed for viscous derivatives
-	#pragma omp section
-	{
-            derivX->calc1stDerivField(U, Ux);
-            transposeXYZtoYZX_Fast(Ux, Nx, Ny, Nz, transUx, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivX->calc1stDerivField(rhoUP, contEulerX);
-            transposeXYZtoYZX_Fast(rhoUP, Nx, Ny, Nz, transRhoU, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivX->calc1stDerivField(V, Vx);
-            transposeXYZtoYZX_Fast(Vx, Nx, Ny, Nz, transVx, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivX->calc1stDerivField(W, Wx);
-            transposeXYZtoYZX_Fast(Wx,    Nx, Ny, Nz, transWx, blocksize);
-	}
-
- 	#pragma omp section
-        derivX->calc2ndDerivField(U, Uxx);
-
-	#pragma omp section
-	derivX->calc2ndDerivField(V, Vxx);
-
-	#pragma omp section
-        derivX->calc2ndDerivField(W, Wxx);
-
-	#pragma omp section
-        derivX->calc1stDerivField(T, Tx);
-
-	#pragma omp section
-        derivX->calc2ndDerivField(T, Txx);
-
-        //Compute the Euler Derivatives
-	#pragma omp section
-        derivX->calc1stDerivField(temp,  momXEulerX);
-	#pragma omp section
-        derivX->calc1stDerivField(temp2, momYEulerX);
-	#pragma omp section
-        derivX->calc1stDerivField(temp3, momZEulerX);
-	#pragma omp section
-        derivX->calc1stDerivField(temp4, engyEulerX);
-
-	#pragma omp section
-        transposeXYZtoYZX_Fast(rhoP,  Nx, Ny, Nz, transRho, blocksize);
-
-	#pragma omp section
-        transposeXYZtoYZX_Fast(rhoVP, Nx, Ny, Nz, transRhoV, blocksize);
-
-	#pragma omp section
-        transposeXYZtoYZX_Fast(rhoWP, Nx, Ny, Nz, transRhoW, blocksize);
-
-	#pragma omp section
-        transposeXYZtoYZX_Fast(rhoEP, Nx, Ny, Nz, transRhoE, blocksize);
-
+    FOR_XYZ_XPEN{
+	tempX1[ip] = rhoUP[ip]*U[ip] + p[ip];
+    	tempX2[ip] = rhoVP[ip]*U[ip];
+    	tempX3[ip] = rhoWP[ip]*U[ip];
+    	tempX4[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip];
     }
 
+    derivX->calc1stDerivField(U, Ux); //dU/dx
+    derivX->calc1stDerivField(V, Vx); //dV/dx
+    derivX->calc1stDerivField(W, Wx); //dW/dx
+    derivX->calc1stDerivField(T, Tx); //dT/dx
 
-    //auto t1 = std::chrono::system_clock::now();
-   //derivX->calc1stDerivField(temp4, engyEulerX);
-    //auto t2 = std::chrono::system_clock::now();
-    //cout << "part 1 deriv test, sectioned: " << std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1).count()/(double)1000000000 << endl;    
+    derivX->calc2ndDerivField(U, Uxx); //d2U/dx2
+    derivX->calc2ndDerivField(V, Vxx); //d2V/dx2
+    derivX->calc2ndDerivField(W, Wxx); //d2W/dx2
+    derivX->calc2ndDerivField(T, Txx); //d2T/dx2
+        
+    derivX->calc1stDerivField(rhoUP,  contEulerX); //d(rhoU)/dx
+    derivX->calc1stDerivField(tempX1, momXEulerX); //d(rhoU*U + p)/dx
+    derivX->calc1stDerivField(tempX2, momYEulerX); //d(rhoU*V)/dx
+    derivX->calc1stDerivField(tempX3, momZEulerX); //d(rhoU*W)/dx
+    derivX->calc1stDerivField(tempX4, engyEulerX); //d(rhoE*U + U*p)/dx
 
+    c2d->transposeX2Y_MajorIndex(Ux, tempY1); 
+    c2d->transposeX2Y_MajorIndex(Vx, tempY2);
+    c2d->transposeX2Y_MajorIndex(Wx, tempY3);
+
+    c2d->transposeX2Y_MajorIndex(rhoP,  tempY4);
+    c2d->transposeX2Y_MajorIndex(rhoUP, tempY5);
+    c2d->transposeX2Y_MajorIndex(rhoVP, tempY6);
+    c2d->transposeX2Y_MajorIndex(rhoWP, tempY7);
+    c2d->transposeX2Y_MajorIndex(rhoEP, tempY8);
 
     ///////////////////
     // Y-DERIVATIVES //
     ///////////////////
 
-    #pragma omp parallel for
-    FOR_XYZ{
+    FOR_XYZ_YPEN{
         //Now recalculate properties in the new space
-	U[ip] = transRhoU[ip]/transRho[ip];
-    	V[ip] = transRhoV[ip]/transRho[ip];
-    	W[ip] = transRhoW[ip]/transRho[ip];
-    	p[ip] = ig->solvep(transRho[ip], transRhoE[ip], U[ip], V[ip], W[ip]);
-    	T[ip] = ig->solveT(transRho[ip], p[ip]);
+	U2[ip] = tempY5[ip]/tempY4[ip];
+    	V2[ip] = tempY6[ip]/tempY4[ip];
+    	W2[ip] = tempY7[ip]/tempY4[ip];
+    	p2[ip] = ig->solvep(tempY4[ip], tempY8[ip], U2[ip], V2[ip], W2[ip]);
+    	T2[ip] = ig->solveT(tempY4[ip], p2[ip]);
 
         //Calculate the stuff for Euler derivatives in new space
-    	temp[ip]  = transRhoU[ip]*V[ip];
-    	temp2[ip] = transRhoV[ip]*V[ip] + p[ip];
-    	temp3[ip] = transRhoW[ip]*V[ip];
-    	temp4[ip] = transRhoE[ip]*V[ip] + V[ip]*p[ip];
+    	tempY9[ip]  = tempY5[ip]*V2[ip];
+    	tempY10[ip] = tempY6[ip]*V2[ip] + p2[ip];
+    	tempY11[ip] = tempY7[ip]*V2[ip];
+    	tempY12[ip] = tempY8[ip]*V2[ip] + V2[ip]*p2[ip];
     }
 
-    #pragma omp parallel sections num_threads(halfThreadCount)
-    {
 
-        //Calculate Viscous Derivatives
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(U, transTempUy);
-            transposeYZXtoZXY_Fast(transTempUy, Nx, Ny, Nz, transUy, blocksize);
-            transposeYZXtoXYZ_Fast(transTempUy, Nx, Ny, Nz, Uy, blocksize);
-	}
+    derivY->calc1stDerivField(U2, tempY13); //dU/dy
+    derivY->calc1stDerivField(V2, tempY14); //dV/dy
+    derivY->calc1stDerivField(W2, tempY15); //dW/dy
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(V, transTempVy);
-            transposeYZXtoZXY_Fast(transTempVy, Nx, Ny, Nz, transVy, blocksize);
-            transposeYZXtoXYZ_Fast(transTempVy, Nx, Ny, Nz, Vy, blocksize);
+    derivY->calc1stDerivField(tempY1, tempY16); //d2U/dxdy
+    derivY->calc1stDerivField(tempY2, tempY17); //d2V/dxdy
+    derivY->calc1stDerivField(tempY3, tempY18); //d2W/dxdy
+    
+    derivY->calc2ndDerivField(U2, tempY19); //d2U/dy2
+    derivY->calc2ndDerivField(V2, tempY20); //d2V/dy2
+    derivY->calc2ndDerivField(W2, tempY21); //d2W/dy2
 
-	}
+    derivY->calc1stDerivField(T2, tempY22); //dT/dy
+    derivY->calc2ndDerivField(T2, tempY23); //d2T/dy2
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(W, transTempWy);
-            transposeYZXtoZXY_Fast(transTempWy, Nx, Ny, Nz, transWy, blocksize);
-            transposeYZXtoXYZ_Fast(transTempWy, Nx, Ny, Nz, Wy, blocksize);
-	}
+   
+    derivY->calc1stDerivField(tempY6, tempY24); //d(rhoV)/dy
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(transUx, transTempUxy);
-            transposeXYZtoZXY_Fast(Ux, Nx, Ny, Nz, transUx, blocksize); //This could be separated if new transUx made
-            transposeYZXtoXYZ_Fast(transTempUxy, Nx, Ny, Nz, Uxy, blocksize);
-	}
+    derivY->calc1stDerivField(tempY9, tempY25); //d(rhoU*V)/dy
+    derivY->calc1stDerivField(tempY10, tempY26); //d(rhoV*V + p)/dy
+    derivY->calc1stDerivField(tempY11, tempY27); //d(rhoW*V)/dy
+    derivY->calc1stDerivField(tempY12, tempY28); //d(rhoE*V + V*p)/dy
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(transVx, transTempVxy);
-            transposeXYZtoZXY_Fast(Vx, Nx, Ny, Nz, transVx, blocksize); //Could be separated if new transVx made
-            transposeYZXtoXYZ_Fast(transTempVxy, Nx, Ny, Nz, Vxy, blocksize);
-	}
+    //Move things we need to back to X
+    c2d->transposeY2X_MajorIndex(tempY13, Uy); 
+    c2d->transposeY2X_MajorIndex(tempY14, Vy); 
+    c2d->transposeY2X_MajorIndex(tempY15, Wy); 
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(transWx, transTempWxy);
-            transposeXYZtoZXY_Fast(Wx, Nx, Ny, Nz, transWx, blocksize); //Could be separated if new transWx made
-            transposeYZXtoXYZ_Fast(transTempWxy, Nx, Ny, Nz, Wxy, blocksize);
-	}
+    c2d->transposeY2X_MajorIndex(tempY16, Uxy);
+    c2d->transposeY2X_MajorIndex(tempY17, Vxy);
+    c2d->transposeY2X_MajorIndex(tempY18, Wxy);
 
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(transRhoV, transTempContEuler);
-            transposeXYZtoZXY_Fast(rhoVP, Nx, Ny, Nz, transRhoV, blocksize); //Could be separated if new transRhoV made
-            transposeYZXtoXYZ_Fast(transTempContEuler, Nx, Ny, Nz, contEulerY, blocksize);
-	}
+    c2d->transposeY2X_MajorIndex(tempY19, Uyy);
+    c2d->transposeY2X_MajorIndex(tempY20, Vyy);
+    c2d->transposeY2X_MajorIndex(tempY21, Wyy);
 
+    c2d->transposeY2X_MajorIndex(tempY22, Ty);
+    c2d->transposeY2X_MajorIndex(tempY23, Tyy);
 
-	#pragma omp section
-	{
-            derivY->calc2ndDerivField(U, transTempUyy);
-            transposeYZXtoXYZ_Fast(transTempUyy, Nx, Ny, Nz, Uyy, blocksize);
-	}
+    c2d->transposeY2X_MajorIndex(tempY24, contEulerY);
+    c2d->transposeY2X_MajorIndex(tempY25, momXEulerY);
+    c2d->transposeY2X_MajorIndex(tempY26, momYEulerY);
+    c2d->transposeY2X_MajorIndex(tempY27, momZEulerY);
+    c2d->transposeY2X_MajorIndex(tempY28, engyEulerY);
 
-	#pragma omp section
-	{
-            derivY->calc2ndDerivField(V, transTempVyy);
-            transposeYZXtoXYZ_Fast(transTempVyy, Nx, Ny, Nz, Vyy, blocksize);
-	}
+    //Move things we need to move over to Z
+    c2d->transposeY2Z_MajorIndex(tempY13, tempZ1); //dU/dy 
+    c2d->transposeY2Z_MajorIndex(tempY14, tempZ2); //dV/dy
+    c2d->transposeY2Z_MajorIndex(tempY15, tempZ3); //dW/dy
 
-	#pragma omp section
-	{
-            derivY->calc2ndDerivField(W, transTempWyy);
-            transposeYZXtoXYZ_Fast(transTempWyy, Nx, Ny, Nz, Wyy, blocksize);
-	}
+    c2d->transposeY2Z_MajorIndex(tempY1, tempZ4); //dU/dx
+    c2d->transposeY2Z_MajorIndex(tempY2, tempZ5); //dV/dx
+    c2d->transposeY2Z_MajorIndex(tempY3, tempZ6); //dW/dx
 
-
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(T, transTempTy);
-            transposeYZXtoXYZ_Fast(transTempTy, Nx, Ny, Nz, Ty, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivY->calc2ndDerivField(T, transTempTyy);
-            transposeYZXtoXYZ_Fast(transTempTyy, Nx, Ny, Nz, Tyy, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(temp, transTempXEuler);
-            transposeYZXtoXYZ_Fast(transTempXEuler, Nx, Ny, Nz, momXEulerY, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(temp2, transTempYEuler);
-            transposeYZXtoXYZ_Fast(transTempYEuler, Nx, Ny, Nz, momYEulerY, blocksize);
-	}
-
-	#pragma omp section
-	{
-            derivY->calc1stDerivField(temp3, transTempZEuler);
-            transposeYZXtoXYZ_Fast(transTempZEuler, Nx, Ny, Nz, momZEulerY, blocksize);
-	}
-	
-	#pragma omp section
-	{
-	    derivY->calc1stDerivField(temp4, transTempEngEuler);
-            transposeYZXtoXYZ_Fast(transTempEngEuler, Nx, Ny, Nz, engyEulerY, blocksize);
-	}
-
-	#pragma omp section
-        transposeXYZtoZXY_Fast(rhoP,  Nx, Ny, Nz, transRho, blocksize);
-
-	#pragma omp section
-        transposeXYZtoZXY_Fast(rhoUP, Nx, Ny, Nz, transRhoU, blocksize);
-
-	#pragma omp section
-        transposeXYZtoZXY_Fast(rhoWP, Nx, Ny, Nz, transRhoW, blocksize);
-
-	#pragma omp section
-        transposeXYZtoZXY_Fast(rhoEP, Nx, Ny, Nz, transRhoE, blocksize);
-
-    }
-
+    c2d->transposeY2Z_MajorIndex(tempY4, tempZ7); //rho
+    c2d->transposeY2Z_MajorIndex(tempY5, tempZ8); //rhoU
+    c2d->transposeY2Z_MajorIndex(tempY6, tempZ9); //rhoV
+    c2d->transposeY2Z_MajorIndex(tempY7, tempZ10); //rhoW
+    c2d->transposeY2Z_MajorIndex(tempY8, tempZ11); //rhoE
 
     ///////////////////
     // Z-DERIVATIVES //
     ///////////////////
 
     //Now recalculate properties in the new space
-    #pragma omp parallel for
-    FOR_XYZ{
-        U[ip] = transRhoU[ip]/transRho[ip];
-        V[ip] = transRhoV[ip]/transRho[ip];
-        W[ip] = transRhoW[ip]/transRho[ip];
-        p[ip] = ig->solvep(transRho[ip], transRhoE[ip], U[ip], V[ip], W[ip]);
-        T[ip] = ig->solveT(transRho[ip], p[ip]);
+    FOR_XYZ_ZPEN{
+        U3[ip] =  tempZ8[ip]/tempZ7[ip];
+        V3[ip] =  tempZ9[ip]/tempZ7[ip];
+        W3[ip] = tempZ10[ip]/tempZ7[ip];
+        p3[ip] = ig->solvep(tempZ7[ip], tempZ11[ip], U3[ip], V3[ip], W3[ip]);
+        T3[ip] = ig->solveT(tempZ7[ip], p3[ip]);
 
         //Calculate the stuff for the Euler Derivatives
-        temp[ip]  = transRhoU[ip]*W[ip];
-        temp2[ip] = transRhoV[ip]*W[ip];
-        temp3[ip] = transRhoW[ip]*W[ip] + p[ip];
-        temp4[ip] = transRhoE[ip]*W[ip] + W[ip]*p[ip];
+        tempZ12[ip] =  tempZ8[ip]*W3[ip];
+        tempZ13[ip] =  tempZ9[ip]*W3[ip];
+        tempZ14[ip] = tempZ10[ip]*W3[ip] + p3[ip];
+        tempZ15[ip] = tempZ11[ip]*W3[ip] + W3[ip]*p3[ip];
     }
 
-    #pragma omp parallel sections num_threads(halfThreadCount)
-    {
-        //Calculate the viscous derivatives
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(U, transTempUy);
-	    transposeZXYtoXYZ_Fast(transTempUy, Nx, Ny, Nz, Uz, blocksize);
-	}
+//TODO LEFT OFF MOVING TO MPI HERE!!!
+   
+    //Calculate the Z direction derivatives
+    derivZ->calc1stDerivField(U3, tempZ16); //dU/dz
+    derivZ->calc1stDerivField(V3, tempZ17); //dV/dz
+    derivZ->calc1stDerivField(W3, tempZ18); //dW/dz
+    derivZ->calc1stDerivField(T3, tempZ19); //dT/dz
 
-	#pragma omp section
-	{
-            derivZ->calc2ndDerivField(U, transTempUyy);
-	    transposeZXYtoXYZ_Fast(transTempUyy, Nx, Ny, Nz, Uzz, blocksize);
-	}
+    derivZ->calc2ndDerivField(U3, tempZ20); //d2U/dz2
+    derivZ->calc2ndDerivField(V3, tempZ21); //d2V/dz2
+    derivZ->calc2ndDerivField(W3, tempZ22); //d2W/dz2
+    derivZ->calc2ndDerivField(T3, tempZ23); //d2T/dz2
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(V, transTempVy);
-	    transposeZXYtoXYZ_Fast(transTempVy, Nx, Ny, Nz, Vz, blocksize);
-	}
+    derivZ->calc1stDerivField(tempZ1, tempZ24); //d2U/dydz
+    derivZ->calc1stDerivField(tempZ2, tempZ25); //d2V/dydz
+    derivZ->calc1stDerivField(tempZ3, tempZ26); //d2W/dydz
 
-	#pragma omp section
-	{
-            derivZ->calc2ndDerivField(V, transTempVyy);
-	    transposeZXYtoXYZ_Fast(transTempVyy, Nx, Ny, Nz, Vzz, blocksize);
-	}
-	
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(W, transTempWy);
-	    transposeZXYtoXYZ_Fast(transTempWy, Nx, Ny, Nz, Wz, blocksize);
-	}
+    derivZ->calc1stDerivField(tempZ4, tempZ27); //d2U/dxdz 
+    derivZ->calc1stDerivField(tempZ5, tempZ28); //d2V/dxdz 
+    derivZ->calc1stDerivField(tempZ6, tempZ29); //d2W/dxdz 
 
-	#pragma omp section
-	{
-            derivZ->calc2ndDerivField(W, transTempWyy);
-	    transposeZXYtoXYZ_Fast(transTempWyy, Nx, Ny, Nz, Wzz, blocksize);
-	}
+    derivZ->calc1stDerivField(tempZ12, tempZ30); //d(rhoU*W)/dz
+    derivZ->calc1stDerivField(tempZ13, tempZ31); //d(rhoV*W)/dz
+    derivZ->calc1stDerivField(tempZ14, tempZ32); //d(rhoW*W + p)/dz
+    derivZ->calc1stDerivField(tempZ15, tempZ33); //d(rhoE*W + W*p)/dz
+    derivZ->calc1stDerivField(tempZ10, tempZ34); //d(rhoW)/dz
+    
+    //Move the things we need back to X
+    c2d->transposeZ2Y_MajorIndex(tempZ16, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Uz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(T, transTempTy);
-	    transposeZXYtoXYZ_Fast(transTempTy, Nx, Ny, Nz, Tz, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ17, tempY1);
+    c2d->transposeY2X_MajorIndex(tempY1, Vz);
+ 
+    c2d->transposeZ2Y_MajorIndex(tempZ18, tempY1);
+    c2d->transposeY2X_MajorIndex(tempY1, Wz);
+ 
+    c2d->transposeZ2Y_MajorIndex(tempZ19, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Ty);
 
-	#pragma omp section
-	{
-            derivZ->calc2ndDerivField(T, transTempTyy);
-	    transposeZXYtoXYZ_Fast(transTempTyy, Nx, Ny, Nz, Tzz, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ20, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Uzz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transUx, transTempUxy);
-	    transposeZXYtoXYZ_Fast(transTempUxy, Nx, Ny, Nz, Uxz, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ21, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Vzz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transVx, transTempVxy);
-	    transposeZXYtoXYZ_Fast(transTempVxy, Nx, Ny, Nz, Vxz, blocksize);
-	}
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transWx, transTempWxy);
-	    transposeZXYtoXYZ_Fast(transTempWxy, Nx, Ny, Nz, Wxz, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ22, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Wzz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transUy, transTempUyz);
-	    transposeZXYtoXYZ_Fast(transTempUyz, Nx, Ny, Nz, Uyz, blocksize);
-	}
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transVy, transTempVyz);
-	    transposeZXYtoXYZ_Fast(transTempVyz, Nx, Ny, Nz, Vyz, blocksize);
-	}
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transWy, transTempWyz);
-	    transposeZXYtoXYZ_Fast(transTempWyz, Nx, Ny, Nz, Wyz, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ23, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Tzz);
 
-        //Calculate the Euler Derivatives
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(transRhoW, transTempContEuler);
-	    transposeZXYtoXYZ_Fast(transTempContEuler, Nx, Ny, Nz, contEulerZ, blocksize);
-	}
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(temp,	 transTempXEuler);
-	    transposeZXYtoXYZ_Fast(transTempXEuler, Nx, Ny, Nz, momXEulerZ, blocksize);
-	}
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(temp2,	 transTempYEuler);
-	    transposeZXYtoXYZ_Fast(transTempYEuler, Nx, Ny, Nz, momYEulerZ, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ24, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Uyz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(temp3,	 transTempZEuler);
-	    transposeZXYtoXYZ_Fast(transTempZEuler, Nx, Ny, Nz, momZEulerZ, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ25, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Vyz);
 
-	#pragma omp section
-	{
-            derivZ->calc1stDerivField(temp4,	 transTempEngEuler);
-	    transposeZXYtoXYZ_Fast(transTempEngEuler, Nx, Ny, Nz, engyEulerZ, blocksize);
-	}
+    c2d->transposeZ2Y_MajorIndex(tempZ26, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Wyz);
 
-    }
+    c2d->transposeZ2Y_MajorIndex(tempZ27, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Uxz);
 
-    //Going back to original...
-    #pragma omp parallel for
-    FOR_XYZ{
-	U[ip] = rhoUP[ip]/rhoP[ip];
-        V[ip] = rhoVP[ip]/rhoP[ip];
-        W[ip] = rhoWP[ip]/rhoP[ip];
-        p[ip] = ig->solvep(rhoP[ip], rhoEP[ip], U[ip], V[ip], W[ip]);
-        T[ip] = ig->solveT(rhoP[ip], p[ip]);
-    }
+    c2d->transposeZ2Y_MajorIndex(tempZ28, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Vxz);
 
-    omp_set_nested(0);
+    c2d->transposeZ2Y_MajorIndex(tempZ29, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Wxz);
 
-    if(useTiming){
-        cout << " > preStepDer Timing: ";
-        toc();
-    }
+    c2d->transposeZ2Y_MajorIndex(tempZ34, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, contEulerZ);
 
+    c2d->transposeZ2Y_MajorIndex(tempZ30, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, momXEulerZ);
+
+    c2d->transposeZ2Y_MajorIndex(tempZ31, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, momYEulerZ);
+
+    c2d->transposeZ2Y_MajorIndex(tempZ32, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, momZEulerZ);
+
+    c2d->transposeZ2Y_MajorIndex(tempZ33, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, engyEulerZ);
 
 }
-*/
+
 
 void UniformCSolver::solveContinuity(){
 
@@ -2510,11 +2368,14 @@ void UniformCSolver::checkSolution(){
 
 	t2 = MPI_Wtime();
 
-	cout << endl;
-        cout << "-------------------------------------------------" << endl;
-        cout << " Step = "<< timeStep << ", time = " << time << ", dt = " << ts->dt << endl;
-        cout << "-------------------------------------------------" << endl;
-        cout << "  Time since last timestep = " << t2 - t1  << endl;
+	IF_RANK0{
+	    cout << endl;
+            cout << "-------------------------------------------------" << endl;
+            cout << " Step = "<< timeStep << ", time = " << time << ", dt = " << ts->dt << endl;
+            cout << "-------------------------------------------------" << endl;
+            cout << "  Time since last timestep = " << t2 - t1  << endl;
+	}
+	
         getRange(rho1, "RHO", pxSize[0], pxSize[1], pxSize[2], mpiRank);
         getRange(U, "U", pxSize[0], pxSize[1], pxSize[2], mpiRank);
         getRange(V, "V", pxSize[0], pxSize[1], pxSize[2], mpiRank);
@@ -2532,108 +2393,51 @@ void UniformCSolver::checkSolution(){
 
 };
 
-/*
+
 void UniformCSolver::dumpSolution(){
 
-    if(useTiming) tic();
 
-    if(timeStep%ts->dumpStep == 0){
-        cout << endl;
-        cout << " > ===============" << endl;
-        cout << " >  DUMPING FIELD " << endl;
-        cout << " > ===============" << endl;
+	double time1 = MPI_Wtime();
+
+	IF_RANK0{
+            cout << endl;
+            cout << " > ===============" << endl;
+            cout << " >  DUMPING FIELD " << endl;
+            cout << " > ===============" << endl;
+	}
 
         ofstream outfile;
         outfile.precision(17);
         string outputFileName;
+	outputFileName = "SolutionDump.";
+	outputFileName.append(to_string(timeStep));
 
-        outputFileName = "rho.out.";
-        outputFileName.append(to_string(timeStep));
-        outfile.open(outputFileName, ios::binary | ios::out);
-	outfile.write((char*)rho1, sizeof(double)*Nx*Ny*Nz);
-        outfile.close();
+	MPI_File fh;
+	MPI_Offset disp, filesize;
 
-        outputFileName = "rhoU.out.";
-        outputFileName.append(to_string(timeStep));
-        outfile.open(outputFileName, ios::binary | ios::out);
-	outfile.write((char*)rhoU1, sizeof(double)*Nx*Ny*Nz);
-        outfile.close();
+	MPI_File_open(MPI_COMM_WORLD, outputFileName.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
 
-        outputFileName = "rhoV.out.";
-        outputFileName.append(to_string(timeStep));
-        outfile.open(outputFileName, ios::binary | ios::out);
-	outfile.write((char*)rhoV1, sizeof(double)*Nx*Ny*Nz);
-        outfile.close();
+	filesize = 0;
+	MPI_File_set_size(fh, filesize);
 
-        outputFileName = "rhoW.out.";
-        outputFileName.append(to_string(timeStep));
-        outfile.open(outputFileName, ios::binary | ios::out);
-	outfile.write((char*)rhoW1, sizeof(double)*Nx*Ny*Nz);
-        outfile.close();
+	disp = 0;
+	c2d->writeVar(fh, disp, 0, rho1);
+	c2d->writeVar(fh, disp, 0, rhoU1);
+	c2d->writeVar(fh, disp, 0, rhoV1);
+	c2d->writeVar(fh, disp, 0, rhoW1);
+	c2d->writeVar(fh, disp, 0, rhoE1);
 
-        outputFileName = "rhoE.out.";
-        outputFileName.append(to_string(timeStep));
-        outfile.open(outputFileName, ios::binary | ios::out);
-	outfile.write((char*)rhoE1, sizeof(double)*Nx*Ny*Nz);
-        outfile.close();
+	MPI_File_close(&fh);
 
-	int dumpSigma = 0;
-	if(dumpSigma == 1){
-	    outputFileName = "sigma.out";
-            outputFileName.append(to_string(timeStep));
-            outfile.open(outputFileName);
-            outfile.precision(17);
-            FOR_XYZ{
-                 outfile << spg->sigma[ip] << " ";
-            }
-	    outfile.close();
+	double time2 = MPI_Wtime();
+
+	IF_RANK0{
+	    cout << endl;
+	    cout << " > File dump took " << time2-time1 << " seconds." << endl;
 	}
-
-	int dumpVorticityMag = 0;
-	if(dumpVorticityMag == 1){
-	   double *vortMag = new double[N];
-	   #pragma omp parallel for
-	   FOR_XYZ{
-		double wx, wy, wz;
-		wx = Wy[ip] - Vz[ip];
-		wy = Uz[ip] - Wx[ip];
-		wz = Vx[ip] - Uy[ip];
-		vortMag[ip] = sqrt(wx*wx + wy*wy + wz*wz);
-	   }
-	   string str = "vortMag.";
-	   str.append(to_string(timeStep));
-	   str.append(".out");
-	   FILE *fp = fopen(str.c_str(), "wb");
-	   fwrite((void *)vortMag, sizeof(double), Nx*Ny*Nx, fp);
-	   fclose(fp);
-
-           outputFileName = "vortMag.";
-           outputFileName.append(to_string(timeStep));
-	   outputFileName.append(".bov");
-           outfile.open(outputFileName);
-           outfile.precision(17);
-	   outfile << "TIME: " << time << endl;	   
-	   outfile << "DATA_FILE: " << str << endl;	   
-	   outfile << "DATA_SIZE: " << Nx << " " << Ny << " " << Nz << endl;	   
-	   outfile << "DATA_FORMAT: DOUBLE" << endl;	   
-	   outfile << "VARIABLE: vortmag" << endl;	   
-	   outfile << "DATA_ENDIAN: LITTLE" << endl;	   
-	   outfile << "CENTERING: ZONAL" << endl;	   
-	   outfile << "BRICK_ORIGIN: 0. 0. 0." << endl;	   
-	   outfile << "BRICK_SIZE:" << Nx << ". " << Ny << ". " << Nz << ". " << endl;	   
-	   outfile.close();
-
-	}
-
-    }
-    if(useTiming){
-        cout << " > dumpSoln   Timing: ";
-        toc();
-    }
-
 
 }
-
+/*
 void UniformCSolver::writeImages(){
 
     if(useTiming) tic();
@@ -2803,23 +2607,28 @@ void UniformCSolver::writeImages(){
 
 
 }
-
+*/
 void UniformCSolver::checkEnd(){
 
-    if(useTiming) tic();
 
     if(time >= ts->maxTime){
-	cout << "=================" << endl;
-	cout << " HIT END OF TIME " << endl;
-	cout << "=================" << endl;
+
+	IF_RANK0{
+	    cout << "=================" << endl;
+	    cout << " HIT END OF TIME " << endl;
+	    cout << "=================" << endl;
+	}
 
 	endFlag = true;
     }
 
     if(timeStep >= ts->maxTimeStep){
-	cout << "=================" << endl;
-	cout << " HIT END OF TIME " << endl;
-	cout << "=================" << endl;
+	
+	IF_RANK0{
+	    cout << "=================" << endl;
+	    cout << " HIT END OF TIME " << endl;
+	    cout << "=================" << endl;
+	}
 
 	endFlag = true;
 
@@ -2829,12 +2638,8 @@ void UniformCSolver::checkEnd(){
 	dumpSolution();
     }
 
-    if(useTiming){
-	cout << " > checkEnd   Timing: ";
-	toc();
-    }
 }
-
+/*
 void UniformCSolver::reportAll(){
 
    cout << "REPORT ALL" << endl;
@@ -2938,64 +2743,62 @@ cout << " " << endl;
 /////////////////////////////////////
 
 void UniformCSolver::preStep(){
-/* 
+ 
    if(timeStep == 0){
         dumpSolution();
-	writeImages();
+//	writeImages();
     }
     
     calcDtFromCFL();
-*/
+
 }
 
 void UniformCSolver::preSubStep(){
-/*
+
     preStepBCHandling();
     preStepDerivatives();
-*/
+
 }
 
 void UniformCSolver::solveEqnSet(){
-/*
+
     solveContinuity();
     solveXMomentum();
     solveYMomentum();
     solveZMomentum();
     solveEnergy();
-*/
+
 }
 
 void UniformCSolver::postSubStep(){
-/*
+
     postStepBCHandling();
-*/
+
 }
 
 void UniformCSolver::updateData(){
-/*
+
     if(rkLast){
         filterConservedData();
     }
     updateNonConservedData();
-*/
+
 }
 
 void UniformCSolver::postStep(){
-/*
+
     //calcTurbulenceQuantities();
-    shearLayerInfoCalc();
+    //shearLayerInfoCalc();
     //calcTaylorGreenQuantities();
 
     updateSponge();
     checkSolution();
-    dumpSolution();
-    writeImages();
 
-    if(timeStep%aoWriteStep == 0)
-        ao->computeAO();
+    if(timeStep%ts->dumpStep == 0)
+        dumpSolution();
 
     checkEnd();
     //reportAll();
-*/
+
 }
 

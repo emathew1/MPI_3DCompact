@@ -45,9 +45,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 20,
-           Ny = 20,
-           Nz = 20;
+    int    Nx = 100,
+           Ny = 100,
+           Nz = 100;
     double Lx = 19.0,
            Ly = 19.0,
            Lz = 19.0;;
@@ -120,11 +120,41 @@ int main(int argc, char *argv[]){
     AbstractCSolver *cs;
     cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      
+
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
     ///////////////////////////////////////////
     AbstractRK *rk;
+    rk = new TVDRK3(cs);
 
+
+    ///////////////////////////////
+    //Set flow initial conditions//
+    ///////////////////////////////
+    FOR_Z_XPEN{
+        FOR_Y_XPEN{
+            FOR_X_XPEN{
+
+                int ip = GETMAJIND_XPEN;
+
+		int ii = GETGLOBALXIND_XPEN;		
+		int jj = GETGLOBALYIND_XPEN;		
+		int kk = GETGLOBALZIND_XPEN;
+
+		double x = d->x[ii]; 		
+		double y = d->y[jj]; 		
+		double z = d->z[kk]; 		
+
+                cs->rho0[ip] = 1.0;
+                cs->p0[ip]   = 1.0/cs->ig->gamma;
+                cs->U0[ip]   = 0.0;
+                cs->V0[ip]   = 0.0;
+                cs->W0[ip]   = 0.0;
+            }
+        }
+    }
+   
+    rk->executeSolverLoop();  
 
     //Now lets kill MPI
     MPI_Finalize();
