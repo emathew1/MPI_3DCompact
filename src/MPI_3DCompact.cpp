@@ -45,12 +45,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 100,
-           Ny = 100,
-           Nz = 100;
-    double Lx = 19.0,
-           Ly = 19.0,
-           Lz = 19.0;;
+    int    Nx = 50,
+           Ny = 50,
+           Nz = 50;
+    double Lx = 1.0,
+           Ly = 1.0,
+           Lz = 1.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -70,16 +70,16 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcXType = BC::PERIODIC_SOLVE;
+    BC::BCType bcYType = BC::PERIODIC_SOLVE;
+    BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcX1 = BC::SPONGE;
-    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY1 = BC::SPONGE;
-    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcZ1 = BC::SPONGE;
+    BC::BCKind bcX0 = BC::PERIODIC;
+    BC::BCKind bcX1 = BC::PERIODIC;
+    BC::BCKind bcY0 = BC::PERIODIC;
+    BC::BCKind bcY1 = BC::PERIODIC;
+    BC::BCKind bcZ0 = BC::PERIODIC;
+    BC::BCKind bcZ1 = BC::PERIODIC;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -141,12 +141,17 @@ int main(int argc, char *argv[]){
 		int jj = GETGLOBALYIND_XPEN;		
 		int kk = GETGLOBALZIND_XPEN;
 
-		double x = d->x[ii]; 		
-		double y = d->y[jj]; 		
-		double z = d->z[kk]; 		
+		double x  = d->x[ii];
+		double x0 = 0.5; 		
+		double y  = d->y[jj]; 		
+		double y0 = 0.5; 		
+		double z  = d->z[kk]; 		
+		double z0 = 0.5; 		
+
+		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
                 cs->rho0[ip] = 1.0;
-                cs->p0[ip]   = 1.0/cs->ig->gamma;
+                cs->p0[ip]   = (1.0 + exp(-r2/0.0001))/cs->ig->gamma;
                 cs->U0[ip]   = 0.0;
                 cs->V0[ip]   = 0.0;
                 cs->W0[ip]   = 0.0;

@@ -6,7 +6,7 @@ void UniformCSolver::initializeSolverData(){
         cout << endl;
         cout << " > Allocating Solver Arrays..." << endl;
         double workSize = 0;
-        workSize = 157.0 * (double)N * 8.0;
+        workSize = 158.0 * (double)N * 8.0;
         cout << " > Need " << workSize/1024.0/1024.0/1024.0 << " Gb of memory required to allocate solver arrays " << endl;
     }
 
@@ -223,11 +223,12 @@ void UniformCSolver::initializeSolverData(){
     c2d->allocZ(tempZ33);
     c2d->allocZ(tempZ34);
 
-    //157
+    //158
     c2d->allocX(tempX1);
     c2d->allocX(tempX2);
     c2d->allocX(tempX3);
     c2d->allocX(tempX4);
+    c2d->allocX(tempX5);
 }
 
 
@@ -632,6 +633,12 @@ void UniformCSolver::setInitialConditions(){
     }
 
     IF_RANK0 std::cout << " > Finished initialization of flow field " << std::endl;
+
+    getRange(rho1,  "rho0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoU1, "rhoU0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoV1, "rhoV0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoW1, "rhoW0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoE1, "rhoE0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
 
 }
 
@@ -1077,12 +1084,19 @@ void UniformCSolver::preStepDerivatives(){
 
     //First we'll do all of the X-Direction derivatives since we're in XYZ order
 
-    //Calculate the Euler Components of the equations... 
+    //Calculate the Euler Components of the equations...
+
+    //Using pointers to temp arrays to make more readable...
+    double *tempEulerX, *tempEulerY, *tempEulerZ, *tempEulerEngy;
+    tempEulerX = tempX1;
+    tempEulerY = tempX2;
+    tempEulerZ = tempX3;
+    tempEulerEngy = tempX4; 
     FOR_XYZ_XPEN{
-	tempX1[ip] = rhoUP[ip]*U[ip] + p[ip];
-    	tempX2[ip] = rhoVP[ip]*U[ip];
-    	tempX3[ip] = rhoWP[ip]*U[ip];
-    	tempX4[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip];
+	tempEulerX[ip]    = rhoUP[ip]*U[ip] + p[ip];
+    	tempEulerY[ip]    = rhoVP[ip]*U[ip];
+    	tempEulerZ[ip]    = rhoWP[ip]*U[ip];
+    	tempEulerEngy[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip];
     }
 
     derivX->calc1stDerivField(U, Ux); //dU/dx
@@ -1096,203 +1110,251 @@ void UniformCSolver::preStepDerivatives(){
     derivX->calc2ndDerivField(T, Txx); //d2T/dx2
         
     derivX->calc1stDerivField(rhoUP,  contEulerX); //d(rhoU)/dx
-    derivX->calc1stDerivField(tempX1, momXEulerX); //d(rhoU*U + p)/dx
-    derivX->calc1stDerivField(tempX2, momYEulerX); //d(rhoU*V)/dx
-    derivX->calc1stDerivField(tempX3, momZEulerX); //d(rhoU*W)/dx
-    derivX->calc1stDerivField(tempX4, engyEulerX); //d(rhoE*U + U*p)/dx
+    derivX->calc1stDerivField(tempEulerX, momXEulerX); //d(rhoU*U + p)/dx
+    derivX->calc1stDerivField(tempEulerY, momYEulerX); //d(rhoU*V)/dx
+    derivX->calc1stDerivField(tempEulerZ, momZEulerX); //d(rhoU*W)/dx
+    derivX->calc1stDerivField(tempEulerEngy, engyEulerX); //d(rhoE*U + U*p)/dx
 
-    c2d->transposeX2Y_MajorIndex(Ux, tempY1); 
-    c2d->transposeX2Y_MajorIndex(Vx, tempY2);
-    c2d->transposeX2Y_MajorIndex(Wx, tempY3);
-
-    c2d->transposeX2Y_MajorIndex(rhoP,  tempY4);
-    c2d->transposeX2Y_MajorIndex(rhoUP, tempY5);
-    c2d->transposeX2Y_MajorIndex(rhoVP, tempY6);
-    c2d->transposeX2Y_MajorIndex(rhoWP, tempY7);
-    c2d->transposeX2Y_MajorIndex(rhoEP, tempY8);
+    double *Ux2, *Vx2, *Wx2;
+    Ux2 = tempY1; Vx2 = tempY2; Wx2 = tempY3;
+    c2d->transposeX2Y_MajorIndex(Ux, Ux2); 
+    c2d->transposeX2Y_MajorIndex(Vx, Vx2);
+    c2d->transposeX2Y_MajorIndex(Wx, Wx2);
+    
+    double *rhoP2, *rhoUP2, *rhoVP2, *rhoWP2, *rhoEP2;
+    rhoP2 = tempY4; 
+    rhoUP2 = tempY5; 
+    rhoVP2 = tempY6; 
+    rhoWP2 = tempY7; 
+    rhoEP2 = tempY8;
+    c2d->transposeX2Y_MajorIndex(rhoP,  rhoP2);
+    c2d->transposeX2Y_MajorIndex(rhoUP, rhoUP2);
+    c2d->transposeX2Y_MajorIndex(rhoVP, rhoVP2);
+    c2d->transposeX2Y_MajorIndex(rhoWP, rhoWP2);
+    c2d->transposeX2Y_MajorIndex(rhoEP, rhoEP2);
 
     ///////////////////
     // Y-DERIVATIVES //
     ///////////////////
 
+    double *tempEulerX2, *tempEulerY2, *tempEulerZ2, *tempEulerEngy2;
+    tempEulerX2    = tempY9;
+    tempEulerY2    = tempY10;
+    tempEulerZ2    = tempY11;
+    tempEulerEngy2 = tempY12;
+
     FOR_XYZ_YPEN{
         //Now recalculate properties in the new space
-	U2[ip] = tempY5[ip]/tempY4[ip];
-    	V2[ip] = tempY6[ip]/tempY4[ip];
-    	W2[ip] = tempY7[ip]/tempY4[ip];
-    	p2[ip] = ig->solvep(tempY4[ip], tempY8[ip], U2[ip], V2[ip], W2[ip]);
-    	T2[ip] = ig->solveT(tempY4[ip], p2[ip]);
+	U2[ip] = rhoUP2[ip]/rhoP2[ip];
+    	V2[ip] = rhoVP2[ip]/rhoP2[ip];
+    	W2[ip] = rhoWP2[ip]/rhoP2[ip];
+    	p2[ip] = ig->solvep(rhoP2[ip], rhoEP2[ip], U2[ip], V2[ip], W2[ip]);
+    	T2[ip] = ig->solveT(rhoP2[ip], p2[ip]);
 
         //Calculate the stuff for Euler derivatives in new space
-    	tempY9[ip]  = tempY5[ip]*V2[ip];
-    	tempY10[ip] = tempY6[ip]*V2[ip] + p2[ip];
-    	tempY11[ip] = tempY7[ip]*V2[ip];
-    	tempY12[ip] = tempY8[ip]*V2[ip] + V2[ip]*p2[ip];
+    	tempEulerX2[ip]    = rhoUP2[ip]*V2[ip];
+    	tempEulerY2[ip]    = rhoVP2[ip]*V2[ip] + p2[ip];
+    	tempEulerZ2[ip]    = rhoWP2[ip]*V2[ip];
+    	tempEulerEngy2[ip] = rhoEP2[ip]*V2[ip] + V2[ip]*p2[ip];
     }
 
+    double *Uy2, *Vy2, *Wy2;
+    Uy2 = tempY13; Vy2 = tempY14; Wy2 = tempY15;
+    derivY->calc1stDerivField(U2, Uy2); //dU/dy
+    derivY->calc1stDerivField(V2, Vy2); //dV/dy
+    derivY->calc1stDerivField(W2, Wy2); //dW/dy
 
-    derivY->calc1stDerivField(U2, tempY13); //dU/dy
-    derivY->calc1stDerivField(V2, tempY14); //dV/dy
-    derivY->calc1stDerivField(W2, tempY15); //dW/dy
-
-    derivY->calc1stDerivField(tempY1, tempY16); //d2U/dxdy
-    derivY->calc1stDerivField(tempY2, tempY17); //d2V/dxdy
-    derivY->calc1stDerivField(tempY3, tempY18); //d2W/dxdy
+    double *Uxy2, *Vxy2, *Wxy2;
+    Uxy2 = tempY16; Vxy2 = tempY17; Wxy2 = tempY18;
+    derivY->calc1stDerivField(Ux2, Uxy2); //d2U/dxdy
+    derivY->calc1stDerivField(Vx2, Vxy2); //d2V/dxdy
+    derivY->calc1stDerivField(Wx2, Wxy2); //d2W/dxdy
     
-    derivY->calc2ndDerivField(U2, tempY19); //d2U/dy2
-    derivY->calc2ndDerivField(V2, tempY20); //d2V/dy2
-    derivY->calc2ndDerivField(W2, tempY21); //d2W/dy2
+    double *Uyy2, *Vyy2, *Wyy2;
+    Uyy2 = tempY19; Vyy2 = tempY20; Wyy2 = tempY21;
+    derivY->calc2ndDerivField(U2, Uyy2); //d2U/dy2
+    derivY->calc2ndDerivField(V2, Vyy2); //d2V/dy2
+    derivY->calc2ndDerivField(W2, Wyy2); //d2W/dy2
 
-    derivY->calc1stDerivField(T2, tempY22); //dT/dy
-    derivY->calc2ndDerivField(T2, tempY23); //d2T/dy2
+    double *Ty2, *Tyy2;
+    Ty2 = tempY22; Tyy2 = tempY23;
+    derivY->calc1stDerivField(T2, Ty2); //dT/dy
+    derivY->calc2ndDerivField(T2, Tyy2); //d2T/dy2
 
-   
-    derivY->calc1stDerivField(tempY6, tempY24); //d(rhoV)/dy
+    double *contEulerY2;
+    contEulerY2 = tempY24; 
+    derivY->calc1stDerivField(rhoVP2, contEulerY2); //d(rhoV)/dy
 
-    derivY->calc1stDerivField(tempY9, tempY25); //d(rhoU*V)/dy
-    derivY->calc1stDerivField(tempY10, tempY26); //d(rhoV*V + p)/dy
-    derivY->calc1stDerivField(tempY11, tempY27); //d(rhoW*V)/dy
-    derivY->calc1stDerivField(tempY12, tempY28); //d(rhoE*V + V*p)/dy
+    double *momXEulerY2, *momYEulerY2, *momZEulerY2, *engyEulerY2;
+    momXEulerY2 = tempY25; momYEulerY2 = tempY26; momZEulerY2 = tempY27; engyEulerY2 = tempY28;
+    derivY->calc1stDerivField(tempEulerX2,    momXEulerY2); //d(rhoU*V)/dy
+    derivY->calc1stDerivField(tempEulerY2,    momYEulerY2); //d(rhoV*V + p)/dy
+    derivY->calc1stDerivField(tempEulerZ2,    momZEulerY2); //d(rhoW*V)/dy
+    derivY->calc1stDerivField(tempEulerEngy2, engyEulerY2); //d(rhoE*V + V*p)/dy
 
     //Move things we need to back to X
-    c2d->transposeY2X_MajorIndex(tempY13, Uy); 
-    c2d->transposeY2X_MajorIndex(tempY14, Vy); 
-    c2d->transposeY2X_MajorIndex(tempY15, Wy); 
+    c2d->transposeY2X_MajorIndex(Uy2, Uy); 
+    c2d->transposeY2X_MajorIndex(Vy2, Vy); 
+    c2d->transposeY2X_MajorIndex(Wy2, Wy); 
 
-    c2d->transposeY2X_MajorIndex(tempY16, Uxy);
-    c2d->transposeY2X_MajorIndex(tempY17, Vxy);
-    c2d->transposeY2X_MajorIndex(tempY18, Wxy);
+    c2d->transposeY2X_MajorIndex(Uxy2, Uxy);
+    c2d->transposeY2X_MajorIndex(Vxy2, Vxy);
+    c2d->transposeY2X_MajorIndex(Wxy2, Wxy);
 
-    c2d->transposeY2X_MajorIndex(tempY19, Uyy);
-    c2d->transposeY2X_MajorIndex(tempY20, Vyy);
-    c2d->transposeY2X_MajorIndex(tempY21, Wyy);
+    c2d->transposeY2X_MajorIndex(Uyy2, Uyy);
+    c2d->transposeY2X_MajorIndex(Vyy2, Vyy);
+    c2d->transposeY2X_MajorIndex(Wyy2, Wyy);
 
-    c2d->transposeY2X_MajorIndex(tempY22, Ty);
-    c2d->transposeY2X_MajorIndex(tempY23, Tyy);
+    c2d->transposeY2X_MajorIndex(Ty2,  Ty);
+    c2d->transposeY2X_MajorIndex(Tyy2, Tyy);
 
-    c2d->transposeY2X_MajorIndex(tempY24, contEulerY);
-    c2d->transposeY2X_MajorIndex(tempY25, momXEulerY);
-    c2d->transposeY2X_MajorIndex(tempY26, momYEulerY);
-    c2d->transposeY2X_MajorIndex(tempY27, momZEulerY);
-    c2d->transposeY2X_MajorIndex(tempY28, engyEulerY);
+    c2d->transposeY2X_MajorIndex(contEulerY2, contEulerY);
+    c2d->transposeY2X_MajorIndex(momXEulerY2, momXEulerY);
+    c2d->transposeY2X_MajorIndex(momYEulerY2, momYEulerY);
+    c2d->transposeY2X_MajorIndex(momZEulerY2, momZEulerY);
+    c2d->transposeY2X_MajorIndex(engyEulerY2, engyEulerY);
 
     //Move things we need to move over to Z
-    c2d->transposeY2Z_MajorIndex(tempY13, tempZ1); //dU/dy 
-    c2d->transposeY2Z_MajorIndex(tempY14, tempZ2); //dV/dy
-    c2d->transposeY2Z_MajorIndex(tempY15, tempZ3); //dW/dy
+    double *Uy3, *Vy3, *Wy3;
+    Uy3 = tempZ1; Vy3 = tempZ2; Wy3 = tempZ3;
+    c2d->transposeY2Z_MajorIndex(Uy2, Uy3); //dU/dy 
+    c2d->transposeY2Z_MajorIndex(Vy2, Vy3); //dV/dy
+    c2d->transposeY2Z_MajorIndex(Wy2, Wy3); //dW/dy
 
-    c2d->transposeY2Z_MajorIndex(tempY1, tempZ4); //dU/dx
-    c2d->transposeY2Z_MajorIndex(tempY2, tempZ5); //dV/dx
-    c2d->transposeY2Z_MajorIndex(tempY3, tempZ6); //dW/dx
+    double *Ux3, *Vx3, *Wx3;
+    Ux3 = tempZ4; Vx3 = tempZ5; Wx3 = tempZ6;
+    c2d->transposeY2Z_MajorIndex(Ux2, Ux3); //dU/dx
+    c2d->transposeY2Z_MajorIndex(Vx2, Vx3); //dV/dx
+    c2d->transposeY2Z_MajorIndex(Wx2, Wx3); //dW/dx
 
-    c2d->transposeY2Z_MajorIndex(tempY4, tempZ7); //rho
-    c2d->transposeY2Z_MajorIndex(tempY5, tempZ8); //rhoU
-    c2d->transposeY2Z_MajorIndex(tempY6, tempZ9); //rhoV
-    c2d->transposeY2Z_MajorIndex(tempY7, tempZ10); //rhoW
-    c2d->transposeY2Z_MajorIndex(tempY8, tempZ11); //rhoE
+    double *rhoP3, *rhoUP3, *rhoVP3, *rhoWP3, *rhoEP3;
+    rhoP3 = tempZ7; rhoUP3 = tempZ8; rhoVP3 = tempZ9;
+    rhoWP3 = tempZ10; rhoEP3 = tempZ11;
+    c2d->transposeY2Z_MajorIndex(rhoP2,  rhoP3); //rho
+    c2d->transposeY2Z_MajorIndex(rhoUP2, rhoUP3); //rhoU
+    c2d->transposeY2Z_MajorIndex(rhoVP2, rhoVP3); //rhoV
+    c2d->transposeY2Z_MajorIndex(rhoWP2, rhoWP3); //rhoW
+    c2d->transposeY2Z_MajorIndex(rhoEP2, rhoEP3); //rhoE
 
     ///////////////////
     // Z-DERIVATIVES //
     ///////////////////
 
+    double *tempEulerX3, *tempEulerY3, *tempEulerZ3, *tempEulerEngy3;
+    tempEulerX3 = tempZ12;
+    tempEulerY3 = tempZ13;
+    tempEulerZ3 = tempZ14;
+    tempEulerEngy3 = tempZ15;
     //Now recalculate properties in the new space
     FOR_XYZ_ZPEN{
-        U3[ip] =  tempZ8[ip]/tempZ7[ip];
-        V3[ip] =  tempZ9[ip]/tempZ7[ip];
-        W3[ip] = tempZ10[ip]/tempZ7[ip];
-        p3[ip] = ig->solvep(tempZ7[ip], tempZ11[ip], U3[ip], V3[ip], W3[ip]);
-        T3[ip] = ig->solveT(tempZ7[ip], p3[ip]);
+        U3[ip] = rhoUP3[ip]/rhoP3[ip];
+        V3[ip] = rhoVP3[ip]/rhoP3[ip];
+        W3[ip] = rhoWP3[ip]/rhoP3[ip];
+        p3[ip] = ig->solvep(rhoP3[ip], rhoEP3[ip], U3[ip], V3[ip], W3[ip]);
+        T3[ip] = ig->solveT(rhoP3[ip], p3[ip]);
 
         //Calculate the stuff for the Euler Derivatives
-        tempZ12[ip] =  tempZ8[ip]*W3[ip];
-        tempZ13[ip] =  tempZ9[ip]*W3[ip];
-        tempZ14[ip] = tempZ10[ip]*W3[ip] + p3[ip];
-        tempZ15[ip] = tempZ11[ip]*W3[ip] + W3[ip]*p3[ip];
+        tempEulerX3[ip] =  rhoUP3[ip]*W3[ip];
+        tempEulerY3[ip] =  rhoVP3[ip]*W3[ip];
+        tempEulerZ3[ip] =  rhoWP3[ip]*W3[ip] + p3[ip];
+        tempEulerEngy3[ip] = rhoEP3[ip]*W3[ip] + W3[ip]*p3[ip];
     }
-
-//TODO LEFT OFF MOVING TO MPI HERE!!!
    
+    
     //Calculate the Z direction derivatives
-    derivZ->calc1stDerivField(U3, tempZ16); //dU/dz
-    derivZ->calc1stDerivField(V3, tempZ17); //dV/dz
-    derivZ->calc1stDerivField(W3, tempZ18); //dW/dz
-    derivZ->calc1stDerivField(T3, tempZ19); //dT/dz
+ 
+    double *Uz3, *Vz3, *Wz3, *Tz3;
+    Uz3 = tempZ16; Vz3 = tempZ17; Wz3 = tempZ18; Tz3 = tempZ19;
+    derivZ->calc1stDerivField(U3, Uz3); //dU/dz
+    derivZ->calc1stDerivField(V3, Vz3); //dV/dz
+    derivZ->calc1stDerivField(W3, Wz3); //dW/dz
+    derivZ->calc1stDerivField(T3, Tz3); //dT/dz
 
-    derivZ->calc2ndDerivField(U3, tempZ20); //d2U/dz2
-    derivZ->calc2ndDerivField(V3, tempZ21); //d2V/dz2
-    derivZ->calc2ndDerivField(W3, tempZ22); //d2W/dz2
-    derivZ->calc2ndDerivField(T3, tempZ23); //d2T/dz2
+    double *Uzz3, *Vzz3, *Wzz3, *Tzz3;
+    Uzz3 = tempZ20; Vzz3 = tempZ21; Wzz3 = tempZ22; Tzz3 = tempZ23;
+    derivZ->calc2ndDerivField(U3, Uzz3); //d2U/dz2
+    derivZ->calc2ndDerivField(V3, Vzz3); //d2V/dz2
+    derivZ->calc2ndDerivField(W3, Wzz3); //d2W/dz2
+    derivZ->calc2ndDerivField(T3, Tzz3); //d2T/dz2
 
-    derivZ->calc1stDerivField(tempZ1, tempZ24); //d2U/dydz
-    derivZ->calc1stDerivField(tempZ2, tempZ25); //d2V/dydz
-    derivZ->calc1stDerivField(tempZ3, tempZ26); //d2W/dydz
+    double *Uyz3, *Vyz3, *Wyz3;
+    Uyz3 = tempZ24; Vyz3 = tempZ25; Wyz3 = tempZ26; 
+    derivZ->calc1stDerivField(Uy3, Uyz3); //d2U/dydz
+    derivZ->calc1stDerivField(Vy3, Vyz3); //d2V/dydz
+    derivZ->calc1stDerivField(Wy3, Wyz3); //d2W/dydz
 
-    derivZ->calc1stDerivField(tempZ4, tempZ27); //d2U/dxdz 
-    derivZ->calc1stDerivField(tempZ5, tempZ28); //d2V/dxdz 
-    derivZ->calc1stDerivField(tempZ6, tempZ29); //d2W/dxdz 
+    double *Uxz3, *Vxz3, *Wxz3;
+    Uxz3 = tempZ27; Vxz3 = tempZ28; Wxz3 = tempZ29;
+    derivZ->calc1stDerivField(Ux3, Uxz3); //d2U/dxdz 
+    derivZ->calc1stDerivField(Vx3, Vxz3); //d2V/dxdz 
+    derivZ->calc1stDerivField(Wx3, Wxz3); //d2W/dxdz 
 
-    derivZ->calc1stDerivField(tempZ12, tempZ30); //d(rhoU*W)/dz
-    derivZ->calc1stDerivField(tempZ13, tempZ31); //d(rhoV*W)/dz
-    derivZ->calc1stDerivField(tempZ14, tempZ32); //d(rhoW*W + p)/dz
-    derivZ->calc1stDerivField(tempZ15, tempZ33); //d(rhoE*W + W*p)/dz
-    derivZ->calc1stDerivField(tempZ10, tempZ34); //d(rhoW)/dz
+    double *contEulerZ3, *momXEulerZ3, *momYEulerZ3, *momZEulerZ3, *engyEulerZ3;
+    contEulerZ3 = tempZ34; momXEulerZ3 = tempZ30; momYEulerZ3 = tempZ31;
+    momZEulerZ3 = tempZ32; engyEulerZ3 = tempZ33;
+    derivZ->calc1stDerivField(tempEulerX3, momXEulerZ3); //d(rhoU*W)/dz
+    derivZ->calc1stDerivField(tempEulerY3, momYEulerZ3); //d(rhoV*W)/dz
+    derivZ->calc1stDerivField(tempEulerZ3, momZEulerZ3); //d(rhoW*W + p)/dz
+    derivZ->calc1stDerivField(tempEulerEngy3, engyEulerZ3); //d(rhoE*W + W*p)/dz
+
+    derivZ->calc1stDerivField(rhoWP3, contEulerZ3); //d(rhoW)/dz
     
     //Move the things we need back to X
-    c2d->transposeZ2Y_MajorIndex(tempZ16, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Uz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Uz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ17, tempY1);
+    c2d->transposeZ2Y_MajorIndex(Vz3, tempY1);
     c2d->transposeY2X_MajorIndex(tempY1, Vz);
  
-    c2d->transposeZ2Y_MajorIndex(tempZ18, tempY1);
+    c2d->transposeZ2Y_MajorIndex(Wz3, tempY1);
     c2d->transposeY2X_MajorIndex(tempY1, Wz);
  
-    c2d->transposeZ2Y_MajorIndex(tempZ19, tempY1); 
-    c2d->transposeY2X_MajorIndex(tempY1, Ty);
+    c2d->transposeZ2Y_MajorIndex(Tz3, tempY1); 
+    c2d->transposeY2X_MajorIndex(tempY1, Tz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ20, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Uzz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Uzz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ21, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Vzz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Vzz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ22, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Wzz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Wzz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ23, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Tzz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Tzz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ24, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Uyz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Uyz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ25, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Vyz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Vyz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ26, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Wyz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Wyz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ27, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Uxz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Uxz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ28, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Vxz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Vxz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ29, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(Wxz3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, Wxz);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ34, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(contEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, contEulerZ);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ30, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(momXEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, momXEulerZ);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ31, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(momYEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, momYEulerZ);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ32, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(momZEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, momZEulerZ);
 
-    c2d->transposeZ2Y_MajorIndex(tempZ33, tempY1); 
+    c2d->transposeZ2Y_MajorIndex(engyEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, engyEulerZ);
 
 }
@@ -1496,21 +1558,6 @@ void UniformCSolver::solveEnergy(){
 
 void UniformCSolver::postStepBCHandling(){
 
-    double *rhoP, *rhoUP, *rhoVP, *rhoWP, *rhoEP;
-    if(rkStep == 1){
-	rhoP  = rho1;
-	rhoUP = rhoU1;
-	rhoVP = rhoV1;
-	rhoWP = rhoW1;
-	rhoEP = rhoE1;
-    }else{
-	rhoP  = rhok;
-	rhoUP = rhoUk; 
-	rhoVP = rhoVk;
-	rhoWP = rhoWk;
-	rhoEP = rhoEk;
-    }
-
     ////////////////////////////////
     //ADIABATIC AND MOVING WALL BC// 
     ////////////////////////////////
@@ -1662,17 +1709,17 @@ void UniformCSolver::filterConservedData(){
 
             //Here we'll do X->Y->Z     
 
-                    filtX->filterField(rho2,  rho1);
-		    filtX->filterField(rhoU2, rhoU1);
-		    filtX->filterField(rhoV2, rhoV1);
-		    filtX->filterField(rhoW2, rhoW1);
-		    filtX->filterField(rhoE2, rhoE1);
+                    filtX->filterField(rho2,  tempX1);
+		    filtX->filterField(rhoU2, tempX2);
+		    filtX->filterField(rhoV2, tempX3);
+		    filtX->filterField(rhoW2, tempX4);
+		    filtX->filterField(rhoE2, tempX5);
 
-		    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
-		    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
-		    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
-		    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
-		    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+		    c2d->transposeX2Y_MajorIndex(tempX1, tempY1);
+		    c2d->transposeX2Y_MajorIndex(tempX2, tempY2);
+		    c2d->transposeX2Y_MajorIndex(tempX3, tempY3);
+		    c2d->transposeX2Y_MajorIndex(tempX4, tempY4);
+		    c2d->transposeX2Y_MajorIndex(tempX5, tempY5);
 
 		    filtY->filterField(tempY1, tempY6);
 		    filtY->filterField(tempY2, tempY7);
@@ -1752,11 +1799,11 @@ void UniformCSolver::filterConservedData(){
 
         }else{
 
-	    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
-	    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
-	    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
-	    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
-	    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
+	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
+	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
+	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
 
 	    c2d->transposeY2Z_MajorIndex(tempY1, tempZ1);
 	    c2d->transposeY2Z_MajorIndex(tempY2, tempZ2);
@@ -1776,23 +1823,23 @@ void UniformCSolver::filterConservedData(){
 	    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
 	    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
 
-	    c2d->transposeY2X_MajorIndex(tempY1,  rho2);
-	    c2d->transposeY2X_MajorIndex(tempY2,  rhoU2);
-	    c2d->transposeY2X_MajorIndex(tempY3,  rhoV2);
-	    c2d->transposeY2X_MajorIndex(tempY4,  rhoW2);
-	    c2d->transposeY2X_MajorIndex(tempY5,  rhoE2);
+	    c2d->transposeY2X_MajorIndex(tempY1,  tempX1);
+	    c2d->transposeY2X_MajorIndex(tempY2,  tempX2);
+	    c2d->transposeY2X_MajorIndex(tempY3,  tempX3);
+	    c2d->transposeY2X_MajorIndex(tempY4,  tempX4);
+	    c2d->transposeY2X_MajorIndex(tempY5,  tempX5);
 
-	    filtX->filterField(rho2,  rho1);
-	    filtX->filterField(rhoU2, rhoU1);
-	    filtX->filterField(rhoV2, rhoV1);
-	    filtX->filterField(rhoW2, rhoW1);
-	    filtX->filterField(rhoE2, rhoE1);
+	    filtX->filterField(tempX1, rho2);
+	    filtX->filterField(tempX2, rhoU2);
+	    filtX->filterField(tempX3, rhoV2);
+	    filtX->filterField(tempX4, rhoW2);
+	    filtX->filterField(tempX5, rhoE2);
 
-	    c2d->transposeX2Y_MajorIndex(rho1,  tempY1);
-	    c2d->transposeX2Y_MajorIndex(rhoU1, tempY2);
-	    c2d->transposeX2Y_MajorIndex(rhoV1, tempY3);
-	    c2d->transposeX2Y_MajorIndex(rhoW1, tempY4);
-	    c2d->transposeX2Y_MajorIndex(rhoE1, tempY5);
+	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
+	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
+	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
+	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
 
 	    filtY->filterField(tempY1, tempY6);
 	    filtY->filterField(tempY2, tempY7);
@@ -2385,7 +2432,7 @@ void UniformCSolver::checkSolution(){
         getRange(mu, "mu", pxSize[0], pxSize[1], pxSize[2], mpiRank);
         getRange(rhoE1, "RHOE", pxSize[0], pxSize[1], pxSize[2], mpiRank);
         getRange(sos, "SOS", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        cout << endl;
+        IF_RANK0 cout << endl;
 
 	t1 = MPI_Wtime();
     }
@@ -2410,7 +2457,11 @@ void UniformCSolver::dumpSolution(){
         outfile.precision(17);
         string outputFileName;
 	outputFileName = "SolutionDump.";
-	outputFileName.append(to_string(timeStep));
+	
+	ostringstream timeStepString;
+        timeStepString << timeStep;
+
+	outputFileName.append(timeStepString.str());
 
 	MPI_File fh;
 	MPI_Offset disp, filesize;
@@ -2639,105 +2690,109 @@ void UniformCSolver::checkEnd(){
     }
 
 }
-/*
+
 void UniformCSolver::reportAll(){
 
-   cout << "REPORT ALL" << endl;
+   int Nx = pxSize[0];
+   int Ny = pxSize[1];
+   int Nz = pxSize[2];
 
-   getRange(Ux, "Ux", Nx, Ny, Nz);
-   getRange(Uxx, "Uxx", Nx, Ny, Nz);
-   getRange(Uy, "Uy", Nx, Ny, Nz);
-   getRange(Uyy, "Uyy", Nx, Ny, Nz);
-   getRange(Uz, "Uz", Nx, Ny, Nz);
-   getRange(Uzz, "Uzz", Nx, Ny, Nz);
-   getRange(Uxy, "Uxy", Nx, Ny, Nz);
-   getRange(Uyz, "Uyz", Nx, Ny, Nz);
-   getRange(Uxz, "Uxz", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(Vx, "Vx", Nx, Ny, Nz);
-   getRange(Vxx, "Vxx", Nx, Ny, Nz);
-   getRange(Vy, "Vy", Nx, Ny, Nz);
-   getRange(Vyy, "Vyy", Nx, Ny, Nz);
-   getRange(Vz, "Vz", Nx, Ny, Nz);
-   getRange(Vzz, "Vzz", Nx, Ny, Nz);
-   getRange(Vxy, "Vxy", Nx, Ny, Nz);
-   getRange(Vyz, "Vyz", Nx, Ny, Nz);
-   getRange(Vxz, "Vxz", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(Wx, "Wx", Nx, Ny, Nz);
-   getRange(Wxx, "Wxx", Nx, Ny, Nz);
-   getRange(Wy, "Wy", Nx, Ny, Nz);
-   getRange(Wyy, "Wyy", Nx, Ny, Nz);
-   getRange(Wz, "Wz", Nx, Ny, Nz);
-   getRange(Wzz, "Wzz", Nx, Ny, Nz);
-   getRange(Wxy, "Wxy", Nx, Ny, Nz);
-   getRange(Wyz, "Wyz", Nx, Ny, Nz);
-   getRange(Wxz, "Wxz", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(Tx, "Ux", Nx, Ny, Nz);
-   getRange(Txx, "Uxx", Nx, Ny, Nz);
-   getRange(Ty, "Uy", Nx, Ny, Nz);
-   getRange(Tyy, "Uyy", Nx, Ny, Nz);
-   getRange(Tz, "Uz", Nx, Ny, Nz);
-   getRange(Tzz, "Uzz", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(contEulerX, "contEulerX", Nx, Ny, Nz);
-   getRange(contEulerY, "contEulerY", Nx, Ny, Nz);
-   getRange(contEulerZ, "contEulerZ", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(momXEulerX, "momXEulerX", Nx, Ny, Nz);
-   getRange(momXEulerY, "momXEulerY", Nx, Ny, Nz);
-   getRange(momXEulerZ, "momXEulerZ", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(momYEulerX, "momYEulerX", Nx, Ny, Nz);
-   getRange(momYEulerY, "momYEulerY", Nx, Ny, Nz);
-   getRange(momYEulerZ, "momYEulerZ", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(momZEulerX, "momZEulerX", Nx, Ny, Nz);
-   getRange(momZEulerY, "momZEulerY", Nx, Ny, Nz);
-   getRange(momZEulerZ, "momZEulerZ", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(engyEulerX, "engyEulerX", Nx, Ny, Nz);
-   getRange(engyEulerY, "engyEulerY", Nx, Ny, Nz);
-   getRange(engyEulerZ, "engyEulerZ", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(rho1, "rho1", Nx, Ny, Nz);
-   getRange(rhok, "rhok", Nx, Ny, Nz);
-   getRange(rhok2, "rhok2", Nx, Ny, Nz);
-   getRange(rho2, "rho2", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(rhoU1, "rhoU1", Nx, Ny, Nz);
-   getRange(rhoUk, "rhoUk", Nx, Ny, Nz);
-   getRange(rhoUk2, "rhoUk2", Nx, Ny, Nz);
-   getRange(rhoU2, "rhoU2", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(rhoV1, "rhoV1", Nx, Ny, Nz);
-   getRange(rhoVk, "rhoVk", Nx, Ny, Nz);
-   getRange(rhoVk2, "rhoVk2", Nx, Ny, Nz);
-   getRange(rhoV2, "rhoV2", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(rhoW1, "rhoW1", Nx, Ny, Nz);
-   getRange(rhoWk, "rhoWk", Nx, Ny, Nz);
-   getRange(rhoWk2, "rhoWk2", Nx, Ny, Nz);
-   getRange(rhoW2, "rhoW2", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(rhoE1, "rhoE1", Nx, Ny, Nz);
-   getRange(rhoEk, "rhoEk", Nx, Ny, Nz);
-   getRange(rhoEk2, "rhoEk2", Nx, Ny, Nz);
-   getRange(rhoE2, "rhoE2", Nx, Ny, Nz);
-cout << " " << endl;
-   getRange(p, "p", Nx, Ny, Nz);
-   getRange(U, "U", Nx, Ny, Nz);
-   getRange(V, "V", Nx, Ny, Nz);
-   getRange(W, "W", Nx, Ny, Nz);
-   getRange(T, "T", Nx, Ny, Nz);
-   getRange(mu, "mu", Nx, Ny, Nz);
-   getRange(Amu, "Amu", Nx, Ny, Nz);
-   getRange(sos, "sos", Nx, Ny, Nz);
-cout << " " << endl;
+   IF_RANK0   cout << "REPORT ALL" << endl;
+
+   getRange(Ux, "Ux", Nx, Ny, Nz, mpiRank);
+   getRange(Uxx, "Uxx", Nx, Ny, Nz, mpiRank);
+   getRange(Uy, "Uy", Nx, Ny, Nz, mpiRank);
+   getRange(Uyy, "Uyy", Nx, Ny, Nz, mpiRank);
+   getRange(Uz, "Uz", Nx, Ny, Nz, mpiRank);
+   getRange(Uzz, "Uzz", Nx, Ny, Nz, mpiRank);
+   getRange(Uxy, "Uxy", Nx, Ny, Nz, mpiRank);
+   getRange(Uyz, "Uyz", Nx, Ny, Nz, mpiRank);
+   getRange(Uxz, "Uxz", Nx, Ny, Nz, mpiRank);
+IF_RANK0 cout << " " << endl;
+   getRange(Vx, "Vx", Nx, Ny, Nz, mpiRank);
+   getRange(Vxx, "Vxx", Nx, Ny, Nz, mpiRank);
+   getRange(Vy, "Vy", Nx, Ny, Nz, mpiRank);
+   getRange(Vyy, "Vyy", Nx, Ny, Nz, mpiRank);
+   getRange(Vz, "Vz", Nx, Ny, Nz, mpiRank);
+   getRange(Vzz, "Vzz", Nx, Ny, Nz, mpiRank);
+   getRange(Vxy, "Vxy", Nx, Ny, Nz, mpiRank);
+   getRange(Vyz, "Vyz", Nx, Ny, Nz, mpiRank);
+   getRange(Vxz, "Vxz", Nx, Ny, Nz, mpiRank);
+ IF_RANK0 cout << " " << endl;
+   getRange(Wx, "Wx", Nx, Ny, Nz, mpiRank);
+   getRange(Wxx, "Wxx", Nx, Ny, Nz, mpiRank);
+   getRange(Wy, "Wy", Nx, Ny, Nz, mpiRank);
+   getRange(Wyy, "Wyy", Nx, Ny, Nz, mpiRank);
+   getRange(Wz, "Wz", Nx, Ny, Nz, mpiRank);
+   getRange(Wzz, "Wzz", Nx, Ny, Nz, mpiRank);
+   getRange(Wxy, "Wxy", Nx, Ny, Nz, mpiRank);
+   getRange(Wyz, "Wyz", Nx, Ny, Nz, mpiRank);
+   getRange(Wxz, "Wxz", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(Tx, "Ux", Nx, Ny, Nz, mpiRank);
+   getRange(Txx, "Uxx", Nx, Ny, Nz, mpiRank);
+   getRange(Ty, "Uy", Nx, Ny, Nz, mpiRank);
+   getRange(Tyy, "Uyy", Nx, Ny, Nz, mpiRank);
+   getRange(Tz, "Uz", Nx, Ny, Nz, mpiRank);
+   getRange(Tzz, "Uzz", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(contEulerX, "contEulerX", Nx, Ny, Nz, mpiRank);
+   getRange(contEulerY, "contEulerY", Nx, Ny, Nz, mpiRank);
+   getRange(contEulerZ, "contEulerZ", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(momXEulerX, "momXEulerX", Nx, Ny, Nz, mpiRank);
+   getRange(momXEulerY, "momXEulerY", Nx, Ny, Nz, mpiRank);
+   getRange(momXEulerZ, "momXEulerZ", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(momYEulerX, "momYEulerX", Nx, Ny, Nz, mpiRank);
+   getRange(momYEulerY, "momYEulerY", Nx, Ny, Nz, mpiRank);
+   getRange(momYEulerZ, "momYEulerZ", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(momZEulerX, "momZEulerX", Nx, Ny, Nz, mpiRank);
+   getRange(momZEulerY, "momZEulerY", Nx, Ny, Nz, mpiRank);
+   getRange(momZEulerZ, "momZEulerZ", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(engyEulerX, "engyEulerX", Nx, Ny, Nz, mpiRank);
+   getRange(engyEulerY, "engyEulerY", Nx, Ny, Nz, mpiRank);
+   getRange(engyEulerZ, "engyEulerZ", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(rho1, "rho1", Nx, Ny, Nz, mpiRank);
+   getRange(rhok, "rhok", Nx, Ny, Nz, mpiRank);
+   getRange(rhok2, "rhok2", Nx, Ny, Nz, mpiRank);
+   getRange(rho2, "rho2", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(rhoU1, "rhoU1", Nx, Ny, Nz, mpiRank);
+   getRange(rhoUk, "rhoUk", Nx, Ny, Nz, mpiRank);
+   getRange(rhoUk2, "rhoUk2", Nx, Ny, Nz, mpiRank);
+   getRange(rhoU2, "rhoU2", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(rhoV1, "rhoV1", Nx, Ny, Nz, mpiRank);
+   getRange(rhoVk, "rhoVk", Nx, Ny, Nz, mpiRank);
+   getRange(rhoVk2, "rhoVk2", Nx, Ny, Nz, mpiRank);
+   getRange(rhoV2, "rhoV2", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(rhoW1, "rhoW1", Nx, Ny, Nz, mpiRank);
+   getRange(rhoWk, "rhoWk", Nx, Ny, Nz, mpiRank);
+   getRange(rhoWk2, "rhoWk2", Nx, Ny, Nz, mpiRank);
+   getRange(rhoW2, "rhoW2", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(rhoE1, "rhoE1", Nx, Ny, Nz, mpiRank);
+   getRange(rhoEk, "rhoEk", Nx, Ny, Nz, mpiRank);
+   getRange(rhoEk2, "rhoEk2", Nx, Ny, Nz, mpiRank);
+   getRange(rhoE2, "rhoE2", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(p, "p", Nx, Ny, Nz, mpiRank);
+   getRange(U, "U", Nx, Ny, Nz, mpiRank);
+   getRange(V, "V", Nx, Ny, Nz, mpiRank);
+   getRange(W, "W", Nx, Ny, Nz, mpiRank);
+   getRange(T, "T", Nx, Ny, Nz, mpiRank);
+   getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
+   getRange(Amu, "Amu", Nx, Ny, Nz, mpiRank);
+   getRange(sos, "sos", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
 
 }
-*/
+
 /////////////////////////////////////
 //Our Generalized Solver Functions //
 /////////////////////////////////////

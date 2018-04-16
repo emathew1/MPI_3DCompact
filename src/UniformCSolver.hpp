@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "Macros.hpp"
 #include "Utils.hpp"
 #include "SpongeBC.hpp"
@@ -67,7 +68,7 @@ class UniformCSolver: public AbstractCSolver{
 	double *momZEulerX, *momZEulerY, *momZEulerZ;
 	double *engyEulerX, *engyEulerY, *engyEulerZ;
 
-	double *tempX1,  *tempX2,  *tempX3,  *tempX4;;
+	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
 
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;

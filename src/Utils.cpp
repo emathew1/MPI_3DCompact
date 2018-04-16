@@ -241,7 +241,7 @@ void getRange(double *phi, string Var, int Nx, int Ny, int Nz, int mpiRank){
 
     double dataMax = -1000000.0;
     for(int ip = 0; ip < Nx*Ny*Nz; ip++)
-	dataMin = max(phi[ip], dataMax);
+	dataMax = max(phi[ip], dataMax);
 
     double globalMin, globalMax;
     MPI_Reduce(&dataMin, &globalMin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
