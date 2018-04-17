@@ -291,6 +291,7 @@ void UniformCSolver::setInitialConditions(){
         }END_FORX0
     }
 
+
     if(bc->bcX1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_X1_XPEN_MAJ{
@@ -331,6 +332,7 @@ void UniformCSolver::setInitialConditions(){
                                  T2[GETMAJIND_YPEN_Yp4],
                                  T2[GETMAJIND_YPEN_Yp5],
                                  T2[GETMAJIND_YPEN_Yp6]);
+
 	}END_FORY0 
 
 	c2d->transposeY2X_MajorIndex(T2, T);
@@ -639,6 +641,8 @@ void UniformCSolver::setInitialConditions(){
     getRange(rhoV1, "rhoV0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
     getRange(rhoW1, "rhoW0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
     getRange(rhoE1, "rhoE0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(T, "T0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(p, "p0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
 
 }
 
@@ -2813,6 +2817,7 @@ void UniformCSolver::preSubStep(){
     preStepBCHandling();
     preStepDerivatives();
 
+    reportAll();
 }
 
 void UniformCSolver::solveEqnSet(){

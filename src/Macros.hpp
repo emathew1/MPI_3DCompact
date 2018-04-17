@@ -103,7 +103,7 @@
 
 //NOTE: Major indexed are going to have the boundaries definitely included
 #define FOR_X0_XPEN_MAJ FOR_X0_XPEN 
-#define FOR_X1_XPEN_MAJ FOR_X0_XPEN
+#define FOR_X1_XPEN_MAJ FOR_X1_XPEN
 #define FOR_Y0_XPEN_MAJ FOR_Y0_XPEN
 #define FOR_Y1_XPEN_MAJ FOR_Y1_XPEN
 #define FOR_Z0_XPEN_MAJ FOR_Z0_XPEN

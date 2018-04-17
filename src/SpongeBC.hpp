@@ -61,13 +61,13 @@ class SpongeBC{
 	    c2d->allocX(spongeRhoWAvg);
 	    c2d->allocX(spongeRhoEAvg);
 
-	    avgT = 15.0;
+	    avgT = 2.0;
 	    epsP = 0.005;
 	    spongeP = 1.0/idealGas->gamma;
 	    spongeStrength = 6.0;
-	    spongeLX = 0.1*domain->gLx;
-	    spongeLY = 0.1*domain->gLy;
-	    spongeLZ = 0.1*domain->gLz;
+	    spongeLX = 0.15*domain->gLx;
+	    spongeLY = 0.15*domain->gLy;
+	    spongeLZ = 0.15*domain->gLz;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_XPEN sigma[ip] = 0.0;
