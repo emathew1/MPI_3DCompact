@@ -1998,42 +1998,50 @@ void UniformCSolver::updateSponge(){
 
         if(bc->bcY0 == BC::SPONGE){
 	    FOR_Y0_XPEN{
-		rho1[ip]  = spg->spongeRhoAvg[ip];
-		rhoU1[ip] = spg->spongeRhoUAvg[ip];
-		rhoV1[ip] = spg->spongeRhoVAvg[ip];
-		rhoW1[ip] = spg->spongeRhoWAvg[ip];
-		rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		if(GETGLOBALYIND_XPEN == 0){		
+		    rho1[ip]  = spg->spongeRhoAvg[ip];
+		    rhoU1[ip] = spg->spongeRhoUAvg[ip];
+		    rhoV1[ip] = spg->spongeRhoVAvg[ip];
+		    rhoW1[ip] = spg->spongeRhoWAvg[ip];
+		    rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		}
 	    }END_FORY0
         }
 
         if(bc->bcY1 == BC::SPONGE){
 	    FOR_Y1_XPEN{
-		rho1[ip]  = spg->spongeRhoAvg[ip];
-		rhoU1[ip] = spg->spongeRhoUAvg[ip];
-		rhoV1[ip] = spg->spongeRhoVAvg[ip];
-		rhoW1[ip] = spg->spongeRhoWAvg[ip];
-		rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		if(GETGLOBALYIND_XPEN == Ny-1){
+		    rho1[ip]  = spg->spongeRhoAvg[ip];
+		    rhoU1[ip] = spg->spongeRhoUAvg[ip];
+		    rhoV1[ip] = spg->spongeRhoVAvg[ip];
+		    rhoW1[ip] = spg->spongeRhoWAvg[ip];
+		    rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		}
 	    }END_FORY1
         }
 
         if(bc->bcZ0 == BC::SPONGE){
 	    FOR_Z0_XPEN{
-		rho1[ip]  = spg->spongeRhoAvg[ip];
-		rhoU1[ip] = spg->spongeRhoUAvg[ip];
-		rhoV1[ip] = spg->spongeRhoVAvg[ip];
-		rhoW1[ip] = spg->spongeRhoWAvg[ip];
-		rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		if(GETGLOBALZIND_XPEN == 0){
+		    rho1[ip]  = spg->spongeRhoAvg[ip];
+		    rhoU1[ip] = spg->spongeRhoUAvg[ip];
+		    rhoV1[ip] = spg->spongeRhoVAvg[ip];
+		    rhoW1[ip] = spg->spongeRhoWAvg[ip];
+		    rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		}
 	    }END_FORZ0
 
         }
 
         if(bc->bcZ1 == BC::SPONGE){
 	    FOR_Z1_XPEN{
-		rho1[ip]  = spg->spongeRhoAvg[ip];
-		rhoU1[ip] = spg->spongeRhoUAvg[ip];
-		rhoV1[ip] = spg->spongeRhoVAvg[ip];
-		rhoW1[ip] = spg->spongeRhoWAvg[ip];
-		rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		if(GETGLOBALZIND_XPEN == Nz-1){
+		    rho1[ip]  = spg->spongeRhoAvg[ip];
+		    rhoU1[ip] = spg->spongeRhoUAvg[ip];
+		    rhoV1[ip] = spg->spongeRhoVAvg[ip];
+		    rhoW1[ip] = spg->spongeRhoWAvg[ip];
+		    rhoE1[ip] = spg->spongeRhoEAvg[ip];
+		}
 	    }END_FORZ1
 
         }

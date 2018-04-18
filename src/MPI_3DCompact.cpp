@@ -45,12 +45,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 111,
-           Ny = 64,
-           Nz = 71;
+    int    Nx = 50,
+           Ny = 50,
+           Nz = 50;
     double Lx = 1.0,
-           Ly = 2.0,
-           Lz = 13.0;;
+           Ly = 1.0,
+           Lz = 1.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 25;
+    int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 5;
     int checkStep    = 1;
@@ -74,12 +74,12 @@ int main(int argc, char *argv[]){
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY1 = BC::ADIABATIC_WALL;
-    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX0 = BC::SPONGE;
+    BC::BCKind bcX1 = BC::SPONGE;
+    BC::BCKind bcY0 = BC::SPONGE;
+    BC::BCKind bcY1 = BC::SPONGE;
+    BC::BCKind bcZ0 = BC::SPONGE;
+    BC::BCKind bcZ1 = BC::SPONGE;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
