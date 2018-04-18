@@ -10,6 +10,8 @@
 class AbstractCSolver{
 
     public:
+
+	int mpiRank;
 	
 	int rkStep;
 	bool rkLast;
@@ -43,6 +45,7 @@ class AbstractCSolver{
 	virtual void postSubStep() = 0;
 	virtual void updateData() = 0;
 	virtual void postStep() = 0;
+	virtual void reportAll() = 0;
 
 };
 

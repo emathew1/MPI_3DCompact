@@ -45,12 +45,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 50,
-           Ny = 50,
-           Nz = 50;
+    int    Nx = 111,
+           Ny = 64,
+           Nz = 71;
     double Lx = 1.0,
-           Ly = 1.0,
-           Lz = 1.0;;
+           Ly = 2.0,
+           Lz = 13.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 25000;
+    int maxTimeStep  = 25;
     double maxTime   = 3000.0;
     int filterStep   = 5;
     int checkStep    = 1;
@@ -93,8 +93,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 0, 
-	pCol = 0;
+    int pRow = 2, 
+	pCol = 2;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
@@ -142,11 +142,11 @@ int main(int argc, char *argv[]){
 		int kk = GETGLOBALZIND_XPEN;
 
 		double x  = d->x[ii];
-		double x0 = 0.5; 		
+		double x0 = Lx/2; 		
 		double y  = d->y[jj]; 		
-		double y0 = 0.5; 		
+		double y0 = Ly/2; 		
 		double z  = d->z[kk]; 		
-		double z0 = 0.5; 		
+		double z0 = Lz/2; 		
 
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 

@@ -18,6 +18,7 @@ class TVDRK3:public AbstractRK{
 
 	TVDRK3(AbstractCSolver *cs){
 	    this->cs = cs;
+	    mpiRank = cs->mpiRank;
 	
 	    a1 = 1.0;
 	    a2 = 3.0/4.0;
@@ -104,7 +105,9 @@ void TVDRK3::executeSolverLoop(){
 	cs->preSubStep();
 	cs->solveEqnSet();
 	cs->postSubStep();
+
 	updateConservedData();
+
 	cs->updateData();
 
 	//Step 2

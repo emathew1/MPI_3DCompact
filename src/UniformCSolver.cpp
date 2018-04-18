@@ -313,12 +313,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcY0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y0_XPEN_MAJ{
-            U[ip]  = 0.0;
-            V[ip]  = 0.0;
-            W[ip]  = 0.0;
-            rhoU1[ip] = 0.0;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALYIND_XPEN == 0){
+                U[ip]  = 0.0;
+                V[ip]  = 0.0;
+                W[ip]  = 0.0;
+                rhoU1[ip] = 0.0;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = 0.0;
+	    }
         }END_FORY0
 
 	double *T2;
@@ -343,12 +345,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcY1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y1_XPEN_MAJ{
-            U[ip]  = 0.0;
-            V[ip]  = 0.0;
-            W[ip]  = 0.0;
-            rhoU1[ip] = 0.0;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+                U[ip]  = 0.0;
+                V[ip]  = 0.0;
+                W[ip]  = 0.0;
+                rhoU1[ip] = 0.0;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = 0.0;
+	    }
        }END_FORY1
 
 	double *T2;
@@ -372,12 +376,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z0_XPEN_MAJ{
-            U[ip]  = 0.0;
-            V[ip]  = 0.0;
-            W[ip]  = 0.0;
-            rhoU1[ip] = 0.0;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == 0){
+                U[ip]  = 0.0;
+                V[ip]  = 0.0;
+                W[ip]  = 0.0;
+                rhoU1[ip] = 0.0;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = 0.0;
+	    }
         }END_FORZ0
 
 	double *T2, *T3;
@@ -406,12 +412,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z1_XPEN_MAJ{
-            U[ip]  = 0.0;
-            V[ip]  = 0.0;
-            W[ip]  = 0.0;
-            rhoU1[ip] = 0.0;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+                U[ip]  = 0.0;
+                V[ip]  = 0.0;
+                W[ip]  = 0.0;
+                rhoU1[ip] = 0.0;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = 0.0;
+	    }
        }END_FORZ1
 
 	double *T2, *T3;
@@ -482,12 +490,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y0_XPEN_MAJ{
-            U[ip]  = Y0WallU;
-            V[ip]  = 0.0;
-            W[ip]  = Y0WallW;
-            rhoU1[ip] = rho1[ip]*Y0WallU;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = rho1[ip]*Y0WallW;
+	    if(GETGLOBALYIND_XPEN == 0){
+                U[ip]  = Y0WallU;
+                V[ip]  = 0.0;
+                W[ip]  = Y0WallW;
+                rhoU1[ip] = rho1[ip]*Y0WallU;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = rho1[ip]*Y0WallW;
+	    }
         }END_FORY0
 
  	double *T2;
@@ -513,12 +523,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y1_XPEN_MAJ{
-            U[ip]  = Y1WallU;
-            V[ip]  = 0.0;
-            W[ip]  = Y1WallW;
-            rhoU1[ip] = rho1[ip]*Y1WallU;
-            rhoV1[ip] = 0.0;
-            rhoW1[ip] = rho1[ip]*Y1WallW;
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+                U[ip]  = Y1WallU;
+                V[ip]  = 0.0;
+                W[ip]  = Y1WallW;
+                rhoU1[ip] = rho1[ip]*Y1WallU;
+                rhoV1[ip] = 0.0;
+                rhoW1[ip] = rho1[ip]*Y1WallW;
+	    }
         }END_FORY1
 
 
@@ -545,12 +557,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z0_XPEN_MAJ{
-            U[ip]  = Z0WallU;
-            V[ip]  = Z0WallV;
-            W[ip]  = 0.0;
-            rhoU1[ip] = rho1[ip]*Z0WallU;
-            rhoV1[ip] = rho1[ip]*Z0WallV;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == 0){
+                U[ip]  = Z0WallU;
+                V[ip]  = Z0WallV;
+                W[ip]  = 0.0;
+                rhoU1[ip] = rho1[ip]*Z0WallU;
+                rhoV1[ip] = rho1[ip]*Z0WallV;
+                rhoW1[ip] = 0.0;
+	    }
         }END_FORZ0
 
 	double *T2, *T3;
@@ -581,12 +595,14 @@ void UniformCSolver::setInitialConditions(){
     if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z1_XPEN_MAJ{
-            U[ip]  = Z1WallU;
-            V[ip]  = Z1WallV;
-            W[ip]  = 0.0;
-            rhoU1[ip] = rho1[ip]*Z1WallU;
-            rhoV1[ip] = rho1[ip]*Z1WallV;
-            rhoW1[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+                U[ip]  = Z1WallU;
+                V[ip]  = Z1WallV;
+                W[ip]  = 0.0;
+                rhoU1[ip] = rho1[ip]*Z1WallU;
+                rhoV1[ip] = rho1[ip]*Z1WallV;
+                rhoW1[ip] = 0.0;
+	    }
         }END_FORZ1
 
 	double *T2, *T3;
@@ -707,6 +723,7 @@ void UniformCSolver::preStepBCHandling(){
 	rhoEP = rhoEk;
     }
 
+
     //--------------------------------
     //No-slip wall boundary conditions
     //--------------------------------
@@ -730,6 +747,7 @@ void UniformCSolver::preStepBCHandling(){
 	}END_FORX0
 
     }
+    
 
     if(bc->bcX1 == BC::ADIABATIC_WALL){
 	FOR_X1_XPEN_MAJ{
@@ -750,6 +768,7 @@ void UniformCSolver::preStepBCHandling(){
 	}END_FORX1
     }   
 
+
     if(bc->bcY0 == BC::ADIABATIC_WALL){
 
         double *T2;
@@ -769,16 +788,19 @@ void UniformCSolver::preStepBCHandling(){
 	c2d->deallocXYZ(T2);
 
 	FOR_Y0_XPEN_MAJ{
-	    U[ip]  = 0.0;
-	    V[ip]  = 0.0;
-	    W[ip]  = 0.0;
-	    rhoUP[ip] = 0.0;
-	    rhoVP[ip] = 0.0;
-	    rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]);
+	    if(GETGLOBALYIND_XPEN == 0){
+	        U[ip]  = 0.0;
+	        V[ip]  = 0.0;
+	        W[ip]  = 0.0;
+	        rhoUP[ip] = 0.0;
+	        rhoVP[ip] = 0.0;
+	        rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]);
+	    }
 	}END_FORY0
     }
+    
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
 
@@ -800,16 +822,20 @@ void UniformCSolver::preStepBCHandling(){
 
 
 	FOR_Y1_XPEN_MAJ{
-	    U[ip]  = 0.0;
-	    V[ip]  = 0.0;
-	    W[ip]  = 0.0;
-	    rhoUP[ip] = 0.0;
-	    rhoVP[ip] = 0.0;
-	    rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+	        U[ip]  = 0.0;
+	        V[ip]  = 0.0;
+	        W[ip]  = 0.0;
+	        rhoUP[ip] = 0.0;
+	        rhoVP[ip] = 0.0;
+	        rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
 	}END_FORY1
     }
+
+
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
 
@@ -834,18 +860,21 @@ void UniformCSolver::preStepBCHandling(){
 	c2d->deallocXYZ(T2);
 	c2d->deallocXYZ(T3);
 
-
 	FOR_Z0_XPEN{
-	    U[ip]  = 0.0;
-	    V[ip]  = 0.0;
-	    W[ip]  = 0.0;
-	    rhoUP[ip] = 0.0;
-	    rhoVP[ip] = 0.0;
-	    rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALZIND_XPEN == 0){
+	        U[ip]  = 0.0;
+	        V[ip]  = 0.0;
+	        W[ip]  = 0.0;
+	        rhoUP[ip] = 0.0;
+	        rhoVP[ip] = 0.0;
+	        rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
 	}END_FORZ0
     }
+
+
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
 
@@ -872,16 +901,19 @@ void UniformCSolver::preStepBCHandling(){
 
 
 	FOR_Z1_XPEN{
-	    U[ip]  = 0.0;
-	    V[ip]  = 0.0;
-	    W[ip]  = 0.0;
-	    rhoUP[ip] = 0.0;
-	    rhoVP[ip] = 0.0;
-	    rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+	        U[ip]  = 0.0;
+	        V[ip]  = 0.0;
+	        W[ip]  = 0.0;
+	        rhoUP[ip] = 0.0;
+	        rhoVP[ip] = 0.0;
+	        rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
 	}END_FORZ1
     }
+
 
     //-------------------------------
     //Moving wall boundary conditions
@@ -945,14 +977,16 @@ void UniformCSolver::preStepBCHandling(){
 	c2d->deallocXYZ(T2);
 
         FOR_Y0_XPEN{
-            U[ip]  = Y0WallU;
-            V[ip]  = 0.0;
-            W[ip]  = Y0WallW;
-            rhoUP[ip] = rhoP[ip]*Y0WallU;
-            rhoVP[ip] = 0.0;
-            rhoWP[ip] = rhoP[ip]*Y0WallW;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALYIND_XPEN == 0){
+                U[ip]  = Y0WallU;
+                V[ip]  = 0.0;
+                W[ip]  = Y0WallW;
+                rhoUP[ip] = rhoP[ip]*Y0WallU;
+                rhoVP[ip] = 0.0;
+                rhoWP[ip] = rhoP[ip]*Y0WallW;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
         }END_FORY0
     }
 
@@ -976,14 +1010,16 @@ void UniformCSolver::preStepBCHandling(){
 
 
         FOR_Y1_XPEN{
-            U[ip]  = Y1WallU;
-            V[ip]  = 0.0;
-            W[ip]  = Y1WallW;
-            rhoUP[ip] = rhoP[ip]*Y1WallU;
-            rhoVP[ip] = 0.0;
-            rhoWP[ip] = rhoP[ip]*Y1WallW;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+                U[ip]  = Y1WallU;
+                V[ip]  = 0.0;
+                W[ip]  = Y1WallW;
+                rhoUP[ip] = rhoP[ip]*Y1WallU;
+                rhoVP[ip] = 0.0;
+                rhoWP[ip] = rhoP[ip]*Y1WallW;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
         }END_FORY1
     }
 
@@ -1011,14 +1047,16 @@ void UniformCSolver::preStepBCHandling(){
 	c2d->deallocXYZ(T3);
 
         FOR_Z0_XPEN{
-            U[ip]  = Z0WallU;
-            V[ip]  = Z0WallV;
-            W[ip]  = 0.0;
-            rhoUP[ip] = rhoP[ip]*Z0WallU;
-            rhoVP[ip] = rhoP[ip]*Z0WallV;
-            rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALZIND_XPEN == 0){
+                U[ip]  = Z0WallU;
+                V[ip]  = Z0WallV;
+                W[ip]  = 0.0;
+                rhoUP[ip] = rhoP[ip]*Z0WallU;
+                rhoVP[ip] = rhoP[ip]*Z0WallV;
+                rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
         }END_FORZ0
     }
 
@@ -1046,14 +1084,16 @@ void UniformCSolver::preStepBCHandling(){
 	c2d->deallocXYZ(T3);
 
         FOR_Z1_XPEN{
-            U[ip]  = Z1WallU;
-            V[ip]  = Z1WallV;
-            W[ip]  = 0.0;
-            rhoUP[ip] = rhoP[ip]*Z1WallU;
-            rhoVP[ip] = rhoP[ip]*Z1WallV;
-            rhoWP[ip] = 0.0;
-	    p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
-	    rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+                U[ip]  = Z1WallU;
+                V[ip]  = Z1WallV;
+                W[ip]  = 0.0;
+                rhoUP[ip] = rhoP[ip]*Z1WallU;
+                rhoVP[ip] = rhoP[ip]*Z1WallV;
+                rhoWP[ip] = 0.0;
+	        p[ip] = ig->solvep_idealgas(rhoP[ip], T[ip]);
+	        rhoEP[ip] = ig->solverhoE(rhoP[ip], p[ip], U[ip], V[ip], W[ip]); //Not 100% about this?
+	    }
         }END_FORZ1
     }
 
@@ -1590,45 +1630,53 @@ void UniformCSolver::postStepBCHandling(){
 
     if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y0_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerY[ip];
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    //rhoEk2[ip] = -ts->dt*(engyEulerY[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tyy[ip]);
-	    rhoEk2[ip] = 0.0;//Not 100% 
+	    if(GETGLOBALYIND_XPEN == 0){
+	        rhok2[ip]  = -ts->dt*contEulerY[ip];
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        //rhoEk2[ip] = -ts->dt*(engyEulerY[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tyy[ip]);
+	        rhoEk2[ip] = 0.0;//Not 100% 
+	    }
 	}END_FORY0
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y1_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerY[ip];
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    //rhoEk2[ip] = -ts->dt*(engyEulerY[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tyy[ip]);
-	    rhoEk2[ip] = 0.0;//Not 100% 
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+	        rhok2[ip]  = -ts->dt*contEulerY[ip];
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        //rhoEk2[ip] = -ts->dt*(engyEulerY[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tyy[ip]);
+	        rhoEk2[ip] = 0.0;//Not 100% 
+	    }
 	}END_FORY1
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z0_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    //rhoEk2[ip] = -ts->dt*(engyEulerZ[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tzz[ip]);
-	    rhoEk2[ip] = 0.0;//Not 100% 
+	    if(GETGLOBALZIND_XPEN == 0){
+	        rhok2[ip]  = -ts->dt*contEulerZ[ip];
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        //rhoEk2[ip] = -ts->dt*(engyEulerZ[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tzz[ip]);
+	        rhoEk2[ip] = 0.0;//Not 100% 
+	    }
 	}END_FORZ0
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z1_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    //rhoEk2[ip] = -ts->dt*(engyEulerZ[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tzz[ip]);
-	    rhoEk2[ip] = 0.0;//Not 100% 
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+	        rhok2[ip]  = -ts->dt*contEulerZ[ip];
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        //rhoEk2[ip] = -ts->dt*(engyEulerZ[ip] - (mu[ip]/ig->Pr/(ig->gamma-1.0))*Tzz[ip]);
+	        rhoEk2[ip] = 0.0;//Not 100% 
+	    }		
 	}END_FORZ1
     }
 
@@ -1659,41 +1707,49 @@ void UniformCSolver::postStepBCHandling(){
 
     if(bc->bcY0 == BC::SPONGE){
 	FOR_Y0_XPEN_MAJ{
-	    rhok2[ip]  = 0.0;
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    rhoEk2[ip] = 0.0;
+	    if(GETGLOBALYIND_XPEN == 0){
+	        rhok2[ip]  = 0.0;
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        rhoEk2[ip] = 0.0;
+	    }
 	}END_FORY0
     }
 
     if(bc->bcY1 == BC::SPONGE){
 	FOR_Y1_XPEN_MAJ{
-	    rhok2[ip]  = 0.0;
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    rhoEk2[ip] = 0.0;
+	    if(GETGLOBALYIND_XPEN == Ny-1){
+	        rhok2[ip]  = 0.0;
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        rhoEk2[ip] = 0.0;
+	    }
 	}END_FORY1
     }
 
     if(bc->bcZ0 == BC::SPONGE){
 	FOR_Z0_XPEN_MAJ{
-	    rhok2[ip]  = 0.0;
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    rhoEk2[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == 0){
+	        rhok2[ip]  = 0.0;
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        rhoEk2[ip] = 0.0;
+	    }
 	}END_FORZ0
     }
 
     if(bc->bcZ1 == BC::SPONGE){
 	FOR_Z1_XPEN_MAJ{
-	    rhok2[ip]  = 0.0;
-	    rhoUk2[ip] = 0.0;
-	    rhoVk2[ip] = 0.0;
-	    rhoWk2[ip] = 0.0;
-	    rhoEk2[ip] = 0.0;
+	    if(GETGLOBALZIND_XPEN == Nz-1){
+	        rhok2[ip]  = 0.0;
+	        rhoUk2[ip] = 0.0;
+	        rhoVk2[ip] = 0.0;
+	        rhoWk2[ip] = 0.0;
+	        rhoEk2[ip] = 0.0;
+	    }
 	}END_FORZ1
     }
 
@@ -2733,12 +2789,12 @@ IF_RANK0 cout << " " << endl;
    getRange(Wyz, "Wyz", Nx, Ny, Nz, mpiRank);
    getRange(Wxz, "Wxz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(Tx, "Ux", Nx, Ny, Nz, mpiRank);
-   getRange(Txx, "Uxx", Nx, Ny, Nz, mpiRank);
-   getRange(Ty, "Uy", Nx, Ny, Nz, mpiRank);
-   getRange(Tyy, "Uyy", Nx, Ny, Nz, mpiRank);
-   getRange(Tz, "Uz", Nx, Ny, Nz, mpiRank);
-   getRange(Tzz, "Uzz", Nx, Ny, Nz, mpiRank);
+   getRange(Tx, "Tx", Nx, Ny, Nz, mpiRank);
+   getRange(Txx, "Txx", Nx, Ny, Nz, mpiRank);
+   getRange(Ty, "Ty", Nx, Ny, Nz, mpiRank);
+   getRange(Tyy, "Tyy", Nx, Ny, Nz, mpiRank);
+   getRange(Tz, "Tz", Nx, Ny, Nz, mpiRank);
+   getRange(Tzz, "Tzz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(contEulerX, "contEulerX", Nx, Ny, Nz, mpiRank);
    getRange(contEulerY, "contEulerY", Nx, Ny, Nz, mpiRank);
@@ -2816,8 +2872,6 @@ void UniformCSolver::preSubStep(){
 
     preStepBCHandling();
     preStepDerivatives();
-
-    reportAll();
 }
 
 void UniformCSolver::solveEqnSet(){

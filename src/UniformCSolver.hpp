@@ -23,7 +23,7 @@ class UniformCSolver: public AbstractCSolver{
         int pxStart[3], pyStart[3], pzStart[3];
         int pxEnd[3], pyEnd[3], pzEnd[3];
 
-	int mpiRank, totRank;
+	int totRank;
 
 	double t1, t2;
 	

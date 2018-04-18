@@ -59,18 +59,18 @@
 #define GETMAJIND_YPEN_Ym6 i*pySize[2]*pySize[1] + k*pySize[1] + j-6
 
 
-#define GETMAJIND_ZPEN_Zp1 j*pySize[2]*pySize[0] + i*pzSize[2] + k+1
-#define GETMAJIND_ZPEN_Zp2 j*pySize[2]*pySize[0] + i*pzSize[2] + k+2
-#define GETMAJIND_ZPEN_Zp3 j*pySize[2]*pySize[0] + i*pzSize[2] + k+3
-#define GETMAJIND_ZPEN_Zp4 j*pySize[2]*pySize[0] + i*pzSize[2] + k+4
-#define GETMAJIND_ZPEN_Zp5 j*pySize[2]*pySize[0] + i*pzSize[2] + k+5
-#define GETMAJIND_ZPEN_Zp6 j*pySize[2]*pySize[0] + i*pzSize[2] + k+6
-#define GETMAJIND_ZPEN_Zm1 j*pySize[2]*pySize[0] + i*pzSize[2] + k-1
-#define GETMAJIND_ZPEN_Zm2 j*pySize[2]*pySize[0] + i*pzSize[2] + k-2
-#define GETMAJIND_ZPEN_Zm3 j*pySize[2]*pySize[0] + i*pzSize[2] + k-3
-#define GETMAJIND_ZPEN_Zm4 j*pySize[2]*pySize[0] + i*pzSize[2] + k-4
-#define GETMAJIND_ZPEN_Zm5 j*pySize[2]*pySize[0] + i*pzSize[2] + k-5
-#define GETMAJIND_ZPEN_Zm6 j*pySize[2]*pySize[0] + i*pzSize[2] + k-6
+#define GETMAJIND_ZPEN_Zp1 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+1
+#define GETMAJIND_ZPEN_Zp2 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+2
+#define GETMAJIND_ZPEN_Zp3 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+3
+#define GETMAJIND_ZPEN_Zp4 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+4
+#define GETMAJIND_ZPEN_Zp5 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+5
+#define GETMAJIND_ZPEN_Zp6 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+6
+#define GETMAJIND_ZPEN_Zm1 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-1
+#define GETMAJIND_ZPEN_Zm2 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-2
+#define GETMAJIND_ZPEN_Zm3 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-3
+#define GETMAJIND_ZPEN_Zm4 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-4
+#define GETMAJIND_ZPEN_Zm5 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-5
+#define GETMAJIND_ZPEN_Zm6 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-6
 
 
 //Loops
