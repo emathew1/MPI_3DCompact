@@ -2,6 +2,9 @@
 
 void UniformCSolver::initializeSolverData(){
 
+   
+    if(useTiming) ft1 = MPI_Wtime();
+
     IF_RANK0{
         cout << endl;
         cout << " > Allocating Solver Arrays..." << endl;
@@ -229,10 +232,18 @@ void UniformCSolver::initializeSolverData(){
     c2d->allocX(tempX3);
     c2d->allocX(tempX4);
     c2d->allocX(tempX5);
+
+
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > initSolDat Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
 }
 
 
 void UniformCSolver::setInitialConditions(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     IF_RANK0{
         cout << endl;
@@ -660,10 +671,17 @@ void UniformCSolver::setInitialConditions(){
     getRange(T, "T0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
     getRange(p, "p0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > setInitCond Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
 }
 
 void UniformCSolver::calcDtFromCFL(){
-    
+
+    if(useTiming) ft1 = MPI_Wtime();    
 
     //Calculate the wave speed over the local spacings...
     double *UChar_dx;
@@ -702,11 +720,19 @@ void UniformCSolver::calcDtFromCFL(){
 	time += ts->dt;
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > calcDtCFL  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
 
 }
 
 
 void UniformCSolver::preStepBCHandling(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoP, *rhoUP, *rhoVP, *rhoWP, *rhoEP;
     if(rkStep == 1){
@@ -1097,10 +1123,20 @@ void UniformCSolver::preStepBCHandling(){
         }END_FORZ1
     }
 
+
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > preBCHandl Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
+
 }
 
 
 void UniformCSolver::preStepDerivatives(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoP;
     double *rhoUP;
@@ -1401,10 +1437,18 @@ void UniformCSolver::preStepDerivatives(){
     c2d->transposeZ2Y_MajorIndex(engyEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, engyEulerZ);
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > preStepDer Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
 }
 
 
 void UniformCSolver::solveContinuity(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoP;
     if(rkStep == 1){
@@ -1425,10 +1469,16 @@ void UniformCSolver::solveContinuity(){
 	rhok2[ip]  = ts->dt*(-contEulerX[ip] - contEulerY[ip] - contEulerZ[ip] + spgSource);
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > solveCont  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
 }
 
 void UniformCSolver::solveXMomentum(){
 
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoUP;
     if(rkStep == 1){
@@ -1459,10 +1509,18 @@ void UniformCSolver::solveXMomentum(){
 	rhoUk2[ip] *= ts->dt;
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > solveXMom  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
 
 }
 
 void UniformCSolver::solveYMomentum(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoVP;
     if(rkStep == 1){
@@ -1494,9 +1552,18 @@ void UniformCSolver::solveYMomentum(){
         rhoVk2[ip] *= ts->dt;
    }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > solveYMom  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
+
 }
 
 void UniformCSolver::solveZMomentum(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoWP;
     if(rkStep == 1){
@@ -1530,11 +1597,19 @@ void UniformCSolver::solveZMomentum(){
         rhoWk2[ip] *= ts->dt;
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > solveZMom  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
+
 }
 
 
 void UniformCSolver::solveEnergy(){
 
+    if(useTiming) ft1 = MPI_Wtime();
 
     double *rhoEP;
     if(rkStep == 1){
@@ -1598,9 +1673,17 @@ void UniformCSolver::solveEnergy(){
 	rhoEk2[ip] = ts->dt*(qtemp + vtemp1 + vtemp2 + engyEuler + spgSource);
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > solveEngy  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
 }
 
 void UniformCSolver::postStepBCHandling(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     ////////////////////////////////
     //ADIABATIC AND MOVING WALL BC// 
@@ -1753,10 +1836,17 @@ void UniformCSolver::postStepBCHandling(){
 	}END_FORZ1
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > postBCHand Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
 }
 
 
 void UniformCSolver::filterConservedData(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     //Need to do round robin of filtering directions...
     if(timeStep%ts->filterStep == 0){
@@ -1925,12 +2015,19 @@ void UniformCSolver::filterConservedData(){
 
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > filterCons Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
 
 
 };
 
 
 void UniformCSolver::updateNonConservedData(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     if(!rkLast){
 
@@ -1959,9 +2056,19 @@ void UniformCSolver::updateNonConservedData(){
 	}
     }
 
+    
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > updNonCons Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }
+
+
+
 }
 
 void UniformCSolver::updateSponge(){
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     if(spongeFlag){
 	double eps = 1.0/(spg->avgT/ts->dt + 1.0);
@@ -2046,6 +2153,11 @@ void UniformCSolver::updateSponge(){
 
         }
 
+    }
+
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > updateSpge Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
     }
 
 };
@@ -2184,7 +2296,7 @@ void UniformCSolver::calcTurbulenceQuantities(){
         outfile.close();
 
     if(useTiming){
-        cout << " > calcTrbDat Timing: ";
+        cout << " > calcTrbDat Timing: " << setw(6) ;
         toc();
     }
 
@@ -2268,7 +2380,7 @@ void UniformCSolver::calcTaylorGreenQuantities(){
         outfile.close();
 
     if(useTiming){
-        cout << " > calcTayGrn Timing: ";
+        cout << " > calcTayGrn Timing: " << setw(6) ;
         toc();
     }
 
@@ -2467,7 +2579,7 @@ void UniformCSolver::shearLayerInfoCalc(){
 
 
     if(useTiming){
-        cout << " > shrLyrInfo Timing: ";
+        cout << " > shrLyrInfo Timing: " << setw(6) ;
         toc();
     }
 
@@ -2478,6 +2590,8 @@ void UniformCSolver::shearLayerInfoCalc(){
 */
 void UniformCSolver::checkSolution(){
 
+
+    if(useTiming) ft1 = MPI_Wtime();
 
     if(timeStep%ts->checkStep == 0){
 
@@ -2505,12 +2619,18 @@ void UniformCSolver::checkSolution(){
 	t1 = MPI_Wtime();
     }
 
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > checkSoln  Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
+    }	 
+
 
 };
 
 
 void UniformCSolver::dumpSolution(){
 
+    if(useTiming) ft1 = MPI_Wtime();
 
 	double time1 = MPI_Wtime();
 
@@ -2554,6 +2674,14 @@ void UniformCSolver::dumpSolution(){
 	    cout << endl;
 	    cout << " > File dump took " << time2-time1 << " seconds." << endl;
 	}
+
+    if(useTiming){
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > dumpSoln Timing: " << setw(6)  << endl;
+	
+    }	 
+
+
 
 }
 /*
@@ -2720,7 +2848,7 @@ void UniformCSolver::writeImages(){
     }
 
     if(useTiming){
-        cout << " > writeImage Timing: ";
+        cout << " > writeImage Timing: " << setw(6) ;
         toc();
     }
 

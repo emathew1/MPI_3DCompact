@@ -16,7 +16,10 @@ class AbstractCSolver{
 	int rkStep;
 	bool rkLast;
 	bool endFlag;
+
+	//Stuff for timing functions
 	bool useTiming;
+	double ft1, ft2;
 	 
 	//Initial Conditions  
 	double *rho0, *p0, *U0, *V0, *W0;

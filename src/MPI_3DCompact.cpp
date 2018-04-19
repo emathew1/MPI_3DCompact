@@ -45,9 +45,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 50,
-           Ny = 50,
-           Nz = 50;
+    int    Nx = 100,
+           Ny = 100,
+           Nz = 100;
     double Lx = 1.0,
            Ly = 1.0,
            Lz = 1.0;;
@@ -59,9 +59,9 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 25000;
+    int maxTimeStep  = 5;
     double maxTime   = 3000.0;
-    int filterStep   = 5;
+    int filterStep   = 1;
     int checkStep    = 1;
     int dumpStep     = 2500;
     TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep, mpiRank);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     double alphaF  = 0.495;
     double mu_ref  = 0.00375;
-    bool useTiming = false;
+    bool useTiming = true;
     AbstractCSolver *cs;
     cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      

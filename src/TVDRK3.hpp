@@ -43,7 +43,8 @@ class TVDRK3:public AbstractRK{
 
 
 void TVDRK3::updateConservedData(){
-
+ 
+    if(cs->useTiming) cs->ft1 = MPI_Wtime();
 
     //Method outline (Gottlieb and Shu, 1998)
     // u(1)   =       u(n) + dt*L(u(n))
@@ -85,6 +86,11 @@ void TVDRK3::updateConservedData(){
 
         }
 
+    }
+
+    if(cs->useTiming){
+        cs->ft2 = MPI_Wtime();
+        IF_RANK0 cout << " > updateCons Timing: " << setw(6)  << (int)((cs->ft2-cs->ft1)*1000) << "ms" << endl;
     }
 
 }
