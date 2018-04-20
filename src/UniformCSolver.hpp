@@ -248,6 +248,7 @@ class UniformCSolver: public AbstractCSolver{
 	};
 
 
+	void writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction);
 
 };
 

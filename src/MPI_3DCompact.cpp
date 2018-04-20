@@ -64,7 +64,16 @@ int main(int argc, char *argv[]){
     int filterStep   = 1;
     int checkStep    = 1;
     int dumpStep     = 2500;
-    TimeStepping *ts = new TimeStepping(timeSteppingType, CFL, maxTimeStep, maxTime, filterStep, checkStep, dumpStep, mpiRank);
+    int imageStep    = 25;
+    TimeStepping *ts = new TimeStepping(timeSteppingType, 
+					CFL, 
+					maxTimeStep, 
+					maxTime, 
+					filterStep, 
+					checkStep, 
+					dumpStep,
+					imageStep, 
+					mpiRank);
 
 
     ///////////////////////////
@@ -76,10 +85,10 @@ int main(int argc, char *argv[]){
 
     BC::BCKind bcX0 = BC::PERIODIC;
     BC::BCKind bcX1 = BC::PERIODIC;
-    BC::BCKind bcY0 = BC::SPONGE;
-    BC::BCKind bcY1 = BC::SPONGE;
-    BC::BCKind bcZ0 = BC::SPONGE;
-    BC::BCKind bcZ1 = BC::SPONGE;
+    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -114,8 +123,8 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.495;
-    double mu_ref  = 0.00375;
+    double alphaF  = 0.4;
+    double mu_ref  = 0.005;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);

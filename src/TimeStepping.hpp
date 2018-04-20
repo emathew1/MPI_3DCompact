@@ -16,9 +16,10 @@ class TimeStepping{
 	int filterStep;  
 	int checkStep;
 	int dumpStep;
+	int imageStep;
 
 	TimeStepping(TimeSteppingType timeSteppingType, 
-		     double CFL, int maxTimeStep, double maxTime, int filterStep, int checkStep, int dumpStep, int mpiRank){
+		     double CFL, int maxTimeStep, double maxTime, int filterStep, int checkStep, int dumpStep, int imageStep, int mpiRank){
 	    this->timeSteppingType = timeSteppingType;
 	    this->CFL = CFL;
 	    this->maxTimeStep = maxTimeStep;
@@ -26,6 +27,7 @@ class TimeStepping{
 	    this->filterStep = filterStep;
 	    this->checkStep  = checkStep;
 	    this->dumpStep   = dumpStep;
+	    this->imageStep  = imageStep;
 
 	    if(mpiRank == 0){
 	        std::cout << std::endl;

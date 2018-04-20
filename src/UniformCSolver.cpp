@@ -2689,7 +2689,6 @@ void UniformCSolver::writeImages(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
-    if(timeStep%10==0){
 	IF_RANK0 cout << " > Dumping images..." << endl;
 
 	ostringstream timeStepStringT;
@@ -2697,6 +2696,10 @@ void UniformCSolver::writeImages(){
 	int zeroPad = 6;
 	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
+	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
+	writePlaneImageForVariable(U, "uXZ", timeStepString, 1, 0.5);
+	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
+/*
 	//going to do our images in greyscale
 	double dataMin, dataMax;
 	
@@ -2764,7 +2767,7 @@ void UniformCSolver::writeImages(){
 	delete[] ggXY;
 	delete[] gXY;	
 
-/*
+
 
 	string imageName = "imagesXY/rhoXY.";
 	imageName.append(timeStepString);
@@ -2897,11 +2900,9 @@ void UniformCSolver::writeImages(){
 	imageName.append(timeStepString);
 	imageName.append(".png");
 	pngXZ->write(imageName.c_str()); 
-
-
 */
 
-    }
+
 
     if(useTiming){
 	ft2 = MPI_Wtime();
@@ -2912,6 +2913,122 @@ void UniformCSolver::writeImages(){
 
 }
 
+void UniformCSolver::writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction){
+
+    //plane == 0, YZ (X-normal Plane)
+    //plane == 1, XZ (Y-normal Plane)
+    //plane == 2, XY (Z-normal Plane)
+
+    int N1 = 0, N2 = 0;
+    PngWriter *png = NULL;
+
+    if(plane == 0){
+	N1 = Ny;
+	N2 = Nz;
+	
+	IF_RANK0 png = pngYZ;	
+
+    }else if(plane == 1){
+	N1 = Nz;
+	N2 = Nx;
+
+	IF_RANK0 png = pngXZ;	
+
+    }else if(plane == 2){
+	N1 = Nx;
+	N2 = Ny;
+
+	IF_RANK0 png = pngXY;	
+    }
+    
+    double *ff = new double[N1*N2];
+    for(int ip = 0; ip < N1*N2; ip++) ff[ip] = -1000000.0;
+
+
+    FOR_Z_XPEN{
+	FOR_Y_XPEN{
+	    FOR_X_XPEN{
+		int gi = GETGLOBALXIND_XPEN;
+		int gj = GETGLOBALYIND_XPEN;
+		int gk = GETGLOBALZIND_XPEN;
+	
+		int ip = GETMAJIND_XPEN;
+
+		if(plane == 0){
+		    if(gi == (int)(Nx*fraction)){
+			ff[gk*Ny + gj] = var[ip];
+		    }
+		}else if(plane == 1){
+		    if(gj == (int)(Ny*fraction)){
+			ff[gi*Nz + gk] = var[ip];
+		    }
+		}else if(plane == 2){
+		    if(gk == (int)(Nz*fraction)){
+			ff[gj*Nx + gi] = var[ip];
+		    }
+		}else{
+		   IF_RANK0 cout << "Unrecognized plane value, must be 1, 2, or 3! May crash? " << endl;
+		}
+
+	    }
+	}
+    }
+
+    double *gf;
+    IF_RANK0{
+	gf = new double[N1*N2];
+    }else{
+  	gf = NULL;
+    }
+
+    MPI_Reduce(ff, gf, N1*N2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    IF_RANK0{
+
+	//Make sure all of the values were filled
+	for(int ip = 0; ip < N1*N2; ip++){
+
+	    if(gf[ip] == -1000000.0){
+		cout << "Error: image matrix not completely filled!" << endl;
+	    }
+	}
+
+	//get the max/min value in the plane...
+	double dataMin =  100000000.0;
+	double dataMax = -100000000.0;
+	for(int ip = 0; ip < N1*N2; ip++){
+	    dataMin = fmin(dataMin, gf[ip]);
+	    dataMax = fmax(dataMax, gf[ip]);
+	}
+
+	//Scale pixel value to local min and max
+	int *g = new int[N1*N2];
+	for(int ip = 0; ip < N1*N2; ip++){
+	   double gtemp = (gf[ip] - dataMin)/(dataMax - dataMin); 
+	   g[ip] = (int)(gtemp*255.0);
+	}
+
+	for(int jp = 0; jp < N2; jp++){
+	    for(int ip = 0; ip < N1; ip++){
+		int ii = jp*N1 + ip;
+		//Grayscale image...
+		png->set(ip, jp, g[ii], g[ii], g[ii]);
+	    }
+	}
+
+	string imageName = varName;
+	imageName.append(".");
+	imageName.append(timeStepString);
+	imageName.append(".png");
+	png->write(imageName.c_str());
+
+	delete[] g;
+	delete[] gf;
+    }
+
+    delete[] ff;
+
+}
 
 void UniformCSolver::checkEnd(){
 
@@ -3104,8 +3221,9 @@ void UniformCSolver::postStep(){
 
     if(timeStep%ts->dumpStep == 0)
         dumpSolution();
-
-    writeImages();
+    
+    if(timeStep%ts->imageStep == 0)
+        writeImages();
 
     checkEnd();
     //reportAll();
