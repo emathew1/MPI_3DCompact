@@ -6,8 +6,8 @@ CFLAGS= -Wall -O3
 AR = ar rv
 RANLIB = ar -ts
 
-LIB =  
-LIBF = -lstdc++
-INC = 
+LIB = /usr/lib 
+LIBF = -lpng -lstdc++
+INC = /usr/include
 
 DECOMP_DIR = ./C2Decomp

@@ -37,6 +37,7 @@ double fRand(double fMin, double fMax);
 
 
 void getRange(double *phi, string Var, int Nx, int Ny, int Nz, int mpiRank);
+void getRangeValue(double *phi, int Nx, int Ny, int Nz, int mpiRank, double &globalDataMin, double &globalDataMax);
 
 //derivatives at boundaries, maybe go somewhere else?
 inline double calcNeumann(double f1, double f2, double f3, double f4, double f5, double f6){

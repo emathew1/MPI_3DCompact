@@ -2684,33 +2684,88 @@ void UniformCSolver::dumpSolution(){
 
 
 }
-/*
+
 void UniformCSolver::writeImages(){
 
-    if(useTiming) tic();
+    if(useTiming) ft1 = MPI_Wtime();
 
-    if(timeStep%25==0){
-	cout << " > Dumping images..." << endl;
+    if(timeStep%10==0){
+	IF_RANK0 cout << " > Dumping images..." << endl;
 
-	string timeStepString = to_string(timeStep);
+	ostringstream timeStepStringT;
+	timeStepStringT << timeStep;
 	int zeroPad = 6;
-	timeStepString = string(zeroPad - timeStepString.length(), '0') + timeStepString;
+	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
 	//going to do our images in greyscale
 	double dataMin, dataMax;
 	
-	//Density...
-	getRangeValue(rho1, Nx, Ny, Nz, dataMin, dataMax);
+	//Pressure...
+	getRangeValue(p, pxSize[0], pxSize[1], pxSize[2], mpiRank, dataMin, dataMax);
 
-	FOR_Y{
-	    FOR_X{
-		int k = (int)(Nz/2.0);
-		int ii = GET3DINDEX_XYZ; 
-		double f = (rho1[ii] - dataMin)/(dataMax - dataMin);
-		int g = (int)(f*255.0);
-		pngXY->set(i,j,g,g,g);
+	int *gXY = new int[Nx*Ny];
+	for(int ip = 0; ip < Nx*Ny; ip++) gXY[ip] = -1000;
+
+	FOR_Z_XPEN{
+	    FOR_Y_XPEN{
+	        FOR_X_XPEN{
+		
+		    int gi = GETGLOBALXIND_XPEN;
+		    int gj = GETGLOBALYIND_XPEN;
+		    int gk = GETGLOBALZIND_XPEN;
+
+		    int ip = GETMAJIND_XPEN;
+
+		    if(gk == (int)(Nz/2.0)){
+			double f = (p[ip] - dataMin)/(dataMax - dataMin);
+			if(fabs(dataMax - dataMin) < 1E-8){
+			    f = 0;
+			}
+			gXY[gj*Nx + gi] = (int)(f*255.0);
+		    }
+
+		}
 	    }
 	}
+
+	int *ggXY;
+
+	IF_RANK0{
+  	    ggXY = new int[Nx*Ny];
+	}else{
+	    ggXY = NULL;
+	}
+
+	MPI_Reduce(gXY, ggXY, Nx*Ny, MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
+
+	IF_RANK0{
+
+	    //Make sure they all get filled
+	    for(int ip = 0; ip < Nx*Ny; ip++){
+		if(ggXY[ip] == -1000){
+		    cout << "Error: Image matrix not completely filled!" << endl;
+		}
+	    }
+
+	    for(int jp = 0; jp < Ny; jp++){
+		for(int ip = 0; ip < Nx; ip++){
+		    int g = ggXY[jp*Nx + ip];
+		    pngXY->set(ip, jp, g, g, g);
+		}
+	    }
+
+	    string imageName = "pXY.";
+	    imageName.append(timeStepString);
+	    imageName.append(".png");
+	    pngXY->write(imageName.c_str());
+
+	}
+
+	delete[] ggXY;
+	delete[] gXY;	
+
+/*
+
 	string imageName = "imagesXY/rhoXY.";
 	imageName.append(timeStepString);
 	imageName.append(".png");
@@ -2844,17 +2899,20 @@ void UniformCSolver::writeImages(){
 	pngXZ->write(imageName.c_str()); 
 
 
+*/
 
     }
 
     if(useTiming){
-        cout << " > writeImage Timing: " << setw(6) ;
-        toc();
-    }
+	ft2 = MPI_Wtime();
+	IF_RANK0 cout << " > writeImg Timing: " << setw(6)  << endl;
+    }	 
+
 
 
 }
-*/
+
+
 void UniformCSolver::checkEnd(){
 
 
@@ -2997,7 +3055,7 @@ void UniformCSolver::preStep(){
  
    if(timeStep == 0){
         dumpSolution();
-//	writeImages();
+	writeImages();
     }
     
     calcDtFromCFL();
@@ -3046,6 +3104,8 @@ void UniformCSolver::postStep(){
 
     if(timeStep%ts->dumpStep == 0)
         dumpSolution();
+
+    writeImages();
 
     checkEnd();
     //reportAll();

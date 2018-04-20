@@ -45,12 +45,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 100,
-           Ny = 100,
-           Nz = 100;
-    double Lx = 1.0,
-           Ly = 1.0,
-           Lz = 1.0;;
+    int    Nx = 64,
+           Ny = 64,
+           Nz = 64;
+    double Lx = 4.0,
+           Ly = 4.0,
+           Lz = 4.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -58,8 +58,8 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.8;
-    int maxTimeStep  = 5;
+    double CFL       = 0.5;
+    int maxTimeStep  = 1000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
@@ -70,12 +70,12 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::SPONGE;
-    BC::BCKind bcX1 = BC::SPONGE;
+    BC::BCKind bcX0 = BC::PERIODIC;
+    BC::BCKind bcX1 = BC::PERIODIC;
     BC::BCKind bcY0 = BC::SPONGE;
     BC::BCKind bcY1 = BC::SPONGE;
     BC::BCKind bcZ0 = BC::SPONGE;
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     double alphaF  = 0.495;
     double mu_ref  = 0.00375;
-    bool useTiming = true;
+    bool useTiming = false;
     AbstractCSolver *cs;
     cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      
@@ -151,8 +151,8 @@ int main(int argc, char *argv[]){
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
                 cs->rho0[ip] = 1.0;
-                cs->p0[ip]   = (1.0 + exp(-r2/0.0001))/cs->ig->gamma;
-                cs->U0[ip]   = 0.0;
+                cs->p0[ip]   = (1.0 + exp(-r2/0.001))/cs->ig->gamma;
+                cs->U0[ip]   = 0.7;
                 cs->V0[ip]   = 0.0;
                 cs->W0[ip]   = 0.0;
             }

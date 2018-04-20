@@ -8,6 +8,7 @@
 #include "Utils.hpp"
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
+#include "PngWriter.hpp"
 
 class UniformCSolver: public AbstractCSolver{
 
@@ -122,6 +123,12 @@ class UniformCSolver: public AbstractCSolver{
 	double Y0WallU, Y0WallW, Y1WallU, Y1WallW;
 	double Z0WallU, Z0WallV, Z1WallU, Z1WallV;
 
+
+	//For drawing images
+	PngWriter *pngXY;
+	PngWriter *pngXZ;
+	PngWriter *pngYZ;
+
 	//Constructor to use for this class...
 	UniformCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
 
@@ -180,6 +187,17 @@ class UniformCSolver: public AbstractCSolver{
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
 
+	    //only rank 0 write images for now...
+	    IF_RANK0{
+		pngXY = new PngWriter(Nx, Ny); 
+		pngXZ = new PngWriter(Nz, Nx); 
+		pngYZ = new PngWriter(Ny, Nz); 
+	    }else{
+		pngXY = NULL;
+		pngXZ = NULL;
+		pngYZ = NULL;
+	    }
+	
 
 	    t1 = MPI_Wtime();
 	}

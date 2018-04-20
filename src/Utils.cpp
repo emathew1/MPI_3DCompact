@@ -250,3 +250,20 @@ void getRange(double *phi, string Var, int Nx, int Ny, int Nz, int mpiRank){
     IF_RANK0 cout << "  Range of " << Var << ": " << globalMin << ":" << globalMax << endl;
 
 }
+
+void getRangeValue(double *phi, int Nx, int Ny, int Nz, int mpiRank, double &globalDataMin, double &globalDataMax){
+
+    double dataMin = 1000000.0;
+    for(int ip = 0; ip < Nx*Ny*Nz; ip++)
+	dataMin = min(phi[ip], dataMin);
+
+    double dataMax = -1000000.0;
+    for(int ip = 0; ip < Nx*Ny*Nz; ip++)
+	dataMax = max(phi[ip], dataMax);
+
+    MPI_Allreduce(&dataMin, &globalDataMin, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+    MPI_Allreduce(&dataMax, &globalDataMax, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
+
+}
+

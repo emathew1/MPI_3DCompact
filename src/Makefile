@@ -22,7 +22,7 @@ MPI_3DCompact:
 
 
 MPI_3DCompact.exe: $(OBJECTS)
-	$(CC) $(CFLAGS) -o $@ $(OBJECTS) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
+	$(CC) $(CFLAGS) -o $@ -I$(INC) $(OBJECTS) -L$(LIB) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
 MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp AbstractRK.hpp TVDRK3.hpp 
 	$(CC) $(CFLAGS) -c $<
@@ -36,7 +36,7 @@ Derivatives.o: Derivatives.cpp Derivatives.hpp Domain.hpp BC.hpp Utils.hpp Macro
 Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-UniformCSolver.o: UniformCSolver.cpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp
+UniformCSolver.o: UniformCSolver.cpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
 	$(CC) $(CFLAGS) -c $<
 
 clean: 
