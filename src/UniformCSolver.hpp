@@ -118,11 +118,13 @@ class UniformCSolver: public AbstractCSolver{
 	bool spongeFlag;
 	SpongeBC *spg; 
 
+	//See if we have to transpose for Neumann BC calculations
+	bool neumannLocalY, neumannLocalZ;
+
 	//Moving Wall BC Velocities
 	double X0WallV, X0WallW, X1WallV, X1WallW;
 	double Y0WallU, Y0WallW, Y1WallU, Y1WallW;
 	double Z0WallU, Z0WallV, Z1WallU, Z1WallV;
-
 
 	//For drawing images
 	PngWriter *pngXY;
@@ -198,6 +200,32 @@ class UniformCSolver: public AbstractCSolver{
 		pngYZ = NULL;
 	    }
 	
+
+	    int minXPenYSize;
+	    int minXPenZSize;
+
+	    MPI_Allreduce(&pxSize[1], &minXPenYSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD); 
+	    MPI_Allreduce(&pxSize[2], &minXPenZSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+
+	    IF_RANK0 cout << " > Mininum number of points in Y direction in X-Pencil is " << minXPenYSize << ",";
+	    if(minXPenYSize >= 7){
+		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
+		neumannLocalY = true;
+	    }else{
+ 		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
+		neumannLocalY = false;
+	    }
+
+	    IF_RANK0 cout << " > Mininum number of points in Z direction in X-Pencil is " << minXPenZSize << ",";
+	    if(minXPenZSize >= 7){
+		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
+		neumannLocalZ = true;
+	    }else{
+ 		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
+		neumannLocalZ = false;
+	    }
+
+
 
 	    t1 = MPI_Wtime();
 	}

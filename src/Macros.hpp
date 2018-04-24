@@ -44,7 +44,6 @@
 #define GETMAJIND_XPEN_Xm5 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-5
 #define GETMAJIND_XPEN_Xm6 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-6
 
-
 #define GETMAJIND_YPEN_Yp1 i*pySize[2]*pySize[1] + k*pySize[1] + j+1
 #define GETMAJIND_YPEN_Yp2 i*pySize[2]*pySize[1] + k*pySize[1] + j+2
 #define GETMAJIND_YPEN_Yp3 i*pySize[2]*pySize[1] + k*pySize[1] + j+3
@@ -58,7 +57,6 @@
 #define GETMAJIND_YPEN_Ym5 i*pySize[2]*pySize[1] + k*pySize[1] + j-5
 #define GETMAJIND_YPEN_Ym6 i*pySize[2]*pySize[1] + k*pySize[1] + j-6
 
-
 #define GETMAJIND_ZPEN_Zp1 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+1
 #define GETMAJIND_ZPEN_Zp2 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+2
 #define GETMAJIND_ZPEN_Zp3 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+3
@@ -71,6 +69,34 @@
 #define GETMAJIND_ZPEN_Zm4 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-4
 #define GETMAJIND_ZPEN_Zm5 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-5
 #define GETMAJIND_ZPEN_Zm6 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-6
+
+#define GETYPIND_XPEN_Yp1 k*pxSize[0]*pxSize[1] + (j+1)*pxSize[0] + i
+#define GETYPIND_XPEN_Yp2 k*pxSize[0]*pxSize[1] + (j+2)*pxSize[0] + i
+#define GETYPIND_XPEN_Yp3 k*pxSize[0]*pxSize[1] + (j+3)*pxSize[0] + i
+#define GETYPIND_XPEN_Yp4 k*pxSize[0]*pxSize[1] + (j+4)*pxSize[0] + i
+#define GETYPIND_XPEN_Yp5 k*pxSize[0]*pxSize[1] + (j+5)*pxSize[0] + i
+#define GETYPIND_XPEN_Yp6 k*pxSize[0]*pxSize[1] + (j+6)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym1 k*pxSize[0]*pxSize[1] + (j-1)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym2 k*pxSize[0]*pxSize[1] + (j-2)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym3 k*pxSize[0]*pxSize[1] + (j-3)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym4 k*pxSize[0]*pxSize[1] + (j-4)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym5 k*pxSize[0]*pxSize[1] + (j-5)*pxSize[0] + i
+#define GETYPIND_XPEN_Ym6 k*pxSize[0]*pxSize[1] + (j-6)*pxSize[0] + i
+
+#define GETZPIND_XPEN_Zp1 (k+1)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zp2 (k+2)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zp3 (k+3)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zp4 (k+4)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zp5 (k+5)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zp6 (k+6)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm1 (k-1)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm2 (k-2)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm3 (k-3)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm4 (k-4)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm5 (k-5)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+#define GETZPIND_XPEN_Zm6 (k-6)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
+
+
 
 
 //Loops

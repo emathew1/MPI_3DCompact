@@ -89,25 +89,34 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Yp1],
+                                    T[GETYPIND_XPEN_Yp2],
+                                    T[GETYPIND_XPEN_Yp3],
+                                    T[GETYPIND_XPEN_Yp4],
+                                    T[GETYPIND_XPEN_Yp5],
+                                    T[GETYPIND_XPEN_Yp6]);
+	    } 
         }END_FORY0
 
-	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y0_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
-                                 T2[GETMAJIND_YPEN_Yp2],
-                                 T2[GETMAJIND_YPEN_Yp3],
-                                 T2[GETMAJIND_YPEN_Yp4],
-                                 T2[GETMAJIND_YPEN_Yp5],
-                                 T2[GETMAJIND_YPEN_Yp6]);
+	    FOR_Y0_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                     T2[GETMAJIND_YPEN_Yp2],
+                                     T2[GETMAJIND_YPEN_Yp3],
+                                     T2[GETMAJIND_YPEN_Yp4],
+                                     T2[GETMAJIND_YPEN_Yp5],
+                                     T2[GETMAJIND_YPEN_Yp6]);
 
-	}END_FORY0 
+	    }END_FORY0 
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
     }
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
@@ -119,24 +128,33 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Ym1],
+                                    T[GETYPIND_XPEN_Ym2],
+                                    T[GETYPIND_XPEN_Ym3],
+                                    T[GETYPIND_XPEN_Ym4],
+                                    T[GETYPIND_XPEN_Ym5],
+                                    T[GETYPIND_XPEN_Ym6]);
+	    } 
         }END_FORY1
 
-	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y1_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
-                                 T2[GETMAJIND_YPEN_Ym2],
-                                 T2[GETMAJIND_YPEN_Ym3],
-                                 T2[GETMAJIND_YPEN_Ym4],
-                                 T2[GETMAJIND_YPEN_Ym5],
-                                 T2[GETMAJIND_YPEN_Ym6]);
- 	}END_FORY1 
+	    FOR_Y1_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                     T2[GETMAJIND_YPEN_Ym2],
+                                     T2[GETMAJIND_YPEN_Ym3],
+                                     T2[GETMAJIND_YPEN_Ym4],
+                                     T2[GETMAJIND_YPEN_Ym5],
+                                     T2[GETMAJIND_YPEN_Ym6]);
+ 	    }END_FORY1 
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
     }
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
@@ -148,29 +166,38 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zp1],
+                                    T[GETZPIND_XPEN_Zp2],
+                                    T[GETZPIND_XPEN_Zp3],
+                                    T[GETZPIND_XPEN_Zp4],
+                                    T[GETZPIND_XPEN_Zp5],
+                                    T[GETZPIND_XPEN_Zp6]);
+	    } 
         }END_FORZ0
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
-                                 T3[GETMAJIND_ZPEN_Zp2],
-                                 T3[GETMAJIND_ZPEN_Zp3],
-                                 T3[GETMAJIND_ZPEN_Zp4],
-                                 T3[GETMAJIND_ZPEN_Zp5],
-                                 T3[GETMAJIND_ZPEN_Zp6]);
-	}END_FORZ0
+	    FOR_Z0_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                     T3[GETMAJIND_ZPEN_Zp2],
+                                     T3[GETMAJIND_ZPEN_Zp3],
+                                     T3[GETMAJIND_ZPEN_Zp4],
+                                     T3[GETMAJIND_ZPEN_Zp5],
+                                     T3[GETMAJIND_ZPEN_Zp6]);
+	    }END_FORZ0
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
-
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
     }
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
@@ -182,29 +209,39 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zm1],
+                                    T[GETZPIND_XPEN_Zm2],
+                                    T[GETZPIND_XPEN_Zm3],
+                                    T[GETZPIND_XPEN_Zm4],
+                                    T[GETZPIND_XPEN_Zm5],
+                                    T[GETZPIND_XPEN_Zm6]);
+	    } 
+
         }END_FORZ1
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
-                                 T3[GETMAJIND_ZPEN_Zm2],
-                                 T3[GETMAJIND_ZPEN_Zm3],
-                                 T3[GETMAJIND_ZPEN_Zm4],
-                                 T3[GETMAJIND_ZPEN_Zm5],
-                                 T3[GETMAJIND_ZPEN_Zm6]);
- 	}END_FORZ1
+	    FOR_Z1_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                     T3[GETMAJIND_ZPEN_Zm2],
+                                     T3[GETMAJIND_ZPEN_Zm3],
+                                     T3[GETMAJIND_ZPEN_Zm4],
+                                     T3[GETMAJIND_ZPEN_Zm5],
+                                     T3[GETMAJIND_ZPEN_Zm6]);
+ 	    }END_FORZ1
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
-
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
 
 
     }
@@ -258,24 +295,33 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = rho1[ip]*Y0WallU;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = rho1[ip]*Y0WallW;
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Yp1],
+                                    T[GETYPIND_XPEN_Yp2],
+                                    T[GETYPIND_XPEN_Yp3],
+                                    T[GETYPIND_XPEN_Yp4],
+                                    T[GETYPIND_XPEN_Yp5],
+                                    T[GETYPIND_XPEN_Yp6]);
+	    } 
         }END_FORY0
 
- 	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+ 	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y0_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
-                                 T2[GETMAJIND_YPEN_Yp2],
-                                 T2[GETMAJIND_YPEN_Yp3],
-                                 T2[GETMAJIND_YPEN_Yp4],
-                                 T2[GETMAJIND_YPEN_Yp5],
-                                 T2[GETMAJIND_YPEN_Yp6]);
-	}END_FORY0 
+	    FOR_Y0_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                     T2[GETMAJIND_YPEN_Yp2],
+                                     T2[GETMAJIND_YPEN_Yp3],
+                                     T2[GETMAJIND_YPEN_Yp4],
+                                     T2[GETMAJIND_YPEN_Yp5],
+                                     T2[GETMAJIND_YPEN_Yp6]);
+	    }END_FORY0 
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
 
 
    }
@@ -289,25 +335,33 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = rho1[ip]*Y1WallU;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = rho1[ip]*Y1WallW;
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Ym1],
+                                    T[GETYPIND_XPEN_Ym2],
+                                    T[GETYPIND_XPEN_Ym3],
+                                    T[GETYPIND_XPEN_Ym4],
+                                    T[GETYPIND_XPEN_Ym5],
+                                    T[GETYPIND_XPEN_Ym6]);
+	    } 
         }END_FORY1
 
+	if(!neumannLocalY){
+	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	    FOR_Y1_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                     T2[GETMAJIND_YPEN_Ym2],
+                                     T2[GETMAJIND_YPEN_Ym3],
+                                     T2[GETMAJIND_YPEN_Ym4],
+                                     T2[GETMAJIND_YPEN_Ym5],
+                                     T2[GETMAJIND_YPEN_Ym6]);
+ 	    }END_FORY1 
 
-	FOR_Y1_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
-                                 T2[GETMAJIND_YPEN_Ym2],
-                                 T2[GETMAJIND_YPEN_Ym3],
-                                 T2[GETMAJIND_YPEN_Ym4],
-                                 T2[GETMAJIND_YPEN_Ym5],
-                                 T2[GETMAJIND_YPEN_Ym6]);
- 	}END_FORY1 
-
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
 
  
    }
@@ -321,29 +375,39 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = rho1[ip]*Z0WallU;
             rhoV1[ip] = rho1[ip]*Z0WallV;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zp1],
+                                    T[GETZPIND_XPEN_Zp2],
+                                    T[GETZPIND_XPEN_Zp3],
+                                    T[GETZPIND_XPEN_Zp4],
+                                    T[GETZPIND_XPEN_Zp5],
+                                    T[GETZPIND_XPEN_Zp6]);
+	    } 
         }END_FORZ0
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
-                                 T3[GETMAJIND_ZPEN_Zp2],
-                                 T3[GETMAJIND_ZPEN_Zp3],
-                                 T3[GETMAJIND_ZPEN_Zp4],
-                                 T3[GETMAJIND_ZPEN_Zp5],
-                                 T3[GETMAJIND_ZPEN_Zp6]);
-	}END_FORZ0
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    FOR_Z0_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                     T3[GETMAJIND_ZPEN_Zp2],
+                                     T3[GETMAJIND_ZPEN_Zp3],
+                                     T3[GETMAJIND_ZPEN_Zp4],
+                                     T3[GETMAJIND_ZPEN_Zp5],
+                                     T3[GETMAJIND_ZPEN_Zp6]);
+	    }END_FORZ0
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
 
 
     }
@@ -357,28 +421,40 @@ void UniformCSolver::setInitialConditions(){
             rhoU1[ip] = rho1[ip]*Z1WallU;
             rhoV1[ip] = rho1[ip]*Z1WallV;
             rhoW1[ip] = 0.0;
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zm1],
+                                    T[GETZPIND_XPEN_Zm2],
+                                    T[GETZPIND_XPEN_Zm3],
+                                    T[GETZPIND_XPEN_Zm4],
+                                    T[GETZPIND_XPEN_Zm5],
+                                    T[GETZPIND_XPEN_Zm6]);
+	    } 
+
         }END_FORZ1
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
-                                 T3[GETMAJIND_ZPEN_Zm2],
-                                 T3[GETMAJIND_ZPEN_Zm3],
-                                 T3[GETMAJIND_ZPEN_Zm4],
-                                 T3[GETMAJIND_ZPEN_Zm5],
-                                 T3[GETMAJIND_ZPEN_Zm6]);
- 	}END_FORZ1
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    FOR_Z1_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                     T3[GETMAJIND_ZPEN_Zm2],
+                                     T3[GETMAJIND_ZPEN_Zm3],
+                                     T3[GETMAJIND_ZPEN_Zm4],
+                                     T3[GETMAJIND_ZPEN_Zm5],
+                                     T3[GETMAJIND_ZPEN_Zm6]);
+ 	    }END_FORZ1
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
+
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
 
     }
 
@@ -489,23 +565,33 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcY0 == BC::ADIABATIC_WALL){
 
-        double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+            double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y0_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
-                                 T2[GETMAJIND_YPEN_Yp2],
-                                 T2[GETMAJIND_YPEN_Yp3],
-                                 T2[GETMAJIND_YPEN_Yp4],
-                                 T2[GETMAJIND_YPEN_Yp5],
-                                 T2[GETMAJIND_YPEN_Yp6]);
-	}END_FORY0
+	    FOR_Y0_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                     T2[GETMAJIND_YPEN_Yp2],
+                                     T2[GETMAJIND_YPEN_Yp3],
+                                     T2[GETMAJIND_YPEN_Yp4],
+                                     T2[GETMAJIND_YPEN_Yp5],
+                                     T2[GETMAJIND_YPEN_Yp6]);
+	    }END_FORY0
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
 
 	FOR_Y0_XPEN_MAJ{
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Yp1],
+                                    T[GETYPIND_XPEN_Yp2],
+                                    T[GETYPIND_XPEN_Yp3],
+                                    T[GETYPIND_XPEN_Yp4],
+                                    T[GETYPIND_XPEN_Yp5],
+                                    T[GETYPIND_XPEN_Yp6]);
+	    } 
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
@@ -520,24 +606,33 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcY1 == BC::ADIABATIC_WALL){
 
-	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y1_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
-                                 T2[GETMAJIND_YPEN_Ym2],
-                                 T2[GETMAJIND_YPEN_Ym3],
-                                 T2[GETMAJIND_YPEN_Ym4],
-                                 T2[GETMAJIND_YPEN_Ym5],
-                                 T2[GETMAJIND_YPEN_Ym6]);
- 	}END_FORY1 
+	    FOR_Y1_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                     T2[GETMAJIND_YPEN_Ym2],
+                                     T2[GETMAJIND_YPEN_Ym3],
+                                     T2[GETMAJIND_YPEN_Ym4],
+                                     T2[GETMAJIND_YPEN_Ym5],
+                                     T2[GETMAJIND_YPEN_Ym6]);
+ 	    }END_FORY1 
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
 
 	FOR_Y1_XPEN_MAJ{
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Ym1],
+                                    T[GETYPIND_XPEN_Ym2],
+                                    T[GETYPIND_XPEN_Ym3],
+                                    T[GETYPIND_XPEN_Ym4],
+                                    T[GETYPIND_XPEN_Ym5],
+                                    T[GETYPIND_XPEN_Ym6]);
+	    } 
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
@@ -553,28 +648,39 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL){
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
-                                 T3[GETMAJIND_ZPEN_Zp2],
-                                 T3[GETMAJIND_ZPEN_Zp3],
-                                 T3[GETMAJIND_ZPEN_Zp4],
-                                 T3[GETMAJIND_ZPEN_Zp5],
-                                 T3[GETMAJIND_ZPEN_Zp6]);
-	}END_FORZ0
+	    FOR_Z0_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                     T3[GETMAJIND_ZPEN_Zp2],
+                                     T3[GETMAJIND_ZPEN_Zp3],
+                                     T3[GETMAJIND_ZPEN_Zp4],
+                                     T3[GETMAJIND_ZPEN_Zp5],
+                                     T3[GETMAJIND_ZPEN_Zp6]);
+	    }END_FORZ0
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
+	
 
 	FOR_Z0_XPEN{
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zp1],
+                                    T[GETZPIND_XPEN_Zp2],
+                                    T[GETZPIND_XPEN_Zp3],
+                                    T[GETZPIND_XPEN_Zp4],
+                                    T[GETZPIND_XPEN_Zp5],
+                                    T[GETZPIND_XPEN_Zp6]);
+	    } 
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
@@ -590,29 +696,38 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL){
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
-                                 T3[GETMAJIND_ZPEN_Zm2],
-                                 T3[GETMAJIND_ZPEN_Zm3],
-                                 T3[GETMAJIND_ZPEN_Zm4],
-                                 T3[GETMAJIND_ZPEN_Zm5],
-                                 T3[GETMAJIND_ZPEN_Zm6]);
- 	}END_FORZ1
+	    FOR_Z1_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                     T3[GETMAJIND_ZPEN_Zm2],
+                                     T3[GETMAJIND_ZPEN_Zm3],
+                                     T3[GETMAJIND_ZPEN_Zm4],
+                                     T3[GETMAJIND_ZPEN_Zm5],
+                                     T3[GETMAJIND_ZPEN_Zm6]);
+ 	    }END_FORZ1
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
-
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
 
 	FOR_Z1_XPEN{
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zm1],
+                                    T[GETZPIND_XPEN_Zm2],
+                                    T[GETZPIND_XPEN_Zm3],
+                                    T[GETZPIND_XPEN_Zm4],
+                                    T[GETZPIND_XPEN_Zm5],
+                                    T[GETZPIND_XPEN_Zm6]);
+	    } 
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
@@ -669,24 +784,34 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 
+	if(!neumannLocalY){
+ 	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
- 	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	    FOR_Y0_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
+                                     T2[GETMAJIND_YPEN_Yp2],
+                                     T2[GETMAJIND_YPEN_Yp3],
+                                     T2[GETMAJIND_YPEN_Yp4],
+                                     T2[GETMAJIND_YPEN_Yp5],
+                                     T2[GETMAJIND_YPEN_Yp6]);
+	    }END_FORY0 
 
-	FOR_Y0_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Yp1],
-                                 T2[GETMAJIND_YPEN_Yp2],
-                                 T2[GETMAJIND_YPEN_Yp3],
-                                 T2[GETMAJIND_YPEN_Yp4],
-                                 T2[GETMAJIND_YPEN_Yp5],
-                                 T2[GETMAJIND_YPEN_Yp6]);
-	}END_FORY0 
-
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
+	
+	
         FOR_Y0_XPEN{
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Yp1],
+                                    T[GETYPIND_XPEN_Yp2],
+                                    T[GETYPIND_XPEN_Yp3],
+                                    T[GETYPIND_XPEN_Yp4],
+                                    T[GETYPIND_XPEN_Yp5],
+                                    T[GETYPIND_XPEN_Yp6]);
+	    } 
             U[ip]  = Y0WallU;
             V[ip]  = 0.0;
             W[ip]  = Y0WallW;
@@ -700,24 +825,34 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 
-	double *T2;
-	c2d->allocY(T2);
-	c2d->transposeX2Y_MajorIndex(T, T2);
+	if(!neumannLocalY){
+	    double *T2;
+	    c2d->allocY(T2);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
 
-	FOR_Y1_YPEN_MAJ{
-            T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
-                                 T2[GETMAJIND_YPEN_Ym2],
-                                 T2[GETMAJIND_YPEN_Ym3],
-                                 T2[GETMAJIND_YPEN_Ym4],
-                                 T2[GETMAJIND_YPEN_Ym5],
-                                 T2[GETMAJIND_YPEN_Ym6]);
- 	}END_FORY1 
+	    FOR_Y1_YPEN_MAJ{
+                T2[ip] = calcNeumann(T2[GETMAJIND_YPEN_Ym1],
+                                     T2[GETMAJIND_YPEN_Ym2],
+                                     T2[GETMAJIND_YPEN_Ym3],
+                                     T2[GETMAJIND_YPEN_Ym4],
+                                     T2[GETMAJIND_YPEN_Ym5],
+                                     T2[GETMAJIND_YPEN_Ym6]);
+ 	    }END_FORY1 
 
-	c2d->transposeY2X_MajorIndex(T2, T);
-	c2d->deallocXYZ(T2);
-
+	    c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->deallocXYZ(T2);
+	}
 
         FOR_Y1_XPEN{
+	    if(neumannLocalY){
+	        T[ip] = calcNeumann(T[GETYPIND_XPEN_Ym1],
+                                    T[GETYPIND_XPEN_Ym2],
+                                    T[GETYPIND_XPEN_Ym3],
+                                    T[GETYPIND_XPEN_Ym4],
+                                    T[GETYPIND_XPEN_Ym5],
+                                    T[GETYPIND_XPEN_Ym6]);
+	    } 
+
             U[ip]  = Y1WallU;
             V[ip]  = 0.0;
             W[ip]  = Y1WallW;
@@ -731,28 +866,40 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z0_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
-                                 T3[GETMAJIND_ZPEN_Zp2],
-                                 T3[GETMAJIND_ZPEN_Zp3],
-                                 T3[GETMAJIND_ZPEN_Zp4],
-                                 T3[GETMAJIND_ZPEN_Zp5],
-                                 T3[GETMAJIND_ZPEN_Zp6]);
-	}END_FORZ0
+	    FOR_Z0_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zp1],
+                                     T3[GETMAJIND_ZPEN_Zp2],
+                                     T3[GETMAJIND_ZPEN_Zp3],
+                                     T3[GETMAJIND_ZPEN_Zp4],
+                                     T3[GETMAJIND_ZPEN_Zp5],
+                                     T3[GETMAJIND_ZPEN_Zp6]);
+	    }END_FORZ0
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
+
 
         FOR_Z0_XPEN{
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zp1],
+                                    T[GETZPIND_XPEN_Zp2],
+                                    T[GETZPIND_XPEN_Zp3],
+                                    T[GETZPIND_XPEN_Zp4],
+                                    T[GETZPIND_XPEN_Zp5],
+                                    T[GETZPIND_XPEN_Zp6]);
+	    } 
+
             U[ip]  = Z0WallU;
             V[ip]  = Z0WallV;
             W[ip]  = 0.0;
@@ -766,28 +913,39 @@ void UniformCSolver::preStepBCHandling(){
 
     if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 
-	double *T2, *T3;
-	c2d->allocY(T2);
-	c2d->allocZ(T3);
-	c2d->transposeX2Y_MajorIndex(T, T2);
-	c2d->transposeY2Z_MajorIndex(T2, T3);
+	if(!neumannLocalZ){
+	    double *T2, *T3;
+	    c2d->allocY(T2);
+	    c2d->allocZ(T3);
+	    c2d->transposeX2Y_MajorIndex(T, T2);
+	    c2d->transposeY2Z_MajorIndex(T2, T3);
 
-	FOR_Z1_ZPEN_MAJ{
-            T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
-                                 T3[GETMAJIND_ZPEN_Zm2],
-                                 T3[GETMAJIND_ZPEN_Zm3],
-                                 T3[GETMAJIND_ZPEN_Zm4],
-                                 T3[GETMAJIND_ZPEN_Zm5],
-                                 T3[GETMAJIND_ZPEN_Zm6]);
- 	}END_FORZ1
+	    FOR_Z1_ZPEN_MAJ{
+                T3[ip] = calcNeumann(T3[GETMAJIND_ZPEN_Zm1],
+                                     T3[GETMAJIND_ZPEN_Zm2],
+                                     T3[GETMAJIND_ZPEN_Zm3],
+                                     T3[GETMAJIND_ZPEN_Zm4],
+                                     T3[GETMAJIND_ZPEN_Zm5],
+                                     T3[GETMAJIND_ZPEN_Zm6]);
+ 	    }END_FORZ1
 
-	c2d->transposeZ2Y_MajorIndex(T3, T2);
-	c2d->transposeY2X_MajorIndex(T2, T);
+	    c2d->transposeZ2Y_MajorIndex(T3, T2);
+	    c2d->transposeY2X_MajorIndex(T2, T);
 
-	c2d->deallocXYZ(T2);
-	c2d->deallocXYZ(T3);
+	    c2d->deallocXYZ(T2);
+	    c2d->deallocXYZ(T3);
+	}
 
         FOR_Z1_XPEN{
+	    if(neumannLocalZ){
+	        T[ip] = calcNeumann(T[GETZPIND_XPEN_Zm1],
+                                    T[GETZPIND_XPEN_Zm2],
+                                    T[GETZPIND_XPEN_Zm3],
+                                    T[GETZPIND_XPEN_Zm4],
+                                    T[GETZPIND_XPEN_Zm5],
+                                    T[GETZPIND_XPEN_Zm6]);
+	    } 
+
             U[ip]  = Z1WallU;
             V[ip]  = Z1WallV;
             W[ip]  = 0.0;

@@ -102,8 +102,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 2, 
-	pCol = 2;
+    int pRow = 0, 
+	pCol = 0;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
