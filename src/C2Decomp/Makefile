@@ -62,7 +62,6 @@ libc2decomp.a: $(BASE_OBJECTS)
 	$(RANLIB) $@  
 
 
-
 clean: 
 	rm -rf   *.o *.exe *.a
 

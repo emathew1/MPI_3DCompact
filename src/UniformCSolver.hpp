@@ -202,16 +202,6 @@ class UniformCSolver: public AbstractCSolver{
 	    t1 = MPI_Wtime();
 	}
 
-	//Functions required from AbstractCSolver...
-	void initializeSolverData();
-	void setInitialConditions();
-	void preStep();
-	void preSubStep();
-	void solveEqnSet();
-	void updateData();
-	void postSubStep();
-	void postStep();
-
 	//Pre Step Functions...
 	void calcDtFromCFL();
 
@@ -232,24 +222,83 @@ class UniformCSolver: public AbstractCSolver{
 	void updateNonConservedData();
 
 	//Post Step Functions
-	void calcTurbulenceQuantities();
-	void calcTaylorGreenQuantities();
-	void shearLayerInfoCalc();
 	void updateSponge();
 	void writeImages();
+	void writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction);
 	void checkSolution();
 	void dumpSolution();
 	void checkEnd();
 	void reportAll();
+
+	virtual void temporalCalculations(){};
 
 	//Inline, Or general solver functions
 	inline double calcSpongeSource(double phi, double phiSpongeAvg, double sigma){
         	return sigma*(phiSpongeAvg - phi);
 	};
 
+	/////////////////////////////////////
+	//Our Generalized Solver Functions //
+	/////////////////////////////////////
 
-	void writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction);
+	void setInitialConditions();
+	void initializeSolverData();
+
+	void preStep(){
+   	    if(timeStep == 0){
+        	dumpSolution();
+        	writeImages();
+    	    }
+    	    calcDtFromCFL();
+	}
+
+	void preSubStep(){
+    	    preStepBCHandling();
+    	    preStepDerivatives();
+	}
+
+	void solveEqnSet(){
+    	    solveContinuity();
+            solveXMomentum();
+    	    solveYMomentum();
+    	    solveZMomentum();
+    	    solveEnergy();
+	}
+
+	void postSubStep(){
+    	    postStepBCHandling();
+	}
+
+	void updateData(){
+    	    if(rkLast){
+        	filterConservedData();
+    	    }
+    	    updateNonConservedData();
+
+	}
+
+	void postStep(){
+
+    	    updateSponge();
+    	    checkSolution();
+
+    	    if(timeStep%ts->dumpStep == 0)
+        	dumpSolution();
+
+    	    if(timeStep%ts->imageStep == 0)
+        	writeImages();
+
+	    temporalCalculations();
+
+    	    checkEnd();
+	}
+
+
 
 };
 
+
+
 #endif
+
+
