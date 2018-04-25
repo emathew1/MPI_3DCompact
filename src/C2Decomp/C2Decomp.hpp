@@ -147,6 +147,11 @@ class C2Decomp{
 	void transposeY2X_MajorIndex_Start(MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	void transposeY2X_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
+
+	void transposeChunkX2Y_MajorIndex_Start(MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk);
+	void transposeChunkX2Y_MajorIndex_Wait (MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk);
+
+
 	
 	void decompInfoInit();
 	void decompInfoFinalize();
