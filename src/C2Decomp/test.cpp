@@ -392,13 +392,29 @@ int main(int argc, char *argv[]){
     double *u2chunk4; c2d->allocY(u2chunk4);
     double *u2chunk5; c2d->allocY(u2chunk5);
 
+    double *u1chunk1_nc; c2d->allocX(u1chunk1_nc);
+    double *u1chunk2_nc; c2d->allocX(u1chunk2_nc);
+    double *u1chunk3_nc; c2d->allocX(u1chunk3_nc);
+    double *u1chunk4_nc; c2d->allocX(u1chunk4_nc);
+    double *u1chunk5_nc; c2d->allocX(u1chunk5_nc);
+
+    double *u2chunk1_nc; c2d->allocY(u2chunk1_nc);
+    double *u2chunk2_nc; c2d->allocY(u2chunk2_nc);
+    double *u2chunk3_nc; c2d->allocY(u2chunk3_nc);
+    double *u2chunk4_nc; c2d->allocY(u2chunk4_nc);
+    double *u2chunk5_nc; c2d->allocY(u2chunk5_nc);
+
+
+
     if(!mpiRank) cout << " > Setting up array of arrays chunk..." << endl; 
     double *p_src[5] = {u1chunk1, u1chunk2, u1chunk3, u1chunk4, u1chunk5};;
     double *p_dst[5] = {u2chunk1, u2chunk2, u2chunk3, u2chunk4, u2chunk5};
 
     if(!mpiRank) cout << " > Allocating big buffers..." << endl; 
     double *big_sbuf = new double[(int)(xSize[0]*xSize[1]*xSize[2]*5)];
+    double *work1     = new double[(int)(xSize[0]*xSize[1]*xSize[2]*5)];
     double *big_rbuf = new double[(int)(ySize[0]*ySize[1]*ySize[2]*5)];
+    double *work2    = new double[(int)(ySize[0]*ySize[1]*ySize[2]*5)];
 
 
     if(!mpiRank) cout << " > Filling chunk..." << endl; 
@@ -408,10 +424,15 @@ int main(int argc, char *argv[]){
                 int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
 		int totalSize = xSize[0]*xSize[1]*xSize[2];
                 u1chunk1[ii] = data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk1_nc[ii] = u1chunk1[ii];
                 u1chunk2[ii] = totalSize*2 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk2_nc[ii] = u1chunk2[ii];
                 u1chunk3[ii] = totalSize*3 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk3_nc[ii] = u1chunk3[ii];
                 u1chunk4[ii] = totalSize*4 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk4_nc[ii] = u1chunk4[ii];
                 u1chunk5[ii] = totalSize*5 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk5_nc[ii] = u1chunk5[ii];
             }
         }
     }
@@ -419,11 +440,8 @@ int main(int argc, char *argv[]){
     MPI_Request handle_chunk;
 
     t1 = MPI_Wtime();
-    if(!mpiRank) cout << " > Sending chunk..." << endl; 
-    c2d->transposeChunkX2Y_MajorIndex_Start(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5);
-
-    if(!mpiRank) cout << " > Recv chunk..." << endl; 
-    c2d->transposeChunkX2Y_MajorIndex_Wait(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5);
+    c2d->transposeChunkX2Y_MajorIndex_Start(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5, work1);
+    c2d->transposeChunkX2Y_MajorIndex_Wait(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5, work2);
     t2 = MPI_Wtime();
 
     
@@ -431,6 +449,27 @@ int main(int argc, char *argv[]){
 
     if(!mpiRank){
  	printf("chunk elapsed time is %f\n", t2-t1);
+	cout << "Running blocking chunk send..." << endl;
+    }   
+
+    t1 = MPI_Wtime();
+    c2d->transposeChunkX2Y_MajorIndex(p_src, p_dst, 5, work1, work2);
+    t2 = MPI_Wtime();
+
+    if(!mpiRank){
+ 	printf("Blocking chunk send elapsed time is %f\n", t2-t1);
+	cout << "Running regular, non-chunking transposes..." << endl;
+    }
+
+    t1 = MPI_Wtime();
+    c2d->transposeX2Y_MajorIndex(u1chunk1_nc, u2chunk1_nc);
+    c2d->transposeX2Y_MajorIndex(u1chunk2_nc, u2chunk2_nc);
+    c2d->transposeX2Y_MajorIndex(u1chunk3_nc, u2chunk3_nc);
+    c2d->transposeX2Y_MajorIndex(u1chunk4_nc, u2chunk4_nc);
+    c2d->transposeX2Y_MajorIndex(u1chunk5_nc, u2chunk5_nc);
+    t2 = MPI_Wtime();
+    if(!mpiRank){
+ 	printf("nonchunk elapsed time is %f\n", t2-t1);
     }   
 
 

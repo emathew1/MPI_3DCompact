@@ -86,7 +86,9 @@ class UniformCSolver: public AbstractCSolver{
 	double *tempZ26, *tempZ27, *tempZ28, *tempZ29, *tempZ30;
 	double *tempZ31, *tempZ32, *tempZ33, *tempZ34;
 
-
+	//TESTING
+        double *sbuf1, *sbuf2, *sbuf3, *sbuf4, *sbuf5;
+	double *rbuf1, *rbuf2, *rbuf3, *rbuf4, *rbuf5;
 
 
 	double *temp, *temp2, *temp3, *temp4;
@@ -172,6 +174,7 @@ class UniformCSolver: public AbstractCSolver{
 		spongeFlag = true;
 		spg = new SpongeBC(dom, ig, bc, c2d, mpiRank);
 	    }else{
+		spongeFlag = false;
 		spg = NULL;
 	    }
 

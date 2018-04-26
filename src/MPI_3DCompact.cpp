@@ -125,7 +125,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     double alphaF  = 0.375;
     double mu_ref  = 0.00375;
-    bool useTiming = false;
+    bool useTiming = true;
     AbstractCSolver *cs;
     cs = new UniformCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      

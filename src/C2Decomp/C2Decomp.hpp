@@ -148,8 +148,9 @@ class C2Decomp{
 	void transposeY2X_MajorIndex_Wait (MPI_Request &handle, double *src, double *dst, double *sbuf, double *rbuf);
 	
 
-	void transposeChunkX2Y_MajorIndex_Start(MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk);
-	void transposeChunkX2Y_MajorIndex_Wait (MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk);
+	void transposeChunkX2Y_MajorIndex(double **src, double **dst, int numArrayInChunk, double *src2, double *dst2);
+	void transposeChunkX2Y_MajorIndex_Start(MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk, double *src2);
+	void transposeChunkX2Y_MajorIndex_Wait (MPI_Request &handle, double **src, double **dst, double *sbuf, double *rbuf, int numArrayInChunk, double *dst2);
 
 
 	
@@ -207,6 +208,9 @@ class C2Decomp{
 	void readVar(MPI_File &fh, MPI_Offset &disp, int ipencil, double *var);
 	void readScalar(MPI_File &fh, MPI_Offset &disp, int n, double *var);
 	
+	//Misc
+	
+	void fastLocalTranspose(const double *in, int n, int p, double *out, int blocksize);
 
 	 
 };
