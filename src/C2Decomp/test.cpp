@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 
     }
  
-    int nx = 20, ny = 15, nz = 10;
+    int nx = 100, ny = 100, nz = 100;
     int pRow = 0, pCol = 0;
     bool periodicBC[3] = {true, true, true};
 
@@ -378,6 +378,77 @@ int main(int argc, char *argv[]){
     c2d->deallocXYZ(u4);
     c2d->deallocXYZ(u4a);
 
+
+    //Testing chunking
+    double *u1chunk1; c2d->allocX(u1chunk1);
+    double *u1chunk2; c2d->allocX(u1chunk2);
+    double *u1chunk3; c2d->allocX(u1chunk3);
+    double *u1chunk4; c2d->allocX(u1chunk4);
+    double *u1chunk5; c2d->allocX(u1chunk5);
+
+    double *u2chunk1; c2d->allocY(u2chunk1);
+    double *u2chunk2; c2d->allocY(u2chunk2);
+    double *u2chunk3; c2d->allocY(u2chunk3);
+    double *u2chunk4; c2d->allocY(u2chunk4);
+    double *u2chunk5; c2d->allocY(u2chunk5);
+
+    if(!mpiRank) cout << " > Setting up array of arrays chunk..." << endl; 
+    double *p_src[5] = {u1chunk1, u1chunk2, u1chunk3, u1chunk4, u1chunk5};;
+    double *p_dst[5] = {u2chunk1, u2chunk2, u2chunk3, u2chunk4, u2chunk5};
+
+    if(!mpiRank) cout << " > Allocating big buffers..." << endl; 
+    double *big_sbuf = new double[(int)(xSize[0]*xSize[1]*xSize[2]*5)];
+    double *big_rbuf = new double[(int)(ySize[0]*ySize[1]*ySize[2]*5)];
+
+
+    if(!mpiRank) cout << " > Filling chunk..." << endl; 
+    for(int kp = 0; kp < xSize[2]; kp++){
+        for(int jp = 0; jp < xSize[1]; jp++){
+            for(int ip = 0; ip < xSize[0]; ip++){
+                int ii = kp*xSize[1]*xSize[0] + jp*xSize[0] + ip;
+		int totalSize = xSize[0]*xSize[1]*xSize[2];
+                u1chunk1[ii] = data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk2[ii] = totalSize*2 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk3[ii] = totalSize*3 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk4[ii] = totalSize*4 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+                u1chunk5[ii] = totalSize*5 + data1[c2d->xStart[2]+kp][c2d->xStart[1]+jp][c2d->xStart[0]+ip];
+            }
+        }
+    }
+    
+    MPI_Request handle_chunk;
+
+    t1 = MPI_Wtime();
+    if(!mpiRank) cout << " > Sending chunk..." << endl; 
+    c2d->transposeChunkX2Y_MajorIndex_Start(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5);
+
+    if(!mpiRank) cout << " > Recv chunk..." << endl; 
+    c2d->transposeChunkX2Y_MajorIndex_Wait(handle_chunk, p_src, p_dst, big_sbuf, big_rbuf, 5);
+    t2 = MPI_Wtime();
+
+    
+    if(!mpiRank)  cout << " > DONE..." << endl; 
+
+    if(!mpiRank){
+ 	printf("chunk elapsed time is %f\n", t2-t1);
+    }   
+
+
+
+    c2d->deallocXYZ(u1chunk1);
+    c2d->deallocXYZ(u1chunk2);
+    c2d->deallocXYZ(u1chunk3);
+    c2d->deallocXYZ(u1chunk4);
+    c2d->deallocXYZ(u1chunk5);
+
+    c2d->deallocXYZ(u2chunk1);
+    c2d->deallocXYZ(u2chunk2);
+    c2d->deallocXYZ(u2chunk3);
+    c2d->deallocXYZ(u2chunk4);
+    c2d->deallocXYZ(u2chunk5);
+
+    delete[] big_sbuf;
+    delete[] big_rbuf;
     
 
     //Now lets kill MPI
