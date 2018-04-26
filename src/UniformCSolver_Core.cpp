@@ -320,6 +320,10 @@ void UniformCSolver::preStepDerivatives(){
 	rhoEP = rhoEk; 
     }
 
+    double ftt1 = 0, ftt2 = 0;
+
+    if(useTiming) ftt1 = MPI_Wtime();
+
     ///////////////////
     // X-DERIVATIVES //
     ///////////////////
@@ -328,7 +332,7 @@ void UniformCSolver::preStepDerivatives(){
 
     //Calculate the Euler Components of the equations...
 
-//TESTING - PRESEND Y CONSERVATIVE DATA
+/*/TESTING - PRESEND Y CONSERVATIVE DATA
     double *rhoP2, *rhoUP2, *rhoVP2, *rhoWP2, *rhoEP2;
     rhoP2 = tempY4; 
     rhoUP2 = tempY5; 
@@ -341,7 +345,7 @@ void UniformCSolver::preStepDerivatives(){
     c2d->transposeX2Y_MajorIndex_Start(handle3, rhoVP, rhoVP2, sbuf3, rbuf3);
     c2d->transposeX2Y_MajorIndex_Start(handle4, rhoWP, rhoWP2, sbuf4, rbuf4);
     c2d->transposeX2Y_MajorIndex_Start(handle5, rhoEP, rhoEP2, sbuf5, rbuf5);
-//TESTING
+*///TESTING
 
     //Using pointers to temp arrays to make more readable...
     double *tempEulerX, *tempEulerY, *tempEulerZ, *tempEulerEngy;
@@ -378,26 +382,31 @@ void UniformCSolver::preStepDerivatives(){
     c2d->transposeX2Y_MajorIndex(Vx, Vx2);
     c2d->transposeX2Y_MajorIndex(Wx, Wx2);
     
-//    double *rhoP2, *rhoUP2, *rhoVP2, *rhoWP2, *rhoEP2;
-//    rhoP2 = tempY4; 
-//    rhoUP2 = tempY5; 
-//    rhoVP2 = tempY6; 
-//    rhoWP2 = tempY7; 
-//    rhoEP2 = tempY8;
-//    c2d->transposeX2Y_MajorIndex(rhoP,  rhoP2);
-//    c2d->transposeX2Y_MajorIndex(rhoUP, rhoUP2);
-//    c2d->transposeX2Y_MajorIndex(rhoVP, rhoVP2);
-//    c2d->transposeX2Y_MajorIndex(rhoWP, rhoWP2);
-//    c2d->transposeX2Y_MajorIndex(rhoEP, rhoEP2);
+    double *rhoP2, *rhoUP2, *rhoVP2, *rhoWP2, *rhoEP2;
+    rhoP2 = tempY4; 
+    rhoUP2 = tempY5; 
+    rhoVP2 = tempY6; 
+    rhoWP2 = tempY7; 
+    rhoEP2 = tempY8;
+    c2d->transposeX2Y_MajorIndex(rhoP,  rhoP2);
+    c2d->transposeX2Y_MajorIndex(rhoUP, rhoUP2);
+    c2d->transposeX2Y_MajorIndex(rhoVP, rhoVP2);
+    c2d->transposeX2Y_MajorIndex(rhoWP, rhoWP2);
+    c2d->transposeX2Y_MajorIndex(rhoEP, rhoEP2);
 
-//TESTING -- RECEIVE Y CONSERVATIVE DATA...
+/*/TESTING -- RECEIVE Y CONSERVATIVE DATA...
     c2d->transposeX2Y_MajorIndex_Wait(handle1, rhoP,  rhoP2,  sbuf1, rbuf1);
     c2d->transposeX2Y_MajorIndex_Wait(handle2, rhoUP, rhoUP2, sbuf2, rbuf2);
     c2d->transposeX2Y_MajorIndex_Wait(handle3, rhoVP, rhoVP2, sbuf3, rbuf3);
     c2d->transposeX2Y_MajorIndex_Wait(handle4, rhoWP, rhoWP2, sbuf4, rbuf4);
     c2d->transposeX2Y_MajorIndex_Wait(handle5, rhoEP, rhoEP2, sbuf5, rbuf5);
-//
+*///
 
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	ftt1 = MPI_Wtime();
+    }
 
     ///////////////////
     // Y-DERIVATIVES //
@@ -501,6 +510,12 @@ void UniformCSolver::preStepDerivatives(){
     c2d->transposeY2Z_MajorIndex(rhoVP2, rhoVP3); //rhoV
     c2d->transposeY2Z_MajorIndex(rhoWP2, rhoWP3); //rhoW
     c2d->transposeY2Z_MajorIndex(rhoEP2, rhoEP3); //rhoE
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > yderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	ftt1 = MPI_Wtime();
+    }
 
     ///////////////////
     // Z-DERIVATIVES //
@@ -622,6 +637,12 @@ void UniformCSolver::preStepDerivatives(){
 
     c2d->transposeZ2Y_MajorIndex(engyEulerZ3, tempY1); 
     c2d->transposeY2X_MajorIndex(tempY1, engyEulerZ);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > zderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
 
     if(useTiming){
 	ft2 = MPI_Wtime();
