@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o
 
 default: MPI_3DCompact
 
@@ -24,7 +24,7 @@ MPI_3DCompact:
 MPI_3DCompact.exe: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ -I$(INC) $(OBJECTS) -L$(LIB) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
-MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp AbstractRK.hpp TVDRK3.hpp 
+MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp UniformCSolverConservative.hpp AbstractRK.hpp TVDRK3.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 Utils.o: Utils.cpp Domain.hpp Utils.hpp
@@ -41,6 +41,14 @@ UniformCSolver_BC.o: UniformCSolver_BC.cpp UniformCSolver.hpp Macros.hpp Utils.h
 
 UniformCSolver_Core.o: UniformCSolver_Core.cpp UniformCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
 	$(CC) $(CFLAGS) -c $<
+
+UniformCSolverConservative_BC.o: UniformCSolverConservative_BC.cpp UniformCSolverConservative.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
+
+UniformCSolverConservative_Core.o: UniformCSolverConservative_Core.cpp UniformCSolverConservative.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
+
+
 
 clean: 
 	rm -rf   *.o *.exe *.a
