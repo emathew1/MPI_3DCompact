@@ -9,7 +9,7 @@ void UniformCSolverConservative::initializeSolverData(){
         cout << endl;
         cout << " > Allocating Solver Arrays..." << endl;
         double workSize = 0;
-        workSize = 158.0 * (double)N * 8.0;
+        workSize = 104.0 * (double)N * 8.0;
         cout << " > Need " << workSize/1024.0/1024.0/1024.0 << " Gb of memory required to allocate solver arrays " << endl;
     }
 
@@ -127,12 +127,26 @@ void UniformCSolverConservative::initializeSolverData(){
     c2d->allocY(T2);
     c2d->allocZ(T3);
 
-    //91
+    //72
+    c2d->allocX(p);
     c2d->allocX(mu);
-    c2d->allocX(Amu);
     c2d->allocX(sos);
 
-    //119
+    //84
+    c2d->allocX(tempX1);
+    c2d->allocX(tempX2);
+    c2d->allocX(tempX3);
+    c2d->allocX(tempX4);
+    c2d->allocX(tempX5);
+    c2d->allocX(tempX6);
+    c2d->allocX(tempX7);
+    c2d->allocX(tempX8);
+    c2d->allocX(tempX9);
+    c2d->allocX(tempX10);
+    c2d->allocX(tempX11);
+    c2d->allocX(tempX12);
+
+    //94
     c2d->allocY(tempY1);
     c2d->allocY(tempY2);
     c2d->allocY(tempY3);
@@ -143,26 +157,8 @@ void UniformCSolverConservative::initializeSolverData(){
     c2d->allocY(tempY8);
     c2d->allocY(tempY9);
     c2d->allocY(tempY10);
-    c2d->allocY(tempY11);
-    c2d->allocY(tempY12);
-    c2d->allocY(tempY13);
-    c2d->allocY(tempY14);
-    c2d->allocY(tempY15);
-    c2d->allocY(tempY16);
-    c2d->allocY(tempY17);
-    c2d->allocY(tempY18);
-    c2d->allocY(tempY19);
-    c2d->allocY(tempY20);
-    c2d->allocY(tempY21);
-    c2d->allocY(tempY22);
-    c2d->allocY(tempY23);
-    c2d->allocY(tempY24);
-    c2d->allocY(tempY25);
-    c2d->allocY(tempY26);
-    c2d->allocY(tempY27);
-    c2d->allocY(tempY28);
 
-    //153
+    //104
     c2d->allocZ(tempZ1);
     c2d->allocZ(tempZ2);
     c2d->allocZ(tempZ3);
@@ -173,39 +169,8 @@ void UniformCSolverConservative::initializeSolverData(){
     c2d->allocZ(tempZ8);
     c2d->allocZ(tempZ9);
     c2d->allocZ(tempZ10);
-    c2d->allocZ(tempZ11);
-    c2d->allocZ(tempZ12);
-    c2d->allocZ(tempZ13);
-    c2d->allocZ(tempZ14);
-    c2d->allocZ(tempZ15);
-    c2d->allocZ(tempZ16);
-    c2d->allocZ(tempZ17);
-    c2d->allocZ(tempZ18);
-    c2d->allocZ(tempZ19);
-    c2d->allocZ(tempZ20);
-    c2d->allocZ(tempZ21);
-    c2d->allocZ(tempZ22);
-    c2d->allocZ(tempZ23);
-    c2d->allocZ(tempZ24);
-    c2d->allocZ(tempZ25);
-    c2d->allocZ(tempZ26);
-    c2d->allocZ(tempZ27);
-    c2d->allocZ(tempZ28);
-    c2d->allocZ(tempZ29);
-    c2d->allocZ(tempZ30);
-    c2d->allocZ(tempZ31);
-    c2d->allocZ(tempZ32);
-    c2d->allocZ(tempZ33);
-    c2d->allocZ(tempZ34);
 
-    //158
-    c2d->allocX(tempX1);
-    c2d->allocX(tempX2);
-    c2d->allocX(tempX3);
-    c2d->allocX(tempX4);
-    c2d->allocX(tempX5);
-
-
+    
     if(useTiming){
 	ft2 = MPI_Wtime();
 	IF_RANK0 cout << " > initSolDat Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
@@ -295,11 +260,19 @@ void UniformCSolverConservative::preStepDerivatives(){
     // X-DERIVATIVES //
     ///////////////////
 
+
+    checkSolution();
+    reportAll();
+
     //First we'll do all of the X-Direction derivatives to calc tau
     derivX->calc1stDerivField(U, Ux); //dU/dx
     derivX->calc1stDerivField(V, Vx); //dV/dx
     derivX->calc1stDerivField(W, Wx); //dW/dx
     derivX->calc1stDerivField(T, Tx); //dT/dx
+
+    checkSolution();
+    reportAll();
+
 
 
     if(useTiming){
@@ -342,6 +315,7 @@ void UniformCSolverConservative::preStepDerivatives(){
 	ftt1 = MPI_Wtime();
     }
 
+
     ///////////////////
     // Z-DERIVATIVES //
     ///////////////////
@@ -351,10 +325,10 @@ void UniformCSolverConservative::preStepDerivatives(){
     double *U3,  *V3,  *W3,  *T3;
 
     //Point to the needed Y memory
-    Uz2 = tempY9;
-    Vz2 = tempY10;
-    Wz2 = tempY11;
-    Tz2 = tempY12;
+    Uz2 = tempY5;
+    Vz2 = tempY6;
+    Wz2 = tempY7;
+    Tz2 = tempY8;
 
     //Point to the Z memory
     U3 = tempZ1; Uz3 = tempZ5;
@@ -388,20 +362,168 @@ void UniformCSolverConservative::preStepDerivatives(){
 	ftt1 = MPI_Wtime();
     }
 
-    /////////////////////////
-    // CALC TAU COMPONENTS //
-    /////////////////////////
+
+    /////////////////////////////////////////
+    // CALC TAU COMPONENTS & EQN COMPONENTS//
+    /////////////////////////////////////////
+
+    double *preMomX_X, *preMomX_Y, *preMomX_Z; 
+    double *preMomY_X, *preMomY_Y, *preMomY_Z; 
+    double *preMomZ_X, *preMomZ_Y, *preMomZ_Z; 
+    double *preEngy_X, *preEngy_Y, *preEngy_Z; 
+
+    preMomX_X = tempX1;  preMomX_Y = tempX2;  preMomX_Z = tempX3;
+    preMomY_X = tempX4;  preMomY_Y = tempX5;  preMomY_Z = tempX6;
+    preMomZ_X = tempX7;  preMomZ_Y = tempX8;  preMomZ_Z = tempX9;
+    preEngy_X = tempX10; preEngy_Y = tempX11; preEngy_Z = tempX12;
 
     //Now recalculate properties in the new space
     FOR_XYZ_ZPEN{
-	Tauxx[ip] = (4.0/3.0)*Ux[ip] - (2.0/3.0)*(Vy[ip] + Wz[ip]);
+	Tauxx[ip] = mu[ip]*((4.0/3.0)*Ux[ip] - (2.0/3.0)*(Vy[ip] + Wz[ip]));
+	Tauyy[ip] = mu[ip]*((4.0/3.0)*Vy[ip] - (2.0/3.0)*(Ux[ip] + Wz[ip]));
+	Tauzz[ip] = mu[ip]*((4.0/3.0)*Wz[ip] - (2.0/3.0)*(Ux[ip] + Vy[ip]));
+	Tauxy[ip] = mu[ip]*(Uy[ip] + Vx[ip]);
+	Tauxz[ip] = mu[ip]*(Uz[ip] + Wx[ip]);
+	Tauyz[ip] = mu[ip]*(Vz[ip] + Wy[ip]);
+
+	preMomX_X[ip] = rhoUP[ip]*U[ip] + p[ip] - Tauxx[ip];
+	preMomX_Y[ip] = rhoUP[ip]*V[ip] - Tauxy[ip];
+	preMomX_Z[ip] = rhoUP[ip]*W[ip] - Tauxz[ip];
+
+	preMomY_X[ip] = rhoVP[ip]*U[ip] - Tauyx[ip];
+	preMomY_Y[ip] = rhoVP[ip]*V[ip] + p[ip] - Tauyy[ip];
+	preMomY_Z[ip] = rhoVP[ip]*W[ip] - Tauyz[ip];
+
+	preMomZ_X[ip] = rhoWP[ip]*U[ip] - Tauzx[ip];
+	preMomZ_Y[ip] = rhoWP[ip]*V[ip] - Tauzy[ip];
+	preMomZ_Z[ip] = rhoWP[ip]*W[ip] + p[ip] - Tauzz[ip];
+
+	preEngy_X[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Tx[ip] - U[ip]*Tauxx[ip] - V[ip]*Tauyx[ip] - W[ip]*Tauzx[ip];
+	preEngy_Y[ip] = rhoEP[ip]*V[ip] + V[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Ty[ip] - U[ip]*Tauxy[ip] - V[ip]*Tauyy[ip] - W[ip]*Tauzy[ip];
+	preEngy_Z[ip] = rhoEP[ip]*W[ip] + W[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Tz[ip] - U[ip]*Tauxz[ip] - V[ip]*Tauyz[ip] - W[ip]*Tauzz[ip];
+
     }
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > Tau&Components Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
+    ///////////////////
+    // X-DERIVATIVES //
+    ///////////////////
    
+    derivX->calc1stDerivField(rhoUP,     cont_X);
+    derivX->calc1stDerivField(preMomX_X, momX_X);
+    derivX->calc1stDerivField(preMomY_X, momY_X);
+    derivX->calc1stDerivField(preMomZ_X, momZ_X);
+    derivX->calc1stDerivField(preEngy_X, engy_X);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
+    ///////////////////
+    // Y-DERIVATIVES //
+    ///////////////////
+
+    double *rhoVP2, *preMomX_Y2, *preMomY_Y2, *preMomZ_Y2, *preEngy_Y2;
+    rhoVP2     = tempY1; 
+    preMomX_Y2 = tempY2; 
+    preMomY_Y2 = tempY3; 
+    preMomZ_Y2 = tempY4; 
+    preEngy_Y2 = tempY5; 
+
+    double *cont_Y2, *momX_Y2, *momY_Y2, *momZ_Y2, *engy_Y2;
+    cont_Y2 = tempY6; 
+    momX_Y2 = tempY7; 
+    momY_Y2 = tempY8; 
+    momZ_Y2 = tempY9; 
+    engy_Y2 = tempY10; 
+
+    c2d->transposeX2Y_MajorIndex(rhoVP,     rhoVP2);
+    c2d->transposeX2Y_MajorIndex(preMomX_Y, preMomX_Y2);
+    c2d->transposeX2Y_MajorIndex(preMomY_Y, preMomY_Y2);
+    c2d->transposeX2Y_MajorIndex(preMomZ_Y, preMomZ_Y2);
+    c2d->transposeX2Y_MajorIndex(preEngy_Y, preEngy_Y2);
+
+    derivY->calc1stDerivField(rhoVP2,     cont_Y2); 
+    derivY->calc1stDerivField(preMomX_Y2, momX_Y2); 
+    derivY->calc1stDerivField(preMomY_Y2, momY_Y2); 
+    derivY->calc1stDerivField(preMomZ_Y2, momZ_Y2); 
+    derivY->calc1stDerivField(preEngy_Y2, engy_Y2); 
+
+    c2d->transposeY2X_MajorIndex(cont_Y2, cont_Y);
+    c2d->transposeY2X_MajorIndex(momX_Y2, momX_Y);
+    c2d->transposeY2X_MajorIndex(momY_Y2, momY_Y);
+    c2d->transposeY2X_MajorIndex(momZ_Y2, momZ_Y);
+    c2d->transposeY2X_MajorIndex(engy_Y2, engy_Y);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > yderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
+    ///////////////////
+    // Z-DERIVATIVES //
+    ///////////////////
+
+    double *rhoWP2, *preMomX_Z2, *preMomY_Z2, *preMomZ_Z2, *preEngy_Z2;
+    double *cont_Z2, *momX_Z2, *momY_Z2, *momZ_Z2, *engy_Z2;
+
+    rhoWP2     = tempY1; cont_Z2 = tempY6;
+    preMomX_Z2 = tempY2; momX_Z2 = tempY7;
+    preMomY_Z2 = tempY3; momY_Z2 = tempY8;
+    preMomZ_Z2 = tempY4; momZ_Z2 = tempY9;
+    preEngy_Z2 = tempY5; engy_Z2 = tempY10;
+
+    double *rhoWP3, *preMomX_Z3, *preMomY_Z3, *preMomZ_Z3, *preEngy_Z3;
+    double *cont_Z3, *momX_Z3, *momY_Z3, *momZ_Z3, *engy_Z3;
+
+    rhoWP3     = tempZ1; cont_Z3 = tempZ6;
+    preMomX_Z3 = tempZ2; momX_Z3 = tempZ7;
+    preMomY_Z3 = tempZ3; momY_Z3 = tempZ8;
+    preMomZ_Z3 = tempZ4; momZ_Z3 = tempZ9;
+    preEngy_Z3 = tempZ5; engy_Z3 = tempZ10;
+
+    c2d->transposeX2Y_MajorIndex(rhoWP,     rhoWP2);
+    c2d->transposeX2Y_MajorIndex(preMomX_Z, preMomX_Z2);
+    c2d->transposeX2Y_MajorIndex(preMomY_Z, preMomY_Z2);
+    c2d->transposeX2Y_MajorIndex(preMomZ_Z, preMomZ_Z2);
+    c2d->transposeX2Y_MajorIndex(preEngy_Z, preEngy_Z2);
+
+    c2d->transposeY2Z_MajorIndex(rhoWP2,     rhoWP3);
+    c2d->transposeY2Z_MajorIndex(preMomX_Z2, preMomX_Z3);
+    c2d->transposeY2Z_MajorIndex(preMomY_Z2, preMomY_Z3);
+    c2d->transposeY2Z_MajorIndex(preMomZ_Z2, preMomZ_Z3);
+    c2d->transposeY2Z_MajorIndex(preEngy_Z2, preEngy_Z3);
+ 
+    derivZ->calc1stDerivField(rhoWP3,     cont_Z3);
+    derivZ->calc1stDerivField(preMomX_Z3, momX_Z3);
+    derivZ->calc1stDerivField(preMomY_Z3, momY_Z3);
+    derivZ->calc1stDerivField(preMomZ_Z3, momZ_Z3);
+    derivZ->calc1stDerivField(preEngy_Z3, engy_Z3);
+
+    c2d->transposeZ2Y_MajorIndex(cont_Z3, cont_Z2);
+    c2d->transposeZ2Y_MajorIndex(momX_Z3, momX_Z2);
+    c2d->transposeZ2Y_MajorIndex(momY_Z3, momY_Z2);
+    c2d->transposeZ2Y_MajorIndex(momZ_Z3, momZ_Z2);
+    c2d->transposeZ2Y_MajorIndex(engy_Z3, engy_Z2);
+
+    c2d->transposeZ2Y_MajorIndex(cont_Z2, cont_Z);
+    c2d->transposeZ2Y_MajorIndex(momX_Z2, momX_Z);
+    c2d->transposeZ2Y_MajorIndex(momY_Z2, momY_Z);
+    c2d->transposeZ2Y_MajorIndex(momZ_Z2, momZ_Z);
+    c2d->transposeZ2Y_MajorIndex(engy_Z2, engy_Z);
+
     if(useTiming){
 	ftt2 = MPI_Wtime();
 	IF_RANK0 cout << " > zderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
 
+
+   
 
     if(useTiming){
 	ft2 = MPI_Wtime();
@@ -432,7 +554,7 @@ void UniformCSolverConservative::solveContinuity(){
 	else
 	    spgSource = 0.0;
 		
-	rhok2[ip]  = ts->dt*(-contEulerX[ip] - contEulerY[ip] - contEulerZ[ip] + spgSource);
+	rhok2[ip]  = ts->dt*(-cont_X[ip] - cont_Y[ip] - cont_Z[ip] + spgSource);
     }
 
     if(useTiming){
@@ -453,7 +575,7 @@ void UniformCSolverConservative::solveXMomentum(){
         rhoUP = rhoUk;
     }
 
-    double MuX, MuY, MuZ, spgSource;
+    double spgSource;
     FOR_XYZ_XPEN{
 
 	if(spongeFlag)
@@ -461,17 +583,7 @@ void UniformCSolverConservative::solveXMomentum(){
 	else
 	    spgSource = 0.0;
 
-	//Calculate the viscosity derivatives
-	MuX = Amu[ip]*Tx[ip];
-	MuY = Amu[ip]*Ty[ip];
-	MuZ = Amu[ip]*Tz[ip];
-
-	//Viscous Terms
-        rhoUk2[ip]  = mu[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip] + (1.0/3.0)*Vxy[ip] + (1.0/3.0)*Wxz[ip]);
-	rhoUk2[ip] += (4.0/3.0)*MuX*(Ux[ip] - 0.5*Vy[ip] - 0.5*Wz[ip]) + MuY*(Uy[ip] + Vx[ip]) + MuZ*(Wx[ip] + Uz[ip]);
-
-	//Euler Terms
-	rhoUk2[ip] += -momXEulerX[ip] -momXEulerY[ip] -momXEulerZ[ip] + spgSource;
+	rhoUk2[ip] += -momX_X[ip] - momX_Y[ip] -momX_Z[ip] + spgSource;
 	rhoUk2[ip] *= ts->dt;
     }
 
@@ -495,7 +607,7 @@ void UniformCSolverConservative::solveYMomentum(){
         rhoVP = rhoVk;
     }
 
-    double MuY, MuX, MuZ, spgSource;
+    double spgSource;
 
     FOR_XYZ_XPEN{ 
 
@@ -504,17 +616,7 @@ void UniformCSolverConservative::solveYMomentum(){
 	else
 	    spgSource = 0.0;
 
-		
-	MuX = Amu[ip]*Tx[ip];
-	MuY = Amu[ip]*Ty[ip];
-  	MuZ = Amu[ip]*Tz[ip];
-
-        //Viccous Terms 
-	rhoVk2[ip]  = mu[ip]*((4.0/3.0)*Vyy[ip] + Vxx[ip] + Vzz[ip] + (1.0/3.0)*Uxy[ip] + (1.0/3.0)*Wyz[ip]);
-	rhoVk2[ip] += (4.0/3.0)*MuY*(Vy[ip] - 0.5*Ux[ip] - 0.5*Wz[ip]) + MuX*(Uy[ip] + Vx[ip]) + MuZ*(Wy[ip] + Vz[ip]);
-	//Euler Terms
-	rhoVk2[ip] += -momYEulerX[ip] -momYEulerY[ip] -momYEulerZ[ip] + spgSource;
-
+	rhoVk2[ip] += -momY_X[ip] -momY_Y[ip] -momY_Z[ip] + spgSource;
         rhoVk2[ip] *= ts->dt;
    }
 
@@ -538,9 +640,7 @@ void UniformCSolverConservative::solveZMomentum(){
         rhoWP = rhoWk;
     }
 
-    double MuY, MuX, MuZ, spgSource;
-
-
+    double spgSource;
     FOR_XYZ_XPEN{
 
         if(spongeFlag)
@@ -548,18 +648,7 @@ void UniformCSolverConservative::solveZMomentum(){
         else
 	    spgSource = 0.0;
 
-	MuZ = Amu[ip]*Tz[ip];
-	MuX = Amu[ip]*Tx[ip];
-	MuY = Amu[ip]*Ty[ip];
-
-
-    	//Viscous Terms
-        rhoWk2[ip]  = mu[ip]*((4.0/3.0)*Wzz[ip] + Wyy[ip] + Wxx[ip] + (1.0/3.0)*Uxz[ip] + (1.0/3.0)*Vyz[ip]);
-	rhoWk2[ip] += (4.0/3.0)*MuZ*(Wz[ip] - 0.5*Ux[ip] - 0.5*Vy[ip]) + MuX*(Wx[ip] + Uz[ip]) + MuY*(Wy[ip] + Vz[ip]);
-
-	//Euler Terms
-	rhoWk2[ip] += -momZEulerX[ip] -momZEulerY[ip] -momZEulerZ[ip] + spgSource;
-
+	rhoWk2[ip] += -momZ_X[ip] -momZ_Y[ip] -momZ_Z[ip] + spgSource;
         rhoWk2[ip] *= ts->dt;
     }
 
@@ -584,9 +673,7 @@ void UniformCSolverConservative::solveEnergy(){
         rhoEP = rhoEk;
     }
 
-    double qtemp, vtemp1, vtemp2, engyEuler;
-    double MuX, MuY, MuZ, spgSource;
-
+    double spgSource;
     FOR_XYZ_XPEN{
 
         if(spongeFlag)
@@ -594,49 +681,8 @@ void UniformCSolverConservative::solveEnergy(){
         else
             spgSource = 0.0;
 
-        MuX = Amu[ip]*Tx[ip];
-	MuY = Amu[ip]*Ty[ip];
-	MuZ = Amu[ip]*Tz[ip];
-
-    	//Heat Transfer Terms
-	qtemp   =  ig->cp/ig->Pr*(MuX*Tx[ip]     + MuY*Ty[ip]     +  MuZ*Tz[ip] + 
-		     	 	  mu[ip]*Txx[ip] + mu[ip]*Tyy[ip] + mu[ip]*Tzz[ip]);
-
-
-
-    	//Viscous Energy terms w/o viscosity derivatives...
-	vtemp1  = mu[ip]*(U[ip]*((4.0/3.0)*Uxx[ip] + Uyy[ip] + Uzz[ip]) + 
-		          V[ip]*(Vxx[ip] + (4.0/3.0)*Vyy[ip] + Vzz[ip]) + 
-		          W[ip]*(Wxx[ip] + Wyy[ip] + (4.0/3.0)*Wzz[ip]) + 
-		(4.0/3.0)*(Ux[ip]*Ux[ip] + Vy[ip]*Vy[ip] + Wz[ip]*Wz[ip]) +
-		           Uy[ip]*Uy[ip] + Uz[ip]*Uz[ip] + 
-		           Vx[ip]*Vx[ip] + Vz[ip]*Vz[ip] + 
-		           Wx[ip]*Wx[ip] + Wy[ip]*Wy[ip] -
-	        (4.0/3.0)*(Ux[ip]*Vy[ip] + Ux[ip]*Wz[ip] + Vy[ip]*Wz[ip]) +
-		      2.0*(Uy[ip]*Vx[ip] + Uz[ip]*Wx[ip] + Vz[ip]*Wy[ip]) +
-		(1.0/3.0)*(U[ip]*Vxy[ip] + U[ip]*Wxz[ip] + V[ip]*Uxy[ip]) +
-		(1.0/3.0)*(V[ip]*Wyz[ip] + W[ip]*Uxz[ip] + W[ip]*Vyz[ip]));
-
-
-    	//Viscous Energy terms w/ viscosity derivatives...
-	vtemp2  =  (4.0/3.0)*(U[ip]*MuX*Ux[ip] + V[ip]*MuY*Vy[ip] + W[ip]*MuZ*Wz[ip]) -
-		   (2.0/3.0)* U[ip]*MuX*(Vy[ip] + Wz[ip]) -
-		   (2.0/3.0)* V[ip]*MuY*(Ux[ip] + Wz[ip]) -
-		   (2.0/3.0)* W[ip]*MuZ*(Ux[ip] + Vy[ip]) +
-			      U[ip]*MuY*(Uy[ip] + Vx[ip]) +
-			      U[ip]*MuZ*(Uz[ip] + Wx[ip]) + 
-			      V[ip]*MuX*(Uy[ip] + Vx[ip]) +
-			      V[ip]*MuZ*(Vz[ip] + Wy[ip]) +
-			      W[ip]*MuX*(Uz[ip] + Wx[ip]) +
-			      W[ip]*MuY*(Vz[ip] + Wy[ip]);
-
-
-    	//Euler terms
-	engyEuler  = -engyEulerX[ip] - engyEulerY[ip] - engyEulerZ[ip] + spgSource;
-
-
-	//Put it all together...
-	rhoEk2[ip] = ts->dt*(qtemp + vtemp1 + vtemp2 + engyEuler + spgSource);
+	rhoEk2[ip] = -engy_X[ip] - engy_Y[ip] - engy_Z[ip] + spgSource;
+	rhoEk2[ip] *= ts->dt;
     }
 
     if(useTiming){
@@ -841,7 +887,6 @@ void UniformCSolverConservative::updateNonConservedData(){
 	    p[ip]   = ig->solvep(rhok[ip], rhoEk[ip], U[ip], V[ip], W[ip]);
 	    T[ip]   = ig->solveT(rhok[ip], p[ip]);
 	    mu[ip]  = ig->solveMu(T[ip]);
-	    Amu[ip] = ig->solveAmu(T[ip]);
 	    sos[ip] = ig->solveSOS(rhok[ip], p[ip]);
 	}
 
@@ -854,7 +899,6 @@ void UniformCSolverConservative::updateNonConservedData(){
 	    p[ip]   = ig->solvep(rho1[ip], rhoE1[ip], U[ip], V[ip], W[ip]);
 	    T[ip]   = ig->solveT(rho1[ip], p[ip]);
 	    mu[ip]  = ig->solveMu(T[ip]);
-	    Amu[ip] = ig->solveAmu(T[ip]);
 	    sos[ip] = ig->solveSOS(rho1[ip], p[ip]);
 	}
     }
@@ -1148,61 +1192,40 @@ void UniformCSolverConservative::reportAll(){
    IF_RANK0   cout << "REPORT ALL" << endl;
 
    getRange(Ux, "Ux", Nx, Ny, Nz, mpiRank);
-   getRange(Uxx, "Uxx", Nx, Ny, Nz, mpiRank);
    getRange(Uy, "Uy", Nx, Ny, Nz, mpiRank);
-   getRange(Uyy, "Uyy", Nx, Ny, Nz, mpiRank);
    getRange(Uz, "Uz", Nx, Ny, Nz, mpiRank);
-   getRange(Uzz, "Uzz", Nx, Ny, Nz, mpiRank);
-   getRange(Uxy, "Uxy", Nx, Ny, Nz, mpiRank);
-   getRange(Uyz, "Uyz", Nx, Ny, Nz, mpiRank);
-   getRange(Uxz, "Uxz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(Vx, "Vx", Nx, Ny, Nz, mpiRank);
-   getRange(Vxx, "Vxx", Nx, Ny, Nz, mpiRank);
    getRange(Vy, "Vy", Nx, Ny, Nz, mpiRank);
-   getRange(Vyy, "Vyy", Nx, Ny, Nz, mpiRank);
    getRange(Vz, "Vz", Nx, Ny, Nz, mpiRank);
-   getRange(Vzz, "Vzz", Nx, Ny, Nz, mpiRank);
-   getRange(Vxy, "Vxy", Nx, Ny, Nz, mpiRank);
-   getRange(Vyz, "Vyz", Nx, Ny, Nz, mpiRank);
-   getRange(Vxz, "Vxz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(Wx, "Wx", Nx, Ny, Nz, mpiRank);
-   getRange(Wxx, "Wxx", Nx, Ny, Nz, mpiRank);
    getRange(Wy, "Wy", Nx, Ny, Nz, mpiRank);
-   getRange(Wyy, "Wyy", Nx, Ny, Nz, mpiRank);
    getRange(Wz, "Wz", Nx, Ny, Nz, mpiRank);
-   getRange(Wzz, "Wzz", Nx, Ny, Nz, mpiRank);
-   getRange(Wxy, "Wxy", Nx, Ny, Nz, mpiRank);
-   getRange(Wyz, "Wyz", Nx, Ny, Nz, mpiRank);
-   getRange(Wxz, "Wxz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(Tx, "Tx", Nx, Ny, Nz, mpiRank);
-   getRange(Txx, "Txx", Nx, Ny, Nz, mpiRank);
    getRange(Ty, "Ty", Nx, Ny, Nz, mpiRank);
-   getRange(Tyy, "Tyy", Nx, Ny, Nz, mpiRank);
    getRange(Tz, "Tz", Nx, Ny, Nz, mpiRank);
-   getRange(Tzz, "Tzz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(contEulerX, "contEulerX", Nx, Ny, Nz, mpiRank);
-   getRange(contEulerY, "contEulerY", Nx, Ny, Nz, mpiRank);
-   getRange(contEulerZ, "contEulerZ", Nx, Ny, Nz, mpiRank);
+   getRange(cont_X, "cont_X", Nx, Ny, Nz, mpiRank);
+   getRange(cont_Y, "cont_Y", Nx, Ny, Nz, mpiRank);
+   getRange(cont_Z, "cont_Z", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momXEulerX, "momXEulerX", Nx, Ny, Nz, mpiRank);
-   getRange(momXEulerY, "momXEulerY", Nx, Ny, Nz, mpiRank);
-   getRange(momXEulerZ, "momXEulerZ", Nx, Ny, Nz, mpiRank);
+   getRange(momX_X, "momX_X", Nx, Ny, Nz, mpiRank);
+   getRange(momX_Y, "momX_Y", Nx, Ny, Nz, mpiRank);
+   getRange(momX_Z, "momX_Z", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momYEulerX, "momYEulerX", Nx, Ny, Nz, mpiRank);
-   getRange(momYEulerY, "momYEulerY", Nx, Ny, Nz, mpiRank);
-   getRange(momYEulerZ, "momYEulerZ", Nx, Ny, Nz, mpiRank);
+   getRange(momY_X, "momY_X", Nx, Ny, Nz, mpiRank);
+   getRange(momY_Y, "momY_Y", Nx, Ny, Nz, mpiRank);
+   getRange(momY_Z, "momY_Z", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momZEulerX, "momZEulerX", Nx, Ny, Nz, mpiRank);
-   getRange(momZEulerY, "momZEulerY", Nx, Ny, Nz, mpiRank);
-   getRange(momZEulerZ, "momZEulerZ", Nx, Ny, Nz, mpiRank);
+   getRange(momZ_X, "momZ_X", Nx, Ny, Nz, mpiRank);
+   getRange(momZ_Y, "momZ_Y", Nx, Ny, Nz, mpiRank);
+   getRange(momZ_Z, "momZ_Z", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(engyEulerX, "engyEulerX", Nx, Ny, Nz, mpiRank);
-   getRange(engyEulerY, "engyEulerY", Nx, Ny, Nz, mpiRank);
-   getRange(engyEulerZ, "engyEulerZ", Nx, Ny, Nz, mpiRank);
+   getRange(engy_X, "engy_X", Nx, Ny, Nz, mpiRank);
+   getRange(engy_Y, "engy_Y", Nx, Ny, Nz, mpiRank);
+   getRange(engy_Z, "engy_Z", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(rho1, "rho1", Nx, Ny, Nz, mpiRank);
    getRange(rhok, "rhok", Nx, Ny, Nz, mpiRank);
@@ -1235,7 +1258,6 @@ void UniformCSolverConservative::reportAll(){
    getRange(W, "W", Nx, Ny, Nz, mpiRank);
    getRange(T, "T", Nx, Ny, Nz, mpiRank);
    getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
-   getRange(Amu, "Amu", Nx, Ny, Nz, mpiRank);
    getRange(sos, "sos", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
 

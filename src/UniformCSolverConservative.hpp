@@ -1,5 +1,5 @@
-#ifndef _UNIFORMCSOLVERH_
-#define _UNIFORMCSOLVERH_
+#ifndef _UNIFORMCSOLVERCONSERVATIVEH_
+#define _UNIFORMCSOLVERCONSERVATIVEH_
 
 #include <iostream>
 #include <fstream>
@@ -43,15 +43,13 @@ class UniformCSolverConservative: public AbstractCSolver{
 	        *T, *T2, *T3, 
 		*p, *p2, *p3,
 	       *mu,
-	      *Amu,
-		*k, 
 	      *sos;
 
 	//derivatives of data
 	double *Ux, *Uy, *Uz;
 	double *Vx, *Vy, *Vz;
 	double *Wx, *Wy, *Wz;
-	double *Tx,  *Ty,  *Tz;
+	double *Tx, *Ty, *Tz;
 
 
 	double *Tauxx,  *Tauxy,  *Tauxz;
@@ -65,32 +63,14 @@ class UniformCSolverConservative: public AbstractCSolver{
 	double *engy_X, *engy_Y, *engy_Z;
 
 	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
+	double *tempX6,  *tempX7,  *tempX8,  *tempX9, *tempX10;
+	double *tempX11, *tempX12;
 
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
-	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
-	double *tempY16, *tempY17, *tempY18, *tempY19, *tempY20;
-	double *tempY21, *tempY22, *tempY23, *tempY24, *tempY25;
-	double *tempY26, *tempY27, *tempY28;
 
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
-	double *tempZ11, *tempZ12, *tempZ13, *tempZ14, *tempZ15;
-	double *tempZ16, *tempZ17, *tempZ18, *tempZ19, *tempZ20;
-	double *tempZ21, *tempZ22, *tempZ23, *tempZ24, *tempZ25;
-	double *tempZ26, *tempZ27, *tempZ28, *tempZ29, *tempZ30;
-	double *tempZ31, *tempZ32, *tempZ33, *tempZ34;
-
-	//TESTING
-        double *sbuf1, *sbuf2, *sbuf3, *sbuf4, *sbuf5;
-	double *rbuf1, *rbuf2, *rbuf3, *rbuf4, *rbuf5;
-
-
-	double *temp, *temp2, *temp3, *temp4;
-	double *transRho, *transRhoU, *transRhoV, *transRhoW, *transRhoE;
-	double *transUx, *transVx, *transWx;
-	double *transUy, *transVy, *transWy;
-
 
 	bool spongeFlag;
 	SpongeBC *spg; 
@@ -203,8 +183,6 @@ class UniformCSolverConservative: public AbstractCSolver{
 		neumannLocalZ = false;
 	    }
 
-
-
 	    t1 = MPI_Wtime();
 	}
 
@@ -269,6 +247,7 @@ class UniformCSolverConservative: public AbstractCSolver{
     	    solveYMomentum();
     	    solveZMomentum();
     	    solveEnergy();
+	    
 	}
 
 	void postSubStep(){

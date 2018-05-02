@@ -33,7 +33,6 @@ void UniformCSolverConservative::setInitialConditions(){
 	rhoE1[ip] = ig->solverhoE(rho1[ip], p[ip], U[ip], V[ip], W[ip]);
     	T[ip]     = ig->solveT(rho1[ip], p[ip]);
         mu[ip]    = ig->solveMu(T[ip]);
-        Amu[ip]   = ig->solveAmu(T[ip]);
         sos[ip]   = ig->solveSOS(rho1[ip], p[ip]);
     }
     //This is where we'll do the boundary condition specific stuff...
@@ -977,7 +976,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_X0_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerX[ip];
+	    rhok2[ip]  = -ts->dt*cont_X[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -987,7 +986,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcX1 == BC::ADIABATIC_WALL  || bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_X1_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerX[ip];
+	    rhok2[ip]  = -ts->dt*cont_X[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -997,7 +996,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y0_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerY[ip];
+	    rhok2[ip]  = -ts->dt*cont_Y[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1007,7 +1006,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y1_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerY[ip];
+	    rhok2[ip]  = -ts->dt*cont_Y[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1017,7 +1016,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z0_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
+	    rhok2[ip]  = -ts->dt*cont_Z[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1027,7 +1026,7 @@ void UniformCSolverConservative::postStepBCHandling(){
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z1_XPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*contEulerZ[ip];
+	    rhok2[ip]  = -ts->dt*cont_Z[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
