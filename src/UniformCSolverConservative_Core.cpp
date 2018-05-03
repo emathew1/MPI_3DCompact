@@ -261,18 +261,11 @@ void UniformCSolverConservative::preStepDerivatives(){
     ///////////////////
 
 
-    checkSolution();
-    reportAll();
-
     //First we'll do all of the X-Direction derivatives to calc tau
     derivX->calc1stDerivField(U, Ux); //dU/dx
     derivX->calc1stDerivField(V, Vx); //dV/dx
     derivX->calc1stDerivField(W, Wx); //dW/dx
     derivX->calc1stDerivField(T, Tx); //dT/dx
-
-    checkSolution();
-    reportAll();
-
 
 
     if(useTiming){
@@ -378,7 +371,7 @@ void UniformCSolverConservative::preStepDerivatives(){
     preEngy_X = tempX10; preEngy_Y = tempX11; preEngy_Z = tempX12;
 
     //Now recalculate properties in the new space
-    FOR_XYZ_ZPEN{
+    FOR_XYZ_XPEN{
 	Tauxx[ip] = mu[ip]*((4.0/3.0)*Ux[ip] - (2.0/3.0)*(Vy[ip] + Wz[ip]));
 	Tauyy[ip] = mu[ip]*((4.0/3.0)*Vy[ip] - (2.0/3.0)*(Ux[ip] + Wz[ip]));
 	Tauzz[ip] = mu[ip]*((4.0/3.0)*Wz[ip] - (2.0/3.0)*(Ux[ip] + Vy[ip]));
@@ -511,11 +504,11 @@ void UniformCSolverConservative::preStepDerivatives(){
     c2d->transposeZ2Y_MajorIndex(momZ_Z3, momZ_Z2);
     c2d->transposeZ2Y_MajorIndex(engy_Z3, engy_Z2);
 
-    c2d->transposeZ2Y_MajorIndex(cont_Z2, cont_Z);
-    c2d->transposeZ2Y_MajorIndex(momX_Z2, momX_Z);
-    c2d->transposeZ2Y_MajorIndex(momY_Z2, momY_Z);
-    c2d->transposeZ2Y_MajorIndex(momZ_Z2, momZ_Z);
-    c2d->transposeZ2Y_MajorIndex(engy_Z2, engy_Z);
+    c2d->transposeY2X_MajorIndex(cont_Z2, cont_Z);
+    c2d->transposeY2X_MajorIndex(momX_Z2, momX_Z);
+    c2d->transposeY2X_MajorIndex(momY_Z2, momY_Z);
+    c2d->transposeY2X_MajorIndex(momZ_Z2, momZ_Z);
+    c2d->transposeY2X_MajorIndex(engy_Z2, engy_Z);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
@@ -1206,6 +1199,13 @@ void UniformCSolverConservative::reportAll(){
    getRange(Tx, "Tx", Nx, Ny, Nz, mpiRank);
    getRange(Ty, "Ty", Nx, Ny, Nz, mpiRank);
    getRange(Tz, "Tz", Nx, Ny, Nz, mpiRank);
+   IF_RANK0 cout << " " << endl;
+   getRange(Tauxx, "Tauxx", Nx, Ny, Nz, mpiRank);
+   getRange(Tauyy, "Tauyy", Nx, Ny, Nz, mpiRank);
+   getRange(Tauzz, "Tauzz", Nx, Ny, Nz, mpiRank);
+   getRange(Tauxy, "Tauxy", Nx, Ny, Nz, mpiRank);
+   getRange(Tauyz, "Tauyz", Nx, Ny, Nz, mpiRank);
+   getRange(Tauxz, "Tauxz", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(cont_X, "cont_X", Nx, Ny, Nz, mpiRank);
    getRange(cont_Y, "cont_Y", Nx, Ny, Nz, mpiRank);
