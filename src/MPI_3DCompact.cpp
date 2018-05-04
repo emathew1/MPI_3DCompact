@@ -47,12 +47,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 100,
-           Ny = 100,
-           Nz = 100;
-    double Lx = 1.0,
-           Ly = 1.0,
-           Lz = 1.0;;
+    int    Nx = 50,
+           Ny = 200,
+           Nz = 50;
+    double Lx = 4.0,
+           Ly = 16.0,
+           Lz = 4.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -81,16 +81,16 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-    BC::BCType bcXType = BC::PERIODIC_SOLVE;
-    BC::BCType bcYType = BC::PERIODIC_SOLVE;
-    BC::BCType bcZType = BC::PERIODIC_SOLVE;
+    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::PERIODIC;
-    BC::BCKind bcX1 = BC::PERIODIC;
-    BC::BCKind bcY0 = BC::PERIODIC;
-    BC::BCKind bcY1 = BC::PERIODIC;
-    BC::BCKind bcZ0 = BC::PERIODIC;
-    BC::BCKind bcZ1 = BC::PERIODIC;
+    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY0 = BC::SPONGE;
+    BC::BCKind bcY1 = BC::SPONGE;
+    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,

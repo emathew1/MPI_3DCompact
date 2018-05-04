@@ -64,10 +64,10 @@ class SpongeBC{
 	    avgT = 10.0;
 	    epsP = 0.005;
 	    spongeP = 1.0/idealGas->gamma;
-	    spongeStrength = 1.0;
-	    spongeLX = 0.25*domain->gLx;
-	    spongeLY = 0.25*domain->gLy;
-	    spongeLZ = 0.25*domain->gLz;
+	    spongeStrength = 12.0;
+	    spongeLX = 0.125*domain->gLx;
+	    spongeLY = 0.125*domain->gLy;
+	    spongeLZ = 0.125*domain->gLz;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_XPEN sigma[ip] = 0.0;
