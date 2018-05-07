@@ -145,6 +145,8 @@ class UniformCSolver: public AbstractCSolver{
 	    this->mu_ref = mu_ref;
 	    this->useTiming = useTiming;
 
+	    baseDirection = 0;
+
 	    MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
   	    MPI_Comm_size(MPI_COMM_WORLD, &totRank);	
 
@@ -172,7 +174,7 @@ class UniformCSolver: public AbstractCSolver{
 	    //Initialize the sponge boundary conditions if necessary
 	    if(bc->bcX0 == BC::SPONGE || bc->bcX1 == BC::SPONGE || bc->bcY0 == BC::SPONGE || bc->bcY1 == BC::SPONGE || bc->bcZ0 == BC::SPONGE || bc->bcZ1 == BC::SPONGE){
 		spongeFlag = true;
-		spg = new SpongeBC(dom, ig, bc, c2d, mpiRank);
+		spg = new SpongeBC(dom, ig, bc, c2d, baseDirection, mpiRank);
 	    }else{
 		spongeFlag = false;
 		spg = NULL;

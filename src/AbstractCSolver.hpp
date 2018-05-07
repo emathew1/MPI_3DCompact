@@ -17,6 +17,8 @@ class AbstractCSolver{
 	bool rkLast;
 	bool endFlag;
 
+	int baseDirection;
+
 	//Stuff for timing functions
 	bool useTiming;
 	double ft1, ft2;

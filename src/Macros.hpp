@@ -96,6 +96,32 @@
 #define GETZPIND_XPEN_Zm5 (k-5)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
 #define GETZPIND_XPEN_Zm6 (k-6)*pxSize[0]*pxSize[1] + j*pxSize[0] + i
 
+#define GETMAJIND_YPEN_Xp1 (i+1)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp2 (i+2)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp3 (i+3)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp4 (i+4)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp5 (i+5)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp6 (i+6)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm1 (i-1)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm2 (i-2)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm3 (i-3)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm4 (i-4)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm5 (i-5)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm6 (i-6)*pySize[2]*pySize[1] + k*pySize[1] + j
+
+#define GETMAJIND_YPEN_Zp1 i*pySize[2]*pySize[1] + (k+1)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp2 i*pySize[2]*pySize[1] + (k+2)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp3 i*pySize[2]*pySize[1] + (k+3)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp4 i*pySize[2]*pySize[1] + (k+4)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp5 i*pySize[2]*pySize[1] + (k+5)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp6 i*pySize[2]*pySize[1] + (k+6)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm1 i*pySize[2]*pySize[1] + (k-1)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm2 i*pySize[2]*pySize[1] + (k-2)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm3 i*pySize[2]*pySize[1] + (k-3)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm4 i*pySize[2]*pySize[1] + (k-4)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm5 i*pySize[2]*pySize[1] + (k-5)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm6 i*pySize[2]*pySize[1] + (k-6)*pySize[1] + j
+
 
 
 

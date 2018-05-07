@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o AlgebraicSingleBlockMesh.o
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o 
 
 default: MPI_3DCompact
 
@@ -47,6 +47,14 @@ UniformCSolverConservative_BC.o: UniformCSolverConservative_BC.cpp UniformCSolve
 
 UniformCSolverConservative_Core.o: UniformCSolverConservative_Core.cpp UniformCSolverConservative.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
 	$(CC) $(CFLAGS) -c $<
+
+UniformCSolverConservativeYBase_BC.o: UniformCSolverConservativeYBase_BC.cpp UniformCSolverConservativeYBase.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
+
+UniformCSolverConservativeYBase_Core.o: UniformCSolverConservativeYBase_Core.cpp UniformCSolverConservativeYBase.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
+
+
 
 clean: 
 	rm -rf   *.o *.exe *.a

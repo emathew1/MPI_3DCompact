@@ -1182,11 +1182,11 @@ void UniformCSolver::dumpSolution(){
 	MPI_File_set_size(fh, filesize);
 
 	disp = 0;
-	c2d->writeVar(fh, disp, 0, rho1);
-	c2d->writeVar(fh, disp, 0, rhoU1);
-	c2d->writeVar(fh, disp, 0, rhoV1);
-	c2d->writeVar(fh, disp, 0, rhoW1);
-	c2d->writeVar(fh, disp, 0, rhoE1);
+	c2d->writeVar(fh, disp, baseDirection, rho1);
+	c2d->writeVar(fh, disp, baseDirection, rhoU1);
+	c2d->writeVar(fh, disp, baseDirection, rhoV1);
+	c2d->writeVar(fh, disp, baseDirection, rhoW1);
+	c2d->writeVar(fh, disp, baseDirection, rhoE1);
 
 	MPI_File_close(&fh);
 

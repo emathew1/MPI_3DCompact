@@ -1,6 +1,6 @@
-#include "UniformCSolverConservative.hpp"
+#include "UniformCSolverConservativeYBase.hpp"
 
-void UniformCSolverConservative::initializeSolverData(){
+void UniformCSolverConservativeYBase::initializeSolverData(){
 
    
     if(useTiming) ft1 = MPI_Wtime();
@@ -14,123 +14,123 @@ void UniformCSolverConservative::initializeSolverData(){
     }
 
     //3
-    c2d->allocX(Ux);
-    c2d->allocX(Uy);
-    c2d->allocX(Uz);
+    c2d->allocY(Ux);
+    c2d->allocY(Uy);
+    c2d->allocY(Uz);
 
     //6
-    c2d->allocX(Vx);
-    c2d->allocX(Vy);
-    c2d->allocX(Vz);
+    c2d->allocY(Vx);
+    c2d->allocY(Vy);
+    c2d->allocY(Vz);
 
     //9
-    c2d->allocX(Wx);
-    c2d->allocX(Wy);
-    c2d->allocX(Wz);
+    c2d->allocY(Wx);
+    c2d->allocY(Wy);
+    c2d->allocY(Wz);
 
     //12
-    c2d->allocX(Tx);
-    c2d->allocX(Ty);
-    c2d->allocX(Tz);
+    c2d->allocY(Tx);
+    c2d->allocY(Ty);
+    c2d->allocY(Tz);
 
     //18
-    c2d->allocX(Tauxx);
-    c2d->allocX(Tauxy);
-    c2d->allocX(Tauxz);
-    c2d->allocX(Tauyy);
-    c2d->allocX(Tauyz);
-    c2d->allocX(Tauzz);
+    c2d->allocY(Tauxx);
+    c2d->allocY(Tauxy);
+    c2d->allocY(Tauxz);
+    c2d->allocY(Tauyy);
+    c2d->allocY(Tauyz);
+    c2d->allocY(Tauzz);
 
     Tauyx = Tauxy;
     Tauzx = Tauxz;
     Tauzy = Tauyz;
    
     //21
-    c2d->allocX(cont_X);
-    c2d->allocX(cont_Y);
-    c2d->allocX(cont_Z);
+    c2d->allocY(cont_X);
+    c2d->allocY(cont_Y);
+    c2d->allocY(cont_Z);
 
     //24
-    c2d->allocX(momX_X);
-    c2d->allocX(momX_Y);
-    c2d->allocX(momX_Z);
+    c2d->allocY(momX_X);
+    c2d->allocY(momX_Y);
+    c2d->allocY(momX_Z);
 
     //27
-    c2d->allocX(momY_X);
-    c2d->allocX(momY_Y);
-    c2d->allocX(momY_Z);
+    c2d->allocY(momY_X);
+    c2d->allocY(momY_Y);
+    c2d->allocY(momY_Z);
 
     //30
-    c2d->allocX(momZ_X);
-    c2d->allocX(momZ_Y);
-    c2d->allocX(momZ_Z);
+    c2d->allocY(momZ_X);
+    c2d->allocY(momZ_Y);
+    c2d->allocY(momZ_Z);
 
     //33
-    c2d->allocX(engy_X);
-    c2d->allocX(engy_Y);
-    c2d->allocX(engy_Z);
+    c2d->allocY(engy_X);
+    c2d->allocY(engy_Y);
+    c2d->allocY(engy_Z);
 
     //37
-    c2d->allocX(rho1);
-    c2d->allocX(rhok);
-    c2d->allocX(rhok2);
-    c2d->allocX(rho2);
+    c2d->allocY(rho1);
+    c2d->allocY(rhok);
+    c2d->allocY(rhok2);
+    c2d->allocY(rho2);
 
     //41
-    c2d->allocX(rhoU1);
-    c2d->allocX(rhoUk);
-    c2d->allocX(rhoUk2);
-    c2d->allocX(rhoU2);
+    c2d->allocY(rhoU1);
+    c2d->allocY(rhoUk);
+    c2d->allocY(rhoUk2);
+    c2d->allocY(rhoU2);
 
     //45
-    c2d->allocX(rhoV1);
-    c2d->allocX(rhoVk);
-    c2d->allocX(rhoVk2);
-    c2d->allocX(rhoV2);
+    c2d->allocY(rhoV1);
+    c2d->allocY(rhoVk);
+    c2d->allocY(rhoVk2);
+    c2d->allocY(rhoV2);
 
     //49
-    c2d->allocX(rhoW1);
-    c2d->allocX(rhoWk);
-    c2d->allocX(rhoWk2);
-    c2d->allocX(rhoW2);
+    c2d->allocY(rhoW1);
+    c2d->allocY(rhoWk);
+    c2d->allocY(rhoWk2);
+    c2d->allocY(rhoW2);
  
     //53
-    c2d->allocX(rhoE1);
-    c2d->allocX(rhoEk);
-    c2d->allocX(rhoEk2);
-    c2d->allocX(rhoE2);
+    c2d->allocY(rhoE1);
+    c2d->allocY(rhoEk);
+    c2d->allocY(rhoEk2);
+    c2d->allocY(rhoE2);
 
     //58 these will be cleared though...
-    c2d->allocX(rho0);
-    c2d->allocX(U0);
-    c2d->allocX(V0);
-    c2d->allocX(W0);
-    c2d->allocX(p0);
+    c2d->allocY(rho0);
+    c2d->allocY(U0);
+    c2d->allocY(V0);
+    c2d->allocY(W0);
+    c2d->allocY(p0);
 
     //61
-    c2d->allocX(U);
-    c2d->allocY(U2);
+    c2d->allocX(U1);
+    c2d->allocY(U);
     c2d->allocZ(U3);
 
     //64
-    c2d->allocX(V);
-    c2d->allocY(V2);
+    c2d->allocX(V1);
+    c2d->allocY(V);
     c2d->allocZ(V3);
 
     //67
-    c2d->allocX(W);
-    c2d->allocY(W2);
+    c2d->allocX(W1);
+    c2d->allocY(W);
     c2d->allocZ(W3);
 
     //70
-    c2d->allocX(T);
-    c2d->allocY(T2);
+    c2d->allocX(T1);
+    c2d->allocY(T);
     c2d->allocZ(T3);
 
     //72
-    c2d->allocX(p);
-    c2d->allocX(mu);
-    c2d->allocX(sos);
+    c2d->allocY(p);
+    c2d->allocY(mu);
+    c2d->allocY(sos);
 
     //84
     c2d->allocX(tempX1);
@@ -178,21 +178,21 @@ void UniformCSolverConservative::initializeSolverData(){
 }
 
 
-void UniformCSolverConservative::calcDtFromCFL(){
+void UniformCSolverConservativeYBase::calcDtFromCFL(){
 
     if(useTiming) ft1 = MPI_Wtime();    
 
     //Calculate the wave speed over the local spacings...
     double *UChar_dx;
-    c2d->allocX(UChar_dx);
+    c2d->allocY(UChar_dx);
 
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 	UChar_dx[ip] = (fabs(U[ip]) + sos[ip])/dom->dx + (fabs(V[ip])+sos[ip])/dom->dy + (fabs(W[ip]) + sos[ip])/dom->dz;
     }
 
     //Get the largest value in the domain
     double lmax_UChar_dx = -100000.0;
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 	if(UChar_dx[ip] > lmax_UChar_dx){
 	    lmax_UChar_dx = UChar_dx[ip];
 	}
@@ -228,7 +228,7 @@ void UniformCSolverConservative::calcDtFromCFL(){
 
 }
 
-void UniformCSolverConservative::preStepDerivatives(){
+void UniformCSolverConservativeYBase::preStepDerivatives(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -371,7 +371,7 @@ void UniformCSolverConservative::preStepDerivatives(){
     preEngy_X = tempX10; preEngy_Y = tempX11; preEngy_Z = tempX12;
 
     //Now recalculate properties in the new space
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 	Tauxx[ip] = mu[ip]*((4.0/3.0)*Ux[ip] - (2.0/3.0)*(Vy[ip] + Wz[ip]));
 	Tauyy[ip] = mu[ip]*((4.0/3.0)*Vy[ip] - (2.0/3.0)*(Ux[ip] + Wz[ip]));
 	Tauzz[ip] = mu[ip]*((4.0/3.0)*Wz[ip] - (2.0/3.0)*(Ux[ip] + Vy[ip]));
@@ -527,7 +527,7 @@ void UniformCSolverConservative::preStepDerivatives(){
 }
 
 
-void UniformCSolverConservative::solveContinuity(){
+void UniformCSolverConservativeYBase::solveContinuity(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -540,7 +540,7 @@ void UniformCSolverConservative::solveContinuity(){
 	
     double spgSource; 
 
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 
 	if(spongeFlag)
 	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
@@ -557,7 +557,7 @@ void UniformCSolverConservative::solveContinuity(){
 
 }
 
-void UniformCSolverConservative::solveXMomentum(){
+void UniformCSolverConservativeYBase::solveXMomentum(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -569,7 +569,7 @@ void UniformCSolverConservative::solveXMomentum(){
     }
 
     double spgSource;
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 
 	if(spongeFlag)
 	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
@@ -589,7 +589,7 @@ void UniformCSolverConservative::solveXMomentum(){
 
 }
 
-void UniformCSolverConservative::solveYMomentum(){
+void UniformCSolverConservativeYBase::solveYMomentum(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -602,7 +602,7 @@ void UniformCSolverConservative::solveYMomentum(){
 
     double spgSource;
 
-    FOR_XYZ_XPEN{ 
+    FOR_XYZ_YPEN{ 
 
         if(spongeFlag)
             spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
@@ -622,7 +622,7 @@ void UniformCSolverConservative::solveYMomentum(){
 
 }
 
-void UniformCSolverConservative::solveZMomentum(){
+void UniformCSolverConservativeYBase::solveZMomentum(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -634,7 +634,7 @@ void UniformCSolverConservative::solveZMomentum(){
     }
 
     double spgSource;
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 
         if(spongeFlag)
             spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
@@ -655,7 +655,7 @@ void UniformCSolverConservative::solveZMomentum(){
 }
 
 
-void UniformCSolverConservative::solveEnergy(){
+void UniformCSolverConservativeYBase::solveEnergy(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -667,7 +667,7 @@ void UniformCSolverConservative::solveEnergy(){
     }
 
     double spgSource;
-    FOR_XYZ_XPEN{
+    FOR_XYZ_YPEN{
 
         if(spongeFlag)
             spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
@@ -686,7 +686,7 @@ void UniformCSolverConservative::solveEnergy(){
 
 }
 
-void UniformCSolverConservative::filterConservedData(){
+void UniformCSolverConservativeYBase::filterConservedData(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -849,11 +849,11 @@ void UniformCSolverConservative::filterConservedData(){
  
     //If not filtering, need to copy the solution over to the *1 variables
     }else{
-	    memcpy(rho1,  rho2,  sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
-	    memcpy(rhoU1, rhoU2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
-	    memcpy(rhoV1, rhoV2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
-	    memcpy(rhoW1, rhoW2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
-	    memcpy(rhoE1, rhoE2, sizeof(double)*pxSize[0]*pxSize[1]*pxSize[2]);
+	    memcpy(rho1,  rho2,  sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
+	    memcpy(rhoU1, rhoU2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
+	    memcpy(rhoV1, rhoV2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
+	    memcpy(rhoW1, rhoW2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
+	    memcpy(rhoE1, rhoE2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
 
     }
 
@@ -867,13 +867,13 @@ void UniformCSolverConservative::filterConservedData(){
 };
 
 
-void UniformCSolverConservative::updateNonConservedData(){
+void UniformCSolverConservativeYBase::updateNonConservedData(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
     if(!rkLast){
 
-	FOR_XYZ_XPEN{
+	FOR_XYZ_YPEN{
 	    U[ip]   = ig->solveU(rhok[ip], rhoUk[ip]);
 	    V[ip]   = ig->solveU(rhok[ip], rhoVk[ip]);
 	    W[ip]   = ig->solveU(rhok[ip], rhoWk[ip]);
@@ -885,7 +885,7 @@ void UniformCSolverConservative::updateNonConservedData(){
 
     }else if(rkLast){
 
-	FOR_XYZ_XPEN{
+	FOR_XYZ_YPEN{
 	    U[ip]   = ig->solveU(rho1[ip], rhoU1[ip]);
 	    V[ip]   = ig->solveU(rho1[ip], rhoV1[ip]);
 	    W[ip]   = ig->solveU(rho1[ip], rhoW1[ip]);
@@ -906,7 +906,7 @@ void UniformCSolverConservative::updateNonConservedData(){
 
 }
 
-void UniformCSolverConservative::checkSolution(){
+void UniformCSolverConservativeYBase::checkSolution(){
 
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -923,15 +923,20 @@ void UniformCSolverConservative::checkSolution(){
             cout << "  Time since last timestep = " << t2 - t1  << endl;
 	}
 	
-        getRange(rho1, "RHO", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(U, "U", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(V, "V", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(W, "W", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(p, "P", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(T, "T", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(mu, "mu", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(rhoE1, "RHOE", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-        getRange(sos, "SOS", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+
+	int Nx = pySize[0];
+	int Ny = pySize[1];
+	int Nz = pySize[2];
+
+        getRange(rho1, "RHO", Nx, Ny, Nz, mpiRank);
+        getRange(U, "U", Nx, Ny, Nz, mpiRank);
+        getRange(V, "V", Nx, Ny, Nz, mpiRank);
+        getRange(W, "W", Nx, Ny, Nz, mpiRank);
+        getRange(p, "P", Nx, Ny, Nz, mpiRank);
+        getRange(T, "T", Nx, Ny, Nz, mpiRank);
+        getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
+        getRange(rhoE1, "RHOE", Nx, Ny, Nz, mpiRank);
+        getRange(sos, "SOS", Nx, Ny, Nz, mpiRank);
         IF_RANK0 cout << endl;
 
 	t1 = MPI_Wtime();
@@ -946,7 +951,7 @@ void UniformCSolverConservative::checkSolution(){
 };
 
 
-void UniformCSolverConservative::dumpSolution(){
+void UniformCSolverConservativeYBase::dumpSolution(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -1003,7 +1008,7 @@ void UniformCSolverConservative::dumpSolution(){
 
 }
 
-void UniformCSolverConservative::writeImages(){
+void UniformCSolverConservativeYBase::writeImages(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
@@ -1027,7 +1032,7 @@ void UniformCSolverConservative::writeImages(){
 
 }
 
-void UniformCSolverConservative::writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction){
+void UniformCSolverConservativeYBase::writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction){
 
     //plane == 0, YZ (X-normal Plane)
     //plane == 1, XZ (Y-normal Plane)
@@ -1059,14 +1064,14 @@ void UniformCSolverConservative::writePlaneImageForVariable(double *var, string 
     for(int ip = 0; ip < N1*N2; ip++) ff[ip] = -1000000.0;
 
 
-    FOR_Z_XPEN{
-	FOR_Y_XPEN{
-	    FOR_X_XPEN{
-		int gi = GETGLOBALXIND_XPEN;
-		int gj = GETGLOBALYIND_XPEN;
-		int gk = GETGLOBALZIND_XPEN;
+    FOR_Z_YPEN{
+	FOR_Y_YPEN{
+	    FOR_X_YPEN{
+		int gi = GETGLOBALXIND_YPEN;
+		int gj = GETGLOBALYIND_YPEN;
+		int gk = GETGLOBALZIND_YPEN;
 	
-		int ip = GETMAJIND_XPEN;
+		int ip = GETMAJIND_YPEN;
 
 		if(plane == 0){
 		    if(gi == (int)(Nx*fraction)){
@@ -1144,7 +1149,7 @@ void UniformCSolverConservative::writePlaneImageForVariable(double *var, string 
 
 }
 
-void UniformCSolverConservative::checkEnd(){
+void UniformCSolverConservativeYBase::checkEnd(){
 
 
     if(time >= ts->maxTime){
@@ -1176,11 +1181,11 @@ void UniformCSolverConservative::checkEnd(){
 
 }
 
-void UniformCSolverConservative::reportAll(){
+void UniformCSolverConservativeYBase::reportAll(){
 
-   int Nx = pxSize[0];
-   int Ny = pxSize[1];
-   int Nz = pxSize[2];
+   int Nx = pySize[0];
+   int Ny = pySize[1];
+   int Nz = pySize[2];
 
    IF_RANK0   cout << "REPORT ALL" << endl;
 

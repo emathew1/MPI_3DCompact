@@ -1,5 +1,5 @@
-#ifndef _UNIFORMCSOLVERCONSERVATIVEH_
-#define _UNIFORMCSOLVERCONSERVATIVEH_
+#ifndef _UNIFORMCSOLVERCONSERVATIVEYBASEH_
+#define _UNIFORMCSOLVERCONSERVATIVEYBASEH_
 
 #include <iostream>
 #include <fstream>
@@ -10,7 +10,7 @@
 #include "AbstractCSolver.hpp"
 #include "PngWriter.hpp"
 
-class UniformCSolverConservative: public AbstractCSolver{
+class UniformCSolverConservativeYBase: public AbstractCSolver{
 
     public:
 
@@ -37,11 +37,11 @@ class UniformCSolverConservative: public AbstractCSolver{
         bool done;
 
 	//non-conserved data
-	double  *U, *U2, *U3, 
-		*V, *V2, *V3, 
-		*W, *W2, *W3,
-	        *T, *T2, *T3, 
-		*p, *p2, *p3,
+	double  *U1, *U, *U3, 
+		*V1, *V, *V3, 
+		*W1, *W, *W3,
+	        *T1, *T, *T3, 
+		*p1, *p, *p3,
 	       *mu,
 	      *sos;
 
@@ -76,7 +76,7 @@ class UniformCSolverConservative: public AbstractCSolver{
 	SpongeBC *spg; 
 
 	//See if we have to transpose for Neumann BC calculations
-	bool neumannLocalY, neumannLocalZ;
+	bool neumannLocalX, neumannLocalZ;
 
 	//Moving Wall BC Velocities
 	double X0WallV, X0WallW, X1WallV, X1WallW;
@@ -89,7 +89,7 @@ class UniformCSolverConservative: public AbstractCSolver{
 	PngWriter *pngYZ;
 
 	//Constructor to use for this class...
-	UniformCSolverConservative(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
+	UniformCSolverConservativeYBase(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
 
 	    //Take in input information and initialize data structures...
 	    this->c2d = c2d;
@@ -100,7 +100,7 @@ class UniformCSolverConservative: public AbstractCSolver{
 	    this->mu_ref = mu_ref;
 	    this->useTiming = useTiming;
 
-	    baseDirection = 0;
+	    baseDirection = 1;
 
 	    MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
   	    MPI_Comm_size(MPI_COMM_WORLD, &totRank);	
@@ -161,27 +161,29 @@ class UniformCSolverConservative: public AbstractCSolver{
 	    }
 	
 
-	    int minXPenYSize;
-	    int minXPenZSize;
+	    int minYPenXSize;
+	    int minYPenZSize;
 
-	    MPI_Allreduce(&pxSize[1], &minXPenYSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD); 
-	    MPI_Allreduce(&pxSize[2], &minXPenZSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+	    MPI_Allreduce(&pySize[0], &minYPenXSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD); 
+	    MPI_Allreduce(&pySize[2], &minYPenZSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
-	    IF_RANK0 cout << " > Mininum number of points in Y direction in X-Pencil is " << minXPenYSize << ",";
-	    if(minXPenYSize >= 7){
+	    IF_RANK0 cout << " > Mininum number of points in X direction in Y-Pencil is " << minYPenXSize << ",";
+	    if(minYPenXSize >= 7){
 		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
-		neumannLocalY = true;
+		neumannLocalX = true;
 	    }else{
  		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
-		neumannLocalY = false;
+ 		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
+		neumannLocalX = false;
 	    }
 
-	    IF_RANK0 cout << " > Mininum number of points in Z direction in X-Pencil is " << minXPenZSize << ",";
-	    if(minXPenZSize >= 7){
+	    IF_RANK0 cout << " > Mininum number of points in Z direction in Y-Pencil is " << minYPenZSize << ",";
+	    if(minYPenZSize >= 7){
 		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
 		neumannLocalZ = true;
 	    }else{
  		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
+ 		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
 		neumannLocalZ = false;
 	    }
 
