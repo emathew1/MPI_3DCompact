@@ -143,8 +143,6 @@ void UniformCSolverConservativeYBase::initializeSolverData(){
     c2d->allocX(tempX8);
     c2d->allocX(tempX9);
     c2d->allocX(tempX10);
-    c2d->allocX(tempX11);
-    c2d->allocX(tempX12);
 
     //94
     c2d->allocY(tempY1);
@@ -157,6 +155,8 @@ void UniformCSolverConservativeYBase::initializeSolverData(){
     c2d->allocY(tempY8);
     c2d->allocY(tempY9);
     c2d->allocY(tempY10);
+    c2d->allocY(tempY11);
+    c2d->allocY(tempY12);
 
     //104
     c2d->allocZ(tempZ1);
@@ -257,54 +257,54 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     if(useTiming) ftt1 = MPI_Wtime();
 
     ///////////////////
-    // X-DERIVATIVES //
-    ///////////////////
-
-
-    //First we'll do all of the X-Direction derivatives to calc tau
-    derivX->calc1stDerivField(U, Ux); //dU/dx
-    derivX->calc1stDerivField(V, Vx); //dV/dx
-    derivX->calc1stDerivField(W, Wx); //dW/dx
-    derivX->calc1stDerivField(T, Tx); //dT/dx
-
-
-    if(useTiming){
-	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
-	ftt1 = MPI_Wtime();
-    }
-
-    ///////////////////
     // Y-DERIVATIVES //
     ///////////////////
 
-    double *Uy2, *Vy2, *Wy2, *Ty2;
-    double *U2, *V2, *W2, *T2;
 
-    //Point to the needed Y memory
-    U2 = tempY1; Uy2 = tempY5; 
-    V2 = tempY2; Vy2 = tempY6;
-    W2 = tempY3; Wy2 = tempY7;
-    T2 = tempY4; Ty2 = tempY8;
+    //First we'll do all of the Y-Direction derivatives to calc tau
+    derivY->calc1stDerivField(U, Uy); //dU/dx
+    derivY->calc1stDerivField(V, Vy); //dV/dx
+    derivY->calc1stDerivField(W, Wy); //dW/dx
+    derivY->calc1stDerivField(T, Ty); //dT/dx
 
-    c2d->transposeX2Y_MajorIndex(U, U2);
-    c2d->transposeX2Y_MajorIndex(V, V2);
-    c2d->transposeX2Y_MajorIndex(W, W2);
-    c2d->transposeX2Y_MajorIndex(T, T2);
-
-    derivY->calc1stDerivField(U2, Uy2);
-    derivY->calc1stDerivField(V2, Vy2);
-    derivY->calc1stDerivField(W2, Wy2);
-    derivY->calc1stDerivField(T2, Ty2);
-
-    c2d->transposeY2X_MajorIndex(Uy2, Uy);
-    c2d->transposeY2X_MajorIndex(Vy2, Vy);
-    c2d->transposeY2X_MajorIndex(Wy2, Wy);
-    c2d->transposeY2X_MajorIndex(Ty2, Ty);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
 	IF_RANK0 cout << " > yderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	ftt1 = MPI_Wtime();
+    }
+
+    ///////////////////
+    // X-DERIVATIVES //
+    ///////////////////
+
+    double *Ux1, *Vx1, *Wx1, *Tx1;
+    double *U1, *V1, *W1, *T1;
+
+    //Point to the needed X memory
+    U1 = tempX1; Ux1 = tempX5; 
+    V1 = tempX2; Vx1 = tempX6;
+    W1 = tempX3; Wx1 = tempX7;
+    T1 = tempX4; Tx1 = tempX8;
+
+    c2d->transposeY2X_MajorIndex(U, U1);
+    c2d->transposeY2X_MajorIndex(V, V1);
+    c2d->transposeY2X_MajorIndex(W, W1);
+    c2d->transposeY2X_MajorIndex(T, T1);
+
+    derivX->calc1stDerivField(U1, Ux1);
+    derivX->calc1stDerivField(V1, Vx1);
+    derivX->calc1stDerivField(W1, Wx1);
+    derivX->calc1stDerivField(T1, Tx1);
+
+    c2d->transposeX2Y_MajorIndex(Ux1, Ux);
+    c2d->transposeX2Y_MajorIndex(Vx1, Vx);
+    c2d->transposeX2Y_MajorIndex(Wx1, Wx);
+    c2d->transposeX2Y_MajorIndex(Tx1, Tx);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
 	ftt1 = MPI_Wtime();
     }
 
@@ -313,41 +313,35 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     // Z-DERIVATIVES //
     ///////////////////
 
-    double *Uz2, *Vz2, *Wz2, *Tz2;
     double *Uz3, *Vz3, *Wz3, *Tz3;
     double *U3,  *V3,  *W3,  *T3;
 
-    //Point to the needed Y memory
-    Uz2 = tempY5;
-    Vz2 = tempY6;
-    Wz2 = tempY7;
-    Tz2 = tempY8;
+    //Point to the needed Z memory
+    Uz3 = tempZ1;
+    Vz3 = tempZ2;
+    Wz3 = tempZ3;
+    Tz3 = tempZ4;
 
     //Point to the Z memory
-    U3 = tempZ1; Uz3 = tempZ5;
-    V3 = tempZ2; Vz3 = tempZ6;
-    W3 = tempZ3; Wz3 = tempZ7;
-    T3 = tempZ4; Tz3 = tempZ8;
+    U3 = tempZ5;
+    V3 = tempZ6;
+    W3 = tempZ7;
+    T3 = tempZ8; 
 
-    c2d->transposeY2Z_MajorIndex(U2, U3);
-    c2d->transposeY2Z_MajorIndex(V2, V3);
-    c2d->transposeY2Z_MajorIndex(W2, W3);
-    c2d->transposeY2Z_MajorIndex(T2, T3);
+    c2d->transposeY2Z_MajorIndex(U, U3);
+    c2d->transposeY2Z_MajorIndex(V, V3);
+    c2d->transposeY2Z_MajorIndex(W, W3);
+    c2d->transposeY2Z_MajorIndex(T, T3);
 
     derivZ->calc1stDerivField(U3, Uz3);
     derivZ->calc1stDerivField(V3, Vz3);
     derivZ->calc1stDerivField(W3, Wz3);
     derivZ->calc1stDerivField(T3, Tz3);
 
-    c2d->transposeZ2Y_MajorIndex(Uz3, Uz2);
-    c2d->transposeZ2Y_MajorIndex(Vz3, Vz2);
-    c2d->transposeZ2Y_MajorIndex(Wz3, Wz2);
-    c2d->transposeZ2Y_MajorIndex(Tz3, Tz2);
-
-    c2d->transposeY2X_MajorIndex(Uz2, Uz);
-    c2d->transposeY2X_MajorIndex(Vz2, Vz);
-    c2d->transposeY2X_MajorIndex(Wz2, Wz);
-    c2d->transposeY2X_MajorIndex(Tz2, Tz);
+    c2d->transposeZ2Y_MajorIndex(Uz3, Uz);
+    c2d->transposeZ2Y_MajorIndex(Vz3, Vz);
+    c2d->transposeZ2Y_MajorIndex(Wz3, Wz);
+    c2d->transposeZ2Y_MajorIndex(Tz3, Tz);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
@@ -365,10 +359,10 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     double *preMomZ_X, *preMomZ_Y, *preMomZ_Z; 
     double *preEngy_X, *preEngy_Y, *preEngy_Z; 
 
-    preMomX_X = tempX1;  preMomX_Y = tempX2;  preMomX_Z = tempX3;
-    preMomY_X = tempX4;  preMomY_Y = tempX5;  preMomY_Z = tempX6;
-    preMomZ_X = tempX7;  preMomZ_Y = tempX8;  preMomZ_Z = tempX9;
-    preEngy_X = tempX10; preEngy_Y = tempX11; preEngy_Z = tempX12;
+    preMomX_X = tempY1;  preMomX_Y = tempY2;  preMomX_Z = tempY3;
+    preMomY_X = tempY4;  preMomY_Y = tempY5;  preMomY_Z = tempY6;
+    preMomZ_X = tempY7;  preMomZ_Y = tempY8;  preMomZ_Z = tempY9;
+    preEngy_X = tempY10; preEngy_Y = tempY11; preEngy_Z = tempY12;
 
     //Now recalculate properties in the new space
     FOR_XYZ_YPEN{
@@ -403,55 +397,14 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     }
 
     ///////////////////
-    // X-DERIVATIVES //
-    ///////////////////
-   
-    derivX->calc1stDerivField(rhoUP,     cont_X);
-    derivX->calc1stDerivField(preMomX_X, momX_X);
-    derivX->calc1stDerivField(preMomY_X, momY_X);
-    derivX->calc1stDerivField(preMomZ_X, momZ_X);
-    derivX->calc1stDerivField(preEngy_X, engy_X);
-
-    if(useTiming){
-	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
-    }
-
-    ///////////////////
     // Y-DERIVATIVES //
     ///////////////////
-
-    double *rhoVP2, *preMomX_Y2, *preMomY_Y2, *preMomZ_Y2, *preEngy_Y2;
-    rhoVP2     = tempY1; 
-    preMomX_Y2 = tempY2; 
-    preMomY_Y2 = tempY3; 
-    preMomZ_Y2 = tempY4; 
-    preEngy_Y2 = tempY5; 
-
-    double *cont_Y2, *momX_Y2, *momY_Y2, *momZ_Y2, *engy_Y2;
-    cont_Y2 = tempY6; 
-    momX_Y2 = tempY7; 
-    momY_Y2 = tempY8; 
-    momZ_Y2 = tempY9; 
-    engy_Y2 = tempY10; 
-
-    c2d->transposeX2Y_MajorIndex(rhoVP,     rhoVP2);
-    c2d->transposeX2Y_MajorIndex(preMomX_Y, preMomX_Y2);
-    c2d->transposeX2Y_MajorIndex(preMomY_Y, preMomY_Y2);
-    c2d->transposeX2Y_MajorIndex(preMomZ_Y, preMomZ_Y2);
-    c2d->transposeX2Y_MajorIndex(preEngy_Y, preEngy_Y2);
-
-    derivY->calc1stDerivField(rhoVP2,     cont_Y2); 
-    derivY->calc1stDerivField(preMomX_Y2, momX_Y2); 
-    derivY->calc1stDerivField(preMomY_Y2, momY_Y2); 
-    derivY->calc1stDerivField(preMomZ_Y2, momZ_Y2); 
-    derivY->calc1stDerivField(preEngy_Y2, engy_Y2); 
-
-    c2d->transposeY2X_MajorIndex(cont_Y2, cont_Y);
-    c2d->transposeY2X_MajorIndex(momX_Y2, momX_Y);
-    c2d->transposeY2X_MajorIndex(momY_Y2, momY_Y);
-    c2d->transposeY2X_MajorIndex(momZ_Y2, momZ_Y);
-    c2d->transposeY2X_MajorIndex(engy_Y2, engy_Y);
+   
+    derivY->calc1stDerivField(rhoVP,     cont_Y);
+    derivY->calc1stDerivField(preMomX_Y, momX_Y);
+    derivY->calc1stDerivField(preMomY_Y, momY_Y);
+    derivY->calc1stDerivField(preMomZ_Y, momZ_Y);
+    derivY->calc1stDerivField(preEngy_Y, engy_Y);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
@@ -459,17 +412,49 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     }
 
     ///////////////////
-    // Z-DERIVATIVES //
+    // X-DERIVATIVES //
     ///////////////////
 
-    double *rhoWP2, *preMomX_Z2, *preMomY_Z2, *preMomZ_Z2, *preEngy_Z2;
-    double *cont_Z2, *momX_Z2, *momY_Z2, *momZ_Z2, *engy_Z2;
+    double *rhoUP1, *preMomX_X1, *preMomY_X1, *preMomZ_X1, *preEngy_X1;
+    rhoUP1     = tempX1; 
+    preMomX_X1 = tempX2; 
+    preMomY_X1 = tempX3; 
+    preMomZ_X1 = tempX4; 
+    preEngy_X1 = tempX5; 
 
-    rhoWP2     = tempY1; cont_Z2 = tempY6;
-    preMomX_Z2 = tempY2; momX_Z2 = tempY7;
-    preMomY_Z2 = tempY3; momY_Z2 = tempY8;
-    preMomZ_Z2 = tempY4; momZ_Z2 = tempY9;
-    preEngy_Z2 = tempY5; engy_Z2 = tempY10;
+    double *cont_X1, *momX_X1, *momY_X1, *momZ_X1, *engy_X1;
+    cont_X1 = tempX6; 
+    momX_X1 = tempX7; 
+    momY_X1 = tempX8; 
+    momZ_X1 = tempX9; 
+    engy_X1 = tempX10; 
+
+    c2d->transposeY2X_MajorIndex(rhoUP,     rhoUP1);
+    c2d->transposeY2X_MajorIndex(preMomX_X, preMomX_X1);
+    c2d->transposeY2X_MajorIndex(preMomY_X, preMomY_X1);
+    c2d->transposeY2X_MajorIndex(preMomZ_X, preMomZ_X1);
+    c2d->transposeY2X_MajorIndex(preEngy_X, preEngy_X1);
+
+    derivX->calc1stDerivField(rhoUP1,     cont_X1); 
+    derivX->calc1stDerivField(preMomX_X1, momX_X1); 
+    derivX->calc1stDerivField(preMomY_X1, momY_X1); 
+    derivX->calc1stDerivField(preMomZ_X1, momZ_X1); 
+    derivX->calc1stDerivField(preEngy_X1, engy_X1); 
+
+    c2d->transposeX2Y_MajorIndex(cont_X1, cont_X);
+    c2d->transposeX2Y_MajorIndex(momX_X1, momX_X);
+    c2d->transposeX2Y_MajorIndex(momY_X1, momY_X);
+    c2d->transposeX2Y_MajorIndex(momZ_X1, momZ_X);
+    c2d->transposeX2Y_MajorIndex(engy_X1, engy_X);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
+    ///////////////////
+    // Z-DERIVATIVES //
+    ///////////////////
 
     double *rhoWP3, *preMomX_Z3, *preMomY_Z3, *preMomZ_Z3, *preEngy_Z3;
     double *cont_Z3, *momX_Z3, *momY_Z3, *momZ_Z3, *engy_Z3;
@@ -480,35 +465,23 @@ void UniformCSolverConservativeYBase::preStepDerivatives(){
     preMomZ_Z3 = tempZ4; momZ_Z3 = tempZ9;
     preEngy_Z3 = tempZ5; engy_Z3 = tempZ10;
 
-    c2d->transposeX2Y_MajorIndex(rhoWP,     rhoWP2);
-    c2d->transposeX2Y_MajorIndex(preMomX_Z, preMomX_Z2);
-    c2d->transposeX2Y_MajorIndex(preMomY_Z, preMomY_Z2);
-    c2d->transposeX2Y_MajorIndex(preMomZ_Z, preMomZ_Z2);
-    c2d->transposeX2Y_MajorIndex(preEngy_Z, preEngy_Z2);
+    c2d->transposeY2Z_MajorIndex(rhoWP,     rhoWP3);
+    c2d->transposeY2Z_MajorIndex(preMomX_Z, preMomX_Z3);
+    c2d->transposeY2Z_MajorIndex(preMomY_Z, preMomY_Z3);
+    c2d->transposeY2Z_MajorIndex(preMomZ_Z, preMomZ_Z3);
+    c2d->transposeY2Z_MajorIndex(preEngy_Z, preEngy_Z3);
 
-    c2d->transposeY2Z_MajorIndex(rhoWP2,     rhoWP3);
-    c2d->transposeY2Z_MajorIndex(preMomX_Z2, preMomX_Z3);
-    c2d->transposeY2Z_MajorIndex(preMomY_Z2, preMomY_Z3);
-    c2d->transposeY2Z_MajorIndex(preMomZ_Z2, preMomZ_Z3);
-    c2d->transposeY2Z_MajorIndex(preEngy_Z2, preEngy_Z3);
- 
     derivZ->calc1stDerivField(rhoWP3,     cont_Z3);
     derivZ->calc1stDerivField(preMomX_Z3, momX_Z3);
     derivZ->calc1stDerivField(preMomY_Z3, momY_Z3);
     derivZ->calc1stDerivField(preMomZ_Z3, momZ_Z3);
     derivZ->calc1stDerivField(preEngy_Z3, engy_Z3);
 
-    c2d->transposeZ2Y_MajorIndex(cont_Z3, cont_Z2);
-    c2d->transposeZ2Y_MajorIndex(momX_Z3, momX_Z2);
-    c2d->transposeZ2Y_MajorIndex(momY_Z3, momY_Z2);
-    c2d->transposeZ2Y_MajorIndex(momZ_Z3, momZ_Z2);
-    c2d->transposeZ2Y_MajorIndex(engy_Z3, engy_Z2);
-
-    c2d->transposeY2X_MajorIndex(cont_Z2, cont_Z);
-    c2d->transposeY2X_MajorIndex(momX_Z2, momX_Z);
-    c2d->transposeY2X_MajorIndex(momY_Z2, momY_Z);
-    c2d->transposeY2X_MajorIndex(momZ_Z2, momZ_Z);
-    c2d->transposeY2X_MajorIndex(engy_Z2, engy_Z);
+    c2d->transposeZ2Y_MajorIndex(cont_Z3, cont_Z);
+    c2d->transposeZ2Y_MajorIndex(momX_Z3, momX_Z);
+    c2d->transposeZ2Y_MajorIndex(momY_Z3, momY_Z);
+    c2d->transposeZ2Y_MajorIndex(momZ_Z3, momZ_Z);
+    c2d->transposeZ2Y_MajorIndex(engy_Z3, engy_Z);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
@@ -699,37 +672,25 @@ void UniformCSolverConservativeYBase::filterConservedData(){
         //Going to try and be cute to minimize dmemory allocation
         if(filterTimeStep%3 == 1){
 
-            //Here we'll do X->Y->Z     
+            //Here we'll do Y->Z->X     
 
-                    filtX->filterField(rho2,  tempX1);
-		    filtX->filterField(rhoU2, tempX2);
-		    filtX->filterField(rhoV2, tempX3);
-		    filtX->filterField(rhoW2, tempX4);
-		    filtX->filterField(rhoE2, tempX5);
+                    filtY->filterField(rho2,  tempY1);
+		    filtY->filterField(rhoU2, tempY2);
+		    filtY->filterField(rhoV2, tempY3);
+		    filtY->filterField(rhoW2, tempY4);
+		    filtY->filterField(rhoE2, tempY5);
 
-		    c2d->transposeX2Y_MajorIndex(tempX1, tempY1);
-		    c2d->transposeX2Y_MajorIndex(tempX2, tempY2);
-		    c2d->transposeX2Y_MajorIndex(tempX3, tempY3);
-		    c2d->transposeX2Y_MajorIndex(tempX4, tempY4);
-		    c2d->transposeX2Y_MajorIndex(tempX5, tempY5);
+		    c2d->transposeY2Z_MajorIndex(tempY1, tempZ1);
+		    c2d->transposeY2Z_MajorIndex(tempY2, tempZ2);
+		    c2d->transposeY2Z_MajorIndex(tempY3, tempZ3);
+		    c2d->transposeY2Z_MajorIndex(tempY4, tempZ4);
+		    c2d->transposeY2Z_MajorIndex(tempY5, tempZ5);
 
-		    filtY->filterField(tempY1, tempY6);
-		    filtY->filterField(tempY2, tempY7);
-		    filtY->filterField(tempY3, tempY8);
-		    filtY->filterField(tempY4, tempY9);
-		    filtY->filterField(tempY5, tempY10);
-
-		    c2d->transposeY2Z_MajorIndex(tempY6,  tempZ1);
-		    c2d->transposeY2Z_MajorIndex(tempY7,  tempZ2);
-		    c2d->transposeY2Z_MajorIndex(tempY8,  tempZ3);
-		    c2d->transposeY2Z_MajorIndex(tempY9,  tempZ4);
-		    c2d->transposeY2Z_MajorIndex(tempY10, tempZ5);
-		  
-	            filtZ->filterField(tempZ1, tempZ6);	
-	            filtZ->filterField(tempZ2, tempZ7);	
-	            filtZ->filterField(tempZ3, tempZ8);	
-	            filtZ->filterField(tempZ4, tempZ9);	
-	            filtZ->filterField(tempZ5, tempZ10);	
+		    filtZ->filterField(tempZ1, tempZ6);
+		    filtZ->filterField(tempZ2, tempZ7);
+		    filtZ->filterField(tempZ3, tempZ8);
+		    filtZ->filterField(tempZ4, tempZ9);
+		    filtZ->filterField(tempZ5, tempZ10);
 
 		    c2d->transposeZ2Y_MajorIndex(tempZ6,  tempY1);
 		    c2d->transposeZ2Y_MajorIndex(tempZ7,  tempY2);
@@ -737,71 +698,34 @@ void UniformCSolverConservativeYBase::filterConservedData(){
 		    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
 		    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
 
-		    c2d->transposeY2X_MajorIndex(tempY1, rho1);
-		    c2d->transposeY2X_MajorIndex(tempY2, rhoU1);
-		    c2d->transposeY2X_MajorIndex(tempY3, rhoV1);
-		    c2d->transposeY2X_MajorIndex(tempY4, rhoW1);
-		    c2d->transposeY2X_MajorIndex(tempY5, rhoE1);
+		    c2d->transposeY2X_MajorIndex(tempY1, tempX1);
+		    c2d->transposeY2X_MajorIndex(tempY2, tempX2);
+		    c2d->transposeY2X_MajorIndex(tempY3, tempX3);
+		    c2d->transposeY2X_MajorIndex(tempY4, tempX4);
+		    c2d->transposeY2X_MajorIndex(tempY5, tempX5);
+		  
+	            filtX->filterField(tempX1, tempX6);	
+	            filtX->filterField(tempX2, tempX7);	
+	            filtX->filterField(tempX3, tempX8);	
+	            filtX->filterField(tempX4, tempX9);	
+	            filtX->filterField(tempX5, tempX10);	
+
+		    c2d->transposeX2Y_MajorIndex(tempX6,  rho1);
+		    c2d->transposeX2Y_MajorIndex(tempX7,  rhoU1);
+		    c2d->transposeX2Y_MajorIndex(tempX8,  rhoV1);
+		    c2d->transposeX2Y_MajorIndex(tempX9,  rhoW1);
+		    c2d->transposeX2Y_MajorIndex(tempX10, rhoE1);
+
 
         }else if(filterTimeStep%3 == 2){
 
-            //Here we'll do Y->Z->X     
+            //Here we'll do Z->X->Y     
 
-	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
-	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
-	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
-	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
-	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
-
-	    filtY->filterField(tempY1, tempY6);
-	    filtY->filterField(tempY2, tempY7);
-	    filtY->filterField(tempY3, tempY8);
-	    filtY->filterField(tempY4, tempY9);
-	    filtY->filterField(tempY5, tempY10);
-
-	    c2d->transposeY2Z_MajorIndex(tempY6,  tempZ1);
-	    c2d->transposeY2Z_MajorIndex(tempY7,  tempZ2);
-	    c2d->transposeY2Z_MajorIndex(tempY8,  tempZ3);
-	    c2d->transposeY2Z_MajorIndex(tempY9,  tempZ4);
-	    c2d->transposeY2Z_MajorIndex(tempY10, tempZ5);
-
-	    filtZ->filterField(tempZ1, tempZ6);
-	    filtZ->filterField(tempZ2, tempZ7);
-	    filtZ->filterField(tempZ3, tempZ8);
-	    filtZ->filterField(tempZ4, tempZ9);
-	    filtZ->filterField(tempZ5, tempZ10);
-
-	    c2d->transposeZ2Y_MajorIndex(tempZ6,  tempY1);
-	    c2d->transposeZ2Y_MajorIndex(tempZ7,  tempY2);
-	    c2d->transposeZ2Y_MajorIndex(tempZ8,  tempY3);
-	    c2d->transposeZ2Y_MajorIndex(tempZ9,  tempY4);
-	    c2d->transposeZ2Y_MajorIndex(tempZ10, tempY5);
-
-	    c2d->transposeY2X_MajorIndex(tempY1,  rho2);
-	    c2d->transposeY2X_MajorIndex(tempY2,  rhoU2);
-	    c2d->transposeY2X_MajorIndex(tempY3,  rhoV2);
-	    c2d->transposeY2X_MajorIndex(tempY4,  rhoW2);
-	    c2d->transposeY2X_MajorIndex(tempY5,  rhoE2);
-
-	    filtX->filterField(rho2,  rho1);
-	    filtX->filterField(rhoU2, rhoU1);
-	    filtX->filterField(rhoV2, rhoV1);
-	    filtX->filterField(rhoW2, rhoW1);
-	    filtX->filterField(rhoE2, rhoE1);
-
-        }else{
-
-	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
-	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
-	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
-	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
-	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
-
-	    c2d->transposeY2Z_MajorIndex(tempY1, tempZ1);
-	    c2d->transposeY2Z_MajorIndex(tempY2, tempZ2);
-	    c2d->transposeY2Z_MajorIndex(tempY3, tempZ3);
-	    c2d->transposeY2Z_MajorIndex(tempY4, tempZ4);
-	    c2d->transposeY2Z_MajorIndex(tempY5, tempZ5);
+	    c2d->transposeY2Z_MajorIndex(rho2,  tempZ1);
+	    c2d->transposeY2Z_MajorIndex(rhoU2, tempZ2);
+	    c2d->transposeY2Z_MajorIndex(rhoV2, tempZ3);
+	    c2d->transposeY2Z_MajorIndex(rhoW2, tempZ4);
+	    c2d->transposeY2Z_MajorIndex(rhoE2, tempZ5);
 
 	    filtZ->filterField(tempZ1, tempZ6);
 	    filtZ->filterField(tempZ2, tempZ7);
@@ -821,17 +745,45 @@ void UniformCSolverConservativeYBase::filterConservedData(){
 	    c2d->transposeY2X_MajorIndex(tempY4,  tempX4);
 	    c2d->transposeY2X_MajorIndex(tempY5,  tempX5);
 
-	    filtX->filterField(tempX1, rho2);
-	    filtX->filterField(tempX2, rhoU2);
-	    filtX->filterField(tempX3, rhoV2);
-	    filtX->filterField(tempX4, rhoW2);
-	    filtX->filterField(tempX5, rhoE2);
+	    filtX->filterField(tempX1, tempX6);
+	    filtX->filterField(tempX2, tempX7);
+	    filtX->filterField(tempX3, tempX8);
+	    filtX->filterField(tempX4, tempX9);
+	    filtX->filterField(tempX5, tempX10);
 
-	    c2d->transposeX2Y_MajorIndex(rho2,  tempY1);
-	    c2d->transposeX2Y_MajorIndex(rhoU2, tempY2);
-	    c2d->transposeX2Y_MajorIndex(rhoV2, tempY3);
-	    c2d->transposeX2Y_MajorIndex(rhoW2, tempY4);
-	    c2d->transposeX2Y_MajorIndex(rhoE2, tempY5);
+	    c2d->transposeX2Y_MajorIndex(tempX6,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(tempX7,  tempY2);
+	    c2d->transposeX2Y_MajorIndex(tempX8,  tempY3);
+	    c2d->transposeX2Y_MajorIndex(tempX9,  tempY4);
+	    c2d->transposeX2Y_MajorIndex(tempX10, tempY5);
+
+	    filtY->filterField(tempY1,  rho1);
+	    filtY->filterField(tempY2, rhoU1);
+	    filtY->filterField(tempY3, rhoV1);
+	    filtY->filterField(tempY4, rhoW1);
+	    filtY->filterField(tempY5, rhoE1);
+
+        }else{
+
+            //Here we'll do X->Y->Z     
+
+	    c2d->transposeY2X_MajorIndex(rho2,  tempX1);
+	    c2d->transposeY2X_MajorIndex(rhoU2, tempX2);
+	    c2d->transposeY2X_MajorIndex(rhoV2, tempX3);
+	    c2d->transposeY2X_MajorIndex(rhoW2, tempX4);
+	    c2d->transposeY2X_MajorIndex(rhoE2, tempX5);
+
+	    filtX->filterField(tempX1, tempX6);
+	    filtX->filterField(tempX2, tempX7);
+	    filtX->filterField(tempX3, tempX8);
+	    filtX->filterField(tempX4, tempX9);
+	    filtX->filterField(tempX5, tempX10);
+
+	    c2d->transposeX2Y_MajorIndex(tempX6,  tempY1);
+	    c2d->transposeX2Y_MajorIndex(tempX7,  tempY2);
+	    c2d->transposeX2Y_MajorIndex(tempX8,  tempY3);
+	    c2d->transposeX2Y_MajorIndex(tempX9,  tempY4);
+	    c2d->transposeX2Y_MajorIndex(tempX10, tempY5);
 
 	    filtY->filterField(tempY1, tempY6);
 	    filtY->filterField(tempY2, tempY7);
@@ -839,11 +791,23 @@ void UniformCSolverConservativeYBase::filterConservedData(){
 	    filtY->filterField(tempY4, tempY9);
 	    filtY->filterField(tempY5, tempY10);
 
-	    c2d->transposeY2X_MajorIndex(tempY6,  rho1);
-	    c2d->transposeY2X_MajorIndex(tempY7,  rhoU1);
-	    c2d->transposeY2X_MajorIndex(tempY8,  rhoV1);
-	    c2d->transposeY2X_MajorIndex(tempY9,  rhoW1);
-	    c2d->transposeY2X_MajorIndex(tempY10, rhoE1);
+	    c2d->transposeY2Z_MajorIndex(tempY6,  tempZ1);
+	    c2d->transposeY2Z_MajorIndex(tempY7,  tempZ2);
+	    c2d->transposeY2Z_MajorIndex(tempY8,  tempZ3);
+	    c2d->transposeY2Z_MajorIndex(tempY9,  tempZ4);
+	    c2d->transposeY2Z_MajorIndex(tempY10, tempZ5);
+
+	    filtZ->filterField(tempZ1, tempZ6);
+	    filtZ->filterField(tempZ2, tempZ7);
+	    filtZ->filterField(tempZ3, tempZ8);
+	    filtZ->filterField(tempZ4, tempZ9);
+	    filtZ->filterField(tempZ5, tempZ10);
+
+	    c2d->transposeZ2Y_MajorIndex(tempZ6,  rho1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ7,  rhoU1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ8,  rhoV1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ9,  rhoW1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ10, rhoE1);
 
         }
  

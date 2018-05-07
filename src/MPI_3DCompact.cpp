@@ -18,6 +18,7 @@ using namespace std;
 #include "AbstractCSolver.hpp"
 #include "UniformCSolver.hpp"
 #include "UniformCSolverConservative.hpp"
+#include "UniformCSolverConservativeYBase.hpp"
 
 #include "AbstractRK.hpp"
 #include "TVDRK3.hpp"
@@ -47,12 +48,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 50,
-           Ny = 200,
-           Nz = 50;
-    double Lx = 4.0,
-           Ly = 16.0,
-           Lz = 4.0;;
+    int    Nx = 100,
+           Ny = 100,
+           Nz = 100;
+    double Lx = 1.0,
+           Ly = 1.0,
+           Lz = 1.0;;
     Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -85,12 +86,12 @@ int main(int argc, char *argv[]){
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX0 = BC::SPONGE;
+    BC::BCKind bcX1 = BC::SPONGE;
     BC::BCKind bcY0 = BC::SPONGE;
     BC::BCKind bcY1 = BC::SPONGE;
-    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ0 = BC::SPONGE;
+    BC::BCKind bcZ1 = BC::SPONGE;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -129,7 +130,7 @@ int main(int argc, char *argv[]){
     double mu_ref  = 0.00375;
     bool useTiming = false;
     AbstractCSolver *cs;
-    cs = new UniformCSolverConservative(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
+    cs = new UniformCSolverConservativeYBase(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
      
 
     ///////////////////////////////////////////
@@ -142,15 +143,15 @@ int main(int argc, char *argv[]){
     ///////////////////////////////
     //Set flow initial conditions//
     ///////////////////////////////
-    FOR_Z_XPEN{
-        FOR_Y_XPEN{
-            FOR_X_XPEN{
+    FOR_Z_YPEN{
+        FOR_Y_YPEN{
+            FOR_X_YPEN{
 
-                int ip = GETMAJIND_XPEN;
+                int ip = GETMAJIND_YPEN;
 
-		int ii = GETGLOBALXIND_XPEN;		
-		int jj = GETGLOBALYIND_XPEN;		
-		int kk = GETGLOBALZIND_XPEN;
+		int ii = GETGLOBALXIND_YPEN;		
+		int jj = GETGLOBALYIND_YPEN;		
+		int kk = GETGLOBALZIND_YPEN;
 
 		double x  = d->x[ii];
 		double x0 = Lx/2; 		

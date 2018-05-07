@@ -64,10 +64,10 @@ class UniformCSolverConservativeYBase: public AbstractCSolver{
 
 	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
 	double *tempX6,  *tempX7,  *tempX8,  *tempX9, *tempX10;
-	double *tempX11, *tempX12;
 
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
+	double *tempY11, *tempY12;
 
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
