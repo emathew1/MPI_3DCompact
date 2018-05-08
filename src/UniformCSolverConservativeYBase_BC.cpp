@@ -1125,7 +1125,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
 	}
 	
         if(bc->bcX0 == BC::SPONGE){
-	    FOR_X0_YPEN{
+	    FOR_X0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1135,7 +1135,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
         }
 
         if(bc->bcX1 == BC::SPONGE){
-	    FOR_X1_YPEN{
+	    FOR_X1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1145,7 +1145,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
         }   
 
         if(bc->bcY0 == BC::SPONGE){
-	    FOR_Y0_YPEN{
+	    FOR_Y0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1155,7 +1155,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
         }
 
         if(bc->bcY1 == BC::SPONGE){
-	    FOR_Y1_YPEN{
+	    FOR_Y1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1165,7 +1165,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
         }
 
         if(bc->bcZ0 == BC::SPONGE){
-	    FOR_Z0_YPEN{
+	    FOR_Z0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
@@ -1176,7 +1176,7 @@ void UniformCSolverConservativeYBase::updateSponge(){
         }
 
         if(bc->bcZ1 == BC::SPONGE){
-	    FOR_Z1_YPEN{
+	    FOR_Z1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
 		rhoV1[ip] = spg->spongeRhoVAvg[ip];
