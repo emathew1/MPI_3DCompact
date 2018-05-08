@@ -16,6 +16,7 @@ class AbstractSingleBlockMesh{
 	double *J31, *J32, *J33;
 
 	double max_xi, max_eta, max_zta;
+	double Nx, Ny, Nz;
 
 	Derivatives *derivX, *derivY, *derivZ;
 
