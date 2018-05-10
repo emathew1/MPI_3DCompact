@@ -8,6 +8,7 @@
 #include "Utils.hpp"
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
+#include "AbstractSingleBlockMesh.hpp"
 #include "PngWriter.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
@@ -86,8 +87,11 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//For drawing images
 	PngWriter *png;
 
+	//Mesh object
+	AbstractSingleBlockMesh *msh;
+
 	//Constructor to use for this class...
-	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
+	CurvilinearCSolver(C2Decomp *c2d, AbstractSingleBlockMesh *msh, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
 
 	    //Take in input information and initialize data structures...
 	    this->c2d = c2d;
@@ -97,6 +101,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    this->alphaF = alphaF;
 	    this->mu_ref = mu_ref;
 	    this->useTiming = useTiming;
+	    this->msh = msh;
 
 	    baseDirection = 1;
 
@@ -149,13 +154,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	    //only rank 0 write images for now...
 	    IF_RANK0{
-		pngXY = new PngWriter(Nx, Ny); 
-		pngXZ = new PngWriter(Nz, Nx); 
-		pngYZ = new PngWriter(Ny, Nz); 
+		png = new PngWriter(Nx, Ny); 
 	    }else{
-		pngXY = NULL;
-		pngXZ = NULL;
-		pngYZ = NULL;
+		png = NULL;
 	    }
 	
 
@@ -184,6 +185,10 @@ class CurvilinearCSolver: public AbstractCSolver{
  		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
 		neumannLocalZ = false;
 	    }
+
+
+	    //Get the mesh party started...
+	    msh->solveForJacobians();
 
 	    t1 = MPI_Wtime();
 	}

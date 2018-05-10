@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o 
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o 
 
 default: MPI_3DCompact
 
@@ -24,7 +24,7 @@ MPI_3DCompact:
 MPI_3DCompact.exe: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ -I$(INC) $(OBJECTS) -L$(LIB) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
-MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp UniformCSolverConservative.hpp AbstractRK.hpp TVDRK3.hpp 
+MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp UniformCSolver.hpp UniformCSolverConservative.hpp AbstractRK.hpp AbstractSingleBlockMesh.hpp AlgebraicSingleBlockMesh.hpp TVDRK3.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 Utils.o: Utils.cpp Domain.hpp Utils.hpp
@@ -54,7 +54,11 @@ UniformCSolverConservativeYBase_BC.o: UniformCSolverConservativeYBase_BC.cpp Uni
 UniformCSolverConservativeYBase_Core.o: UniformCSolverConservativeYBase_Core.cpp UniformCSolverConservativeYBase.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
 	$(CC) $(CFLAGS) -c $<
 
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AbstractSingleBlockMesh.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
 
+CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AbstractSingleBlockMesh.hpp PngWriter.hpp
+	$(CC) $(CFLAGS) -c $<
 
 clean: 
 	rm -rf   *.o *.exe *.a

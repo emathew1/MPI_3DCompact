@@ -282,7 +282,7 @@ void CurvilinearCSolver::preStepDerivatives(){
     // X-DERIVATIVES //
     ///////////////////
 
-    double *Ux1, *Vx1, *Wx1, *Tx1;
+    double *dU11, *Vx1, *Wx1, *Tx1;
     double *U1, *V1, *W1, *T1;
 
     //Point to the needed X memory
