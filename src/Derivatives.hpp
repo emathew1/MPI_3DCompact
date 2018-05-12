@@ -35,6 +35,8 @@ class Derivatives{
 
 	double *diag_1D, *offlower_1D, *offupper_1D;
 
+	//for Transforming Periodic Boundary Condition stuff
+	double Nm2val, Nm1val, Np1val, Np2val;
 
         //Second Derivative
 
@@ -170,19 +172,23 @@ class Derivatives{
 
     //Function's to call...
     void calc1stDerivField(double *dataIn, double *dataOut);
+    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2);
     void calc2ndDerivField(double *dataIn, double *dataOut);
 
     void calc1stDeriv(double *phi, double *dphi);
+    void calc1stDeriv_TPB(double *phi, double *dphi);
     void calc2ndDeriv(double *phi, double *dphi);
 
     //Need a cleaner way of passing these things...
     void multRHS1stDerivPeriodic(double dh, double *phi, int N, double *RHSvec);
+    void multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, double *RHSvec);
     void multRHS2ndDerivPeriodic(double dh, double *phi, int N, double *RHSvec);
     void multRHS1stDerivDirichlet(double dh, double *phi, int N, double *RHSvec);
     void multRHS2ndDerivDirichlet(double dh, double *phi, int N, double *RHSvec);
 
 
     void Compact1stPeriodic(double *phi, double *dphidx);
+    void Compact1stPeriodic_TPB(double *phi, double *dphidx);
     void Compact2ndPeriodic(double *phi, double *dphidx);
     void Compact1stDirichlet(double *phi, double *dphidx);
     void Compact2ndDirichlet(double *phi, double *dphidx);

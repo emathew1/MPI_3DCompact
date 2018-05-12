@@ -9,6 +9,7 @@
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
 #include "AbstractSingleBlockMesh.hpp"
+//#include "AlgebraicSingleBlockMesh.hpp"
 #include "PngWriter.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
@@ -91,7 +92,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	AbstractSingleBlockMesh *msh;
 
 	//Constructor to use for this class...
-	CurvilinearCSolver(C2Decomp *c2d, AbstractSingleBlockMesh *msh, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
+	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
 
 	    //Take in input information and initialize data structures...
 	    this->c2d = c2d;
@@ -101,7 +102,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    this->alphaF = alphaF;
 	    this->mu_ref = mu_ref;
 	    this->useTiming = useTiming;
-	    this->msh = msh;
 
 	    baseDirection = 1;
 
@@ -188,7 +188,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 
 	    //Get the mesh party started...
-	    msh->solveForJacobians();
+	    //msh = new AlgebraicSingleBlockMesh(c2d, dom, derivX, derivY, derivZ, mpiRank); 
+	
+	    //msh->solveForJacobians();
 
 	    t1 = MPI_Wtime();
 	}
@@ -236,41 +238,50 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void initializeSolverData();
 
 	void preStep(){
+/*
    	    if(timeStep == 0){
         	dumpSolution();
         	writeImages();
     	    }
     	    calcDtFromCFL();
+*/
 	}
 
 	void preSubStep(){
+/*
     	    preStepBCHandling();
     	    preStepDerivatives();
+*/
 	}
 
 	void solveEqnSet(){
+/*
     	    solveContinuity();
             solveXMomentum();
     	    solveYMomentum();
     	    solveZMomentum();
     	    solveEnergy();
-	    
+*/	    
 	}
 
 	void postSubStep(){
+/*
     	    postStepBCHandling();
+*/
 	}
 
 	void updateData(){
+/*
     	    if(rkLast){
         	filterConservedData();
     	    }
     	    updateNonConservedData();
 
+*/
 	}
 
 	void postStep(){
-
+/*
     	    updateSponge();
     	    checkSolution();
 
@@ -283,6 +294,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    temporalCalculations();
 
     	    checkEnd();
+*/
 	}
 
 

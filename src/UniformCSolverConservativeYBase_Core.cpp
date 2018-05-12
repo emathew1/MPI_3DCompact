@@ -985,7 +985,9 @@ void UniformCSolverConservativeYBase::writeImages(){
 
 	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
 	writePlaneImageForVariable(U, "uXZ", timeStepString, 1, 0.5);
-	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
+	writePlaneImageForVariable(T, "TYZ", timeStepString, 0, 0.5);
+	writePlaneImageForVariable(rho1, "rhoYZ", timeStepString, 0, 0.5);
+
 
     if(useTiming){
 	ft2 = MPI_Wtime();

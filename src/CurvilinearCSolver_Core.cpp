@@ -181,7 +181,7 @@ void CurvilinearCSolver::initializeSolverData(){
     }
 }
 
-
+/*
 void CurvilinearCSolver::calcDtFromCFL(){
 
     if(useTiming) ft1 = MPI_Wtime();    
@@ -1148,7 +1148,7 @@ void CurvilinearCSolver::checkEnd(){
     }
 
 }
-
+*/
 void CurvilinearCSolver::reportAll(){
 
    int Nx = pySize[0];
@@ -1156,7 +1156,7 @@ void CurvilinearCSolver::reportAll(){
    int Nz = pySize[2];
 
    IF_RANK0   cout << "REPORT ALL" << endl;
-
+/*
    getRange(Ux, "Ux", Nx, Ny, Nz, mpiRank);
    getRange(Uy, "Uy", Nx, Ny, Nz, mpiRank);
    getRange(Uz, "Uz", Nx, Ny, Nz, mpiRank);
@@ -1234,5 +1234,6 @@ void CurvilinearCSolver::reportAll(){
    getRange(sos, "sos", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
 
+*/
 }
 

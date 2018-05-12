@@ -498,6 +498,8 @@ void CurvilinearCSolver::setInitialConditions(){
 
 }
 
+/*
+
 void CurvilinearCSolver::preStepBCHandling(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -581,7 +583,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->transposeY2X_MajorIndex(T2, T);
 	    c2d->deallocXYZ(T2);
-	}*/
+	}
 
 	FOR_Y0_YPEN_MAJ{
 //	    if(neumannLocalY){
@@ -622,7 +624,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->transposeY2X_MajorIndex(T2, T);
 	    c2d->deallocXYZ(T2);
-	}*/
+	}
 
 	FOR_Y1_YPEN_MAJ{
 //	    if(neumannLocalY){
@@ -669,7 +671,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->deallocXYZ(T2);
 	    c2d->deallocXYZ(T3);
-	}*/
+	}
 	
 
 	FOR_Z0_YPEN{
@@ -717,7 +719,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->deallocXYZ(T2);
 	    c2d->deallocXYZ(T3);
-	}*/
+	}
 
 	FOR_Z1_YPEN{
 //	    if(neumannLocalZ){
@@ -800,7 +802,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->transposeY2X_MajorIndex(T2, T);
 	    c2d->deallocXYZ(T2);
-	}*/
+	}
 	
 	
         FOR_Y0_YPEN{
@@ -841,7 +843,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->transposeY2X_MajorIndex(T2, T);
 	    c2d->deallocXYZ(T2);
-	}*/
+	}
 
         FOR_Y1_YPEN{
 //	    if(neumannLocalY){
@@ -887,7 +889,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->deallocXYZ(T2);
 	    c2d->deallocXYZ(T3);
-	}*/
+	}
 
 
         FOR_Z0_YPEN{
@@ -934,7 +936,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 	    c2d->deallocXYZ(T2);
 	    c2d->deallocXYZ(T3);
-	}*/
+	}
 
         FOR_Z1_YPEN{
 //	    if(neumannLocalZ){
@@ -1193,5 +1195,5 @@ void CurvilinearCSolver::updateSponge(){
     }
 
 };
-
+*/
 

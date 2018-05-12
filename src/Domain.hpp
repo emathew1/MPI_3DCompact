@@ -2,6 +2,7 @@
 #define _DOMAINH_
 
 #include <iostream>
+#include "BC.hpp"
 #include "Macros.hpp"
 #include "C2Decomp.hpp"
 
@@ -26,7 +27,7 @@ class Domain{
 	int mpiRank;
 
 
-    Domain(int Nx, int Ny, int Nz, double Lx, double Ly, double Lz, int mpiRank){
+    Domain(BC *bc, int Nx, int Ny, int Nz, double Lx, double Ly, double Lz, int mpiRank){
 	
 	gNx = Nx;
 	gNy = Ny;
@@ -41,17 +42,36 @@ class Domain{
 	y = new double[gNy];	
 	z = new double[gNz];
 
-        for(int ip = 0; ip < gNx; ip++){
-	    x[ip] = (((double)ip)/((double)gNx - 1.0))*gLx;
-	}	
+	if(bc->bcXType == BC::PERIODIC_SOLVE){
+	    for(int ip = 0; ip < gNx; ip++){
+		x[ip] = (double)ip*gLx/(double)gNx;
+	    }
+	}else{
+            for(int ip = 0; ip < gNx; ip++){
+	        x[ip] = (((double)ip)/((double)gNx - 1.0))*gLx;
+	    }	
+	}
 
-        for(int jp = 0; jp < gNy; jp++){
-	    y[jp] = (((double)jp)/((double)Ny - 1.0))*gLy;
-	}	
+	if(bc->bcYType == BC::PERIODIC_SOLVE){
+	    for(int jp = 0; jp < gNy; jp++){
+	        y[jp] = (double)jp*gLy/(double)gNy;
+	    }
+	}else{
+            for(int jp = 0; jp < gNy; jp++){
+	        y[jp] = (((double)jp)/((double)Ny - 1.0))*gLy;
+	    }	
+	}
 
-        for(int kp = 0; kp < gNz; kp++){
-	    z[kp] = (((double)kp)/((double)Nz - 1.0))*gLz;
-	}	
+	if(bc->bcZType == BC::PERIODIC_SOLVE){
+	    for(int kp = 0; kp < gNz; kp++){	
+		z[kp] = (double)kp*gLz/(double)gNz;
+	    }
+	}else{
+            for(int kp = 0; kp < gNz; kp++){
+	        z[kp] = (((double)kp)/((double)Nz - 1.0))*gLz;
+	    }	
+	}
+
 
 	dx = x[1]-x[0];
 	dy = y[1]-y[0];

@@ -1,3 +1,4 @@
+#include "AbstractSingleBlockMesh.hpp"
 #ifndef _CALGEBRAICSINGLEBLOCKMESHH_
 #define _CALGEBRAICSINGLEBLOCKMESHH_
 
@@ -5,27 +6,37 @@
 #include "Utils.hpp"
 #include "Derivatives.hpp"
 #include "AbstractSingleBlockMesh.hpp"
+#include "AbstractCSolver.hpp"
 
 class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
     public:
 
 	C2Decomp *c2d;
-	Domain *dom;
+	AbstractCSolver *cs;
+	Domain *d;
 
         int pxSize[3], pySize[3], pzSize[3]; 
         int pxStart[3], pyStart[3], pzStart[3];
         int pxEnd[3], pyEnd[3], pzEnd[3];
 
-	AlgebraicSingleBlockMesh(C2Decomp *c2d, Domain *dom, Derivatives *derivX, Derivatives *derivY, Derivatives *derivZ, int mpiRank){
+	double periodicXTranslation;
+	double periodicYTranslation;
+	double periodicZTranslation;
+
+	bool periodicX;
+	bool periodicY;
+	bool periodicZ;
+
+	AlgebraicSingleBlockMesh(C2Decomp *c2d, AbstractCSolver *cs, Domain *dom, int mpiRank){
 
 	    this->mpiRank = mpiRank;
 
 	    this->c2d = c2d;
-	    this->dom = dom;
-	    this->derivX = derivX;
-	    this->derivY = derivY;
-	    this->derivZ = derivZ;
+	    this->d = dom;
+	    this->derivX = cs->derivX;
+	    this->derivY = cs->derivY;
+	    this->derivZ = cs->derivZ;
 
 	    d->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
@@ -42,6 +53,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    c2d->allocY(y);
 	    c2d->allocY(z);
 
+
+
 	    //Generate the mesh algebraically...
 	    FOR_Z_YPEN{
 		FOR_Y_YPEN{
@@ -53,20 +66,47 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			int kk = GETGLOBALZIND_YPEN;
 
 			double xi  = d->x[ii];
-			double eta = d->y[ii];
-			double zta = d->z[ii];
+			double eta = d->y[jj];
+			double zta = d->z[kk];
 		
-			double nXi  = xi/max_xi;
-			double nEta = eta/max_eta;
-			double nZta = zta/max_zta;
+			//double nXi  = xi/max_xi;
+			//double nEta = eta/max_eta;
+			//double nZta = zta/max_zta;
 
-			x[ip] = nXi;
-			y[ip] = 2.0*nEta;
-			z[ip] = nZta;  
+			x[ip] = xi;
+			y[ip] = eta;
+			z[ip] = zta;  
 
 		    }
 		}
 	    }
+
+	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
+		periodicX = true;
+		periodicXTranslation = 1.0;
+		IF_RANK0 cout << "Periodic x translation = " << periodicXTranslation << endl;;
+	    }else{
+		periodicX = false;
+	    }
+
+	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
+		periodicY = true;
+		periodicYTranslation = 1.0;
+		IF_RANK0 cout << "Periodic y translation = " << periodicYTranslation << endl;;
+	    }else{
+		periodicY = false; 
+	    }
+
+	    if(cs->bc->bcZType == BC::PERIODIC_SOLVE){
+		periodicZ = true;
+		periodicZTranslation = 1.0;
+		IF_RANK0 cout << "Periodic z translation = " << periodicZTranslation << endl;;
+	    }else{
+		periodicZ = false;
+	    }
+
+
+
 
 	    c2d->allocY(J);
 	    c2d->allocY(J11);
@@ -81,8 +121,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	}
 
+ 	void solveForJacobians();
 
-        void solveForJacobians();
 
 };
 
@@ -102,7 +142,43 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 
 	//Do the E2 derivatives first...
 	derivY->calc1stDerivField(x, xE12);
-	derivY->calc1stDerivField(y, xE22);
+
+	if(periodicY){
+	    double *Nm2, *Nm1, *Np1, *Np2;
+	    Nm2 = new double[pySize[0]*pySize[2]];
+	    Nm1 = new double[pySize[0]*pySize[2]];
+	    Np1 = new double[pySize[0]*pySize[2]];
+	    Np2 = new double[pySize[0]*pySize[2]];
+
+	    FOR_X_YPEN{
+		FOR_Z_YPEN{
+		    int ii = i*pySize[2] + k;
+
+		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;		
+		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
+		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
+		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
+
+		    Nm2[ii] = y[iim2]-periodicYTranslation;
+		    Nm1[ii] = y[iim1]-periodicYTranslation;
+		    Np1[ii] = y[iip1]+periodicYTranslation;
+		    Np2[ii] = y[iip2]+periodicYTranslation;
+		
+		}
+	    }
+
+	    derivY->calc1stDerivField_TPB(y, xE22, Nm2, Nm1, Np1, Np2);
+
+	    delete[] Nm2;
+	    delete[] Nm1;
+	    delete[] Np1;
+	    delete[] Np2;
+
+	}else{
+	    derivY->calc1stDerivField(y, xE22);
+	}
+
+	getRange(xE22, "xE22", pySize[0], pySize[1], pySize[2], mpiRank);
 	
 	//Transpose over to E1...
 	double *tempX1, *tempX2, *tempX3, *tempX4;
@@ -170,12 +246,12 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	     Vc3[ip] = xE23[ip]*z[ip];
 	}
 
-	c2d->dealloc(xE11);
-	c2d->dealloc(xE12);
-	c2d->dealloc(xE13);
-	c2d->dealloc(xE21);
-	c2d->dealloc(xE22);
-	c2d->dealloc(xE23);
+	c2d->deallocXYZ(xE11);
+	c2d->deallocXYZ(xE12);
+	c2d->deallocXYZ(xE13);
+	c2d->deallocXYZ(xE21);
+	c2d->deallocXYZ(xE22);
+	c2d->deallocXYZ(xE23);
 
 	//Only need the off-diagonals of the outer grad tensor of the vectors
 	double *dVa12, *dVa13;

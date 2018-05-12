@@ -16,9 +16,10 @@ using namespace std;
 #include "BC.hpp" 
 
 #include "AbstractCSolver.hpp"
-#include "UniformCSolver.hpp"
-#include "UniformCSolverConservative.hpp"
-#include "UniformCSolverConservativeYBase.hpp"
+#include "CurvilinearCSolver.hpp"
+
+#include "AbstractSingleBlockMesh.hpp"
+#include "AlgebraicSingleBlockMesh.hpp"
 
 #include "AbstractRK.hpp"
 #include "TVDRK3.hpp"
@@ -45,26 +46,15 @@ int main(int argc, char *argv[]){
 	cout << endl;
     }
  
-    /////////////////////////
-    //Initialize the Domain//
-    /////////////////////////
-    int    Nx = 100,
-           Ny = 100,
-           Nz = 100;
-    double Lx = 1.0,
-           Ly = 1.0,
-           Lz = 1.0;;
-    Domain *d = new Domain(Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
-
 
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 500;
+    int maxTimeStep  = 250;
     double maxTime   = 3000.0;
-    int filterStep   = 2;
+    int filterStep   = 1;
     int checkStep    = 1;
     int dumpStep     = 2500;
     int imageStep    = 25;
@@ -82,16 +72,16 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcXType = BC::PERIODIC_SOLVE;
+    BC::BCType bcYType = BC::PERIODIC_SOLVE;
+    BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::SPONGE;
-    BC::BCKind bcX1 = BC::SPONGE;
-    BC::BCKind bcY0 = BC::SPONGE;
-    BC::BCKind bcY1 = BC::SPONGE;
-    BC::BCKind bcZ0 = BC::SPONGE;
-    BC::BCKind bcZ1 = BC::SPONGE;
+    BC::BCKind bcX0 = BC::PERIODIC;
+    BC::BCKind bcX1 = BC::PERIODIC;
+    BC::BCKind bcY0 = BC::PERIODIC;
+    BC::BCKind bcY1 = BC::PERIODIC;
+    BC::BCKind bcZ0 = BC::PERIODIC;
+    BC::BCKind bcZ1 = BC::PERIODIC;
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -99,6 +89,16 @@ int main(int argc, char *argv[]){
                     bcZType, bcZ0, bcZ1,
 		    periodicBC, mpiRank);
 
+    /////////////////////////
+    //Initialize the Domain//
+    /////////////////////////
+    int    Nx = 100,
+           Ny = 100,
+           Nz = 100;
+    double Lx = 1.0,
+           Ly = 1.0,
+           Lz = 1.0;;
+    Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
     /////////////////////////////
@@ -122,7 +122,6 @@ int main(int argc, char *argv[]){
     int pxEnd[3], pyEnd[3], pzEnd[3];
     d->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
-
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
@@ -130,8 +129,28 @@ int main(int argc, char *argv[]){
     double mu_ref  = 0.00375;
     bool useTiming = false;
     AbstractCSolver *cs;
-    cs = new UniformCSolverConservativeYBase(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
-     
+    cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
+    
+    AbstractSingleBlockMesh *msh;
+    msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
+    msh->solveForJacobians();
+
+
+    getRange(msh->J, "J", pySize[0], pySize[1], pySize[2], mpiRank);
+ 
+    double *J11;
+    c2d->allocY(J11);
+    FOR_XYZ_YPEN{
+	J11[ip] = msh->J[ip]*msh->J11[ip];
+    }
+
+    getRange(J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J12, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J13, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J21, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J22, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J23, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
 
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
@@ -163,7 +182,7 @@ int main(int argc, char *argv[]){
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
                 cs->rho0[ip] = 1.0;
-                cs->p0[ip]   = (1.0 + exp(-r2/0.001))/cs->ig->gamma;
+                cs->p0[ip]   = (1.0 + 10.0*exp(-r2/0.001))/cs->ig->gamma;
                 cs->U0[ip]   = 0.0;
                 cs->V0[ip]   = 0.0;
                 cs->W0[ip]   = 0.0;
@@ -171,7 +190,7 @@ int main(int argc, char *argv[]){
         }
     }
    
-    rk->executeSolverLoop();  
+//    rk->executeSolverLoop();  
 
     //Now lets kill MPI
     MPI_Finalize();
