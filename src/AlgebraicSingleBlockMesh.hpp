@@ -20,9 +20,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
         int pxStart[3], pyStart[3], pzStart[3];
         int pxEnd[3], pyEnd[3], pzEnd[3];
 
-	double periodicXTranslation;
-	double periodicYTranslation;
-	double periodicZTranslation;
+	double periodicXTranslation[3];
+	double periodicYTranslation[3];
+	double periodicZTranslation[3];
 
 	bool periodicX;
 	bool periodicY;
@@ -83,24 +83,32 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
 		periodicX = true;
-		periodicXTranslation = 1.0;
-		IF_RANK0 cout << "Periodic x translation = " << periodicXTranslation << endl;;
+		periodicXTranslation[0] = 1.0;
+		periodicXTranslation[1] = 0.0;
+		periodicXTranslation[2] = 0.0;
+		IF_RANK0 cout << "Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
 	    }else{
 		periodicX = false;
 	    }
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
-		periodicYTranslation = 1.0;
-		IF_RANK0 cout << "Periodic y translation = " << periodicYTranslation << endl;;
+		periodicYTranslation[0] = 0.0;
+		periodicYTranslation[1] = 1.0;
+		periodicYTranslation[2] = 0.0;
+		IF_RANK0 cout << "Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;;
 	    }else{
 		periodicY = false; 
 	    }
 
 	    if(cs->bc->bcZType == BC::PERIODIC_SOLVE){
 		periodicZ = true;
-		periodicZTranslation = 1.0;
-		IF_RANK0 cout << "Periodic z translation = " << periodicZTranslation << endl;;
+		periodicZTranslation[0] = 0.0;
+		periodicZTranslation[1] = 0.0;
+		periodicZTranslation[2] = 1.0;
+
+		IF_RANK0 cout << "Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
+
 	    }else{
 		periodicZ = false;
 	    }
@@ -141,7 +149,41 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(xE23);
 
 	//Do the E2 derivatives first...
-	derivY->calc1stDerivField(x, xE12);
+	if(periodicY){
+	    double *Nm2, *Nm1, *Np1, *Np2;
+	    Nm2 = new double[pySize[0]*pySize[2]];
+	    Nm1 = new double[pySize[0]*pySize[2]];
+	    Np1 = new double[pySize[0]*pySize[2]];
+	    Np2 = new double[pySize[0]*pySize[2]];
+
+	    FOR_X_YPEN{
+		FOR_Z_YPEN{
+		    int ii = i*pySize[2] + k;
+
+		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;		
+		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
+		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
+		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
+
+		    Nm2[ii] = x[iim2]-periodicYTranslation[0];
+		    Nm1[ii] = x[iim1]-periodicYTranslation[0];
+		    Np1[ii] = x[iip1]+periodicYTranslation[0];
+		    Np2[ii] = x[iip2]+periodicYTranslation[0];
+		
+		}
+	    }
+
+	    derivY->calc1stDerivField_TPB(x, xE12, Nm2, Nm1, Np1, Np2);
+
+	    delete[] Nm2;
+	    delete[] Nm1;
+	    delete[] Np1;
+	    delete[] Np2;
+
+	}else{
+		derivY->calc1stDerivField(x, xE12);
+	}
+	
 
 	if(periodicY){
 	    double *Nm2, *Nm1, *Np1, *Np2;
@@ -159,10 +201,10 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
 		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
 
-		    Nm2[ii] = y[iim2]-periodicYTranslation;
-		    Nm1[ii] = y[iim1]-periodicYTranslation;
-		    Np1[ii] = y[iip1]+periodicYTranslation;
-		    Np2[ii] = y[iip2]+periodicYTranslation;
+		    Nm2[ii] = y[iim2]-periodicYTranslation[1];
+		    Nm1[ii] = y[iim1]-periodicYTranslation[1];
+		    Np1[ii] = y[iip1]+periodicYTranslation[1];
+		    Np2[ii] = y[iip2]+periodicYTranslation[1];
 		
 		}
 	    }
@@ -178,6 +220,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	    derivY->calc1stDerivField(y, xE22);
 	}
 
+	getRange(xE12, "xE12", pySize[0], pySize[1], pySize[2], mpiRank);
 	getRange(xE22, "xE22", pySize[0], pySize[1], pySize[2], mpiRank);
 	
 	//Transpose over to E1...
