@@ -1,4 +1,3 @@
-#include "AbstractSingleBlockMesh.hpp"
 #ifndef _CALGEBRAICSINGLEBLOCKMESHH_
 #define _CALGEBRAICSINGLEBLOCKMESHH_
 
@@ -73,9 +72,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 
-			x[ip] = xi;
+			x[ip] = xi + eta;
 			y[ip] = eta;
-			z[ip] = zta;  
+			z[ip] = zta + eta;  
 
 		    }
 		}
@@ -113,7 +112,12 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicZ = false;
 	    }
 
-
+	    getRange(x, "X", pySize[0], pySize[1], pySize[2], mpiRank);
+	    getRange(y, "Y", pySize[0], pySize[1], pySize[2], mpiRank);
+	    getRange(z, "Z", pySize[0], pySize[1], pySize[2], mpiRank);
+	    IF_RANK0 cout << "  Range of Xi: "  << d->x[0] <<  ":" << d->x[Nx-1] << endl;
+	    IF_RANK0 cout << "  Range of Eta: " << d->y[0] <<  ":" << d->y[Ny-1] << endl;
+	    IF_RANK0 cout << "  Range of Zta: " << d->z[0] <<  ":" << d->z[Nz-1] << endl;
 
 
 	    c2d->allocY(J);
@@ -379,6 +383,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	     Vc1[ip] = xE21[ip]*z[ip];
 	     Vc2[ip] = xE22[ip]*z[ip];
 	     Vc3[ip] = xE23[ip]*z[ip];
+
 	}
 
 	getRange(Vb3, "Vb3", pySize[0], pySize[1], pySize[2], mpiRank);
@@ -419,7 +424,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(dVc32);
 
 	//Start doing the E2 derivatives of all of this stuff
-	if(periodicX){
+	if(periodicY){
 	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
 	    Nm2a1 = new double[pySize[0]*pySize[2]];
 	    Nm1a1 = new double[pySize[0]*pySize[2]];
@@ -558,48 +563,365 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 
 
 	//Start doing the E1 derivatives...
+	double *tempX5, *tempX6, *tempX7, *tempX8;
+	double *tempX9, *tempX10, *tempX11, *tempX12;
+	c2d->allocX(tempX5); c2d->allocX(tempX9);
+	c2d->allocX(tempX6); c2d->allocX(tempX10);
+	c2d->allocX(tempX7); c2d->allocX(tempX11);
+	c2d->allocX(tempX8); c2d->allocX(tempX12);
+
+	double *y1, *z1;
+	double *xE12_1, *xE13_1;
+	double *xE22_1, *xE23_1;
+
 	c2d->transposeY2X_MajorIndex(Va2, tempX1);
 	c2d->transposeY2X_MajorIndex(Va3, tempX2);
-	derivX->calc1stDerivField(tempX1, tempX3);
-	derivX->calc1stDerivField(tempX2, tempX4);
-	c2d->transposeX2Y_MajorIndex(tempX3, dVa21);
-	c2d->transposeX2Y_MajorIndex(tempX4, dVa31);
+	c2d->transposeY2X_MajorIndex(Vb2, tempX3);
+	c2d->transposeY2X_MajorIndex(Vb3, tempX4);
+	c2d->transposeY2X_MajorIndex(Vc2, tempX5);
+	c2d->transposeY2X_MajorIndex(Vc3, tempX6);
 
-	c2d->transposeY2X_MajorIndex(Vb2, tempX1);
-	c2d->transposeY2X_MajorIndex(Vb3, tempX2);
-	derivX->calc1stDerivField(tempX1, tempX3);
-	derivX->calc1stDerivField(tempX2, tempX4);
-	c2d->transposeX2Y_MajorIndex(tempX3, dVb21);
-	c2d->transposeX2Y_MajorIndex(tempX4, dVb31);
 
-	c2d->transposeY2X_MajorIndex(Vc2, tempX1);
-	c2d->transposeY2X_MajorIndex(Vc3, tempX2);
-	derivX->calc1stDerivField(tempX1, tempX3);
-	derivX->calc1stDerivField(tempX2, tempX4);
-	c2d->transposeX2Y_MajorIndex(tempX3, dVc21);
-	c2d->transposeX2Y_MajorIndex(tempX4, dVc31);
+	if(periodicX){
+	    
+	    c2d->allocX(y1);
+	    c2d->allocX(z1);
+	    c2d->transposeY2X_MajorIndex(y, y1);
+	    c2d->transposeY2X_MajorIndex(z, z1);
+
+	    c2d->allocX(xE12_1);
+	    c2d->allocX(xE13_1);
+	    c2d->allocX(xE22_1);
+	    c2d->allocX(xE23_1);
+	    c2d->transposeY2X_MajorIndex(xE12, xE12_1);
+	    c2d->transposeY2X_MajorIndex(xE13, xE13_1);
+	    c2d->transposeY2X_MajorIndex(xE22, xE22_1);
+	    c2d->transposeY2X_MajorIndex(xE23, xE23_1);
+
+	    double *Nm2a2, *Nm1a2, *Np1a2, *Np2a2;
+            Nm2a2 = new double[pxSize[1]*pxSize[2]];
+            Nm1a2 = new double[pxSize[1]*pxSize[2]];
+            Np1a2 = new double[pxSize[1]*pxSize[2]];
+            Np2a2 = new double[pxSize[1]*pxSize[2]];
+
+	    double *Nm2a3, *Nm1a3, *Np1a3, *Np2a3;
+            Nm2a3 = new double[pxSize[1]*pxSize[2]];
+            Nm1a3 = new double[pxSize[1]*pxSize[2]];
+            Np1a3 = new double[pxSize[1]*pxSize[2]];
+            Np2a3 = new double[pxSize[1]*pxSize[2]];
+
+	    double *Nm2b2, *Nm1b2, *Np1b2, *Np2b2;
+	    Nm2b2 = new double[pxSize[1]*pxSize[2]];
+	    Nm1b2 = new double[pxSize[1]*pxSize[2]];
+	    Np1b2 = new double[pxSize[1]*pxSize[2]];
+	    Np2b2 = new double[pxSize[1]*pxSize[2]];
+
+	    double *Nm2b3, *Nm1b3, *Np1b3, *Np2b3;
+	    Nm2b3 = new double[pxSize[1]*pxSize[2]];
+	    Nm1b3 = new double[pxSize[1]*pxSize[2]];
+	    Np1b3 = new double[pxSize[1]*pxSize[2]];
+	    Np2b3 = new double[pxSize[1]*pxSize[2]];
+
+	    double *Nm2c2, *Nm1c2, *Np1c2, *Np2c2;
+	    Nm2c2 = new double[pxSize[1]*pxSize[2]];
+	    Nm1c2 = new double[pxSize[1]*pxSize[2]];
+	    Np1c2 = new double[pxSize[1]*pxSize[2]];
+	    Np2c2 = new double[pxSize[1]*pxSize[2]];
+
+	    double *Nm2c3, *Nm1c3, *Np1c3, *Np2c3;
+	    Nm2c3 = new double[pxSize[1]*pxSize[2]];
+	    Nm1c3 = new double[pxSize[1]*pxSize[2]];
+	    Np1c3 = new double[pxSize[1]*pxSize[2]];
+	    Np2c3 = new double[pxSize[1]*pxSize[2]];
+
+            FOR_Z_XPEN{
+                FOR_Y_XPEN{
+                    int ii = k*pxSize[1] + j;
+
+                    int iim2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-2;
+                    int iim1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-1;
+                    int iip1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 0;
+                    int iip2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 1;
+
+                    Nm2a2[ii] = (y1[iim2]-periodicXTranslation[1])*xE12_1[iim2];
+                    Nm1a2[ii] = (y1[iim1]-periodicXTranslation[1])*xE12_1[iim1];
+                    Np1a2[ii] = (y1[iip1]+periodicXTranslation[1])*xE12_1[iip1];
+                    Np2a2[ii] = (y1[iip2]+periodicXTranslation[1])*xE12_1[iip2];
+              
+		    Nm2a3[ii] = (y1[iim2]-periodicXTranslation[1])*xE13_1[iim2];
+                    Nm1a3[ii] = (y1[iim1]-periodicXTranslation[1])*xE13_1[iim1];
+                    Np1a3[ii] = (y1[iip1]+periodicXTranslation[1])*xE13_1[iip1];
+                    Np2a3[ii] = (y1[iip2]+periodicXTranslation[1])*xE13_1[iip2];
+             
+		    Nm2b2[ii] = (z1[iim2]-periodicXTranslation[2])*xE12_1[iim2];
+                    Nm1b2[ii] = (z1[iim1]-periodicXTranslation[2])*xE12_1[iim1];
+                    Np1b2[ii] = (z1[iip1]+periodicXTranslation[2])*xE12_1[iip1];
+                    Np2b2[ii] = (z1[iip2]+periodicXTranslation[2])*xE12_1[iip2];
+ 
+		    Nm2b3[ii] = (z1[iim2]-periodicXTranslation[2])*xE13_1[iim2];
+                    Nm1b3[ii] = (z1[iim1]-periodicXTranslation[2])*xE13_1[iim1];
+                    Np1b3[ii] = (z1[iip1]+periodicXTranslation[2])*xE13_1[iip1];
+                    Np2b3[ii] = (z1[iip2]+periodicXTranslation[2])*xE13_1[iip2];
+ 
+		    Nm2c2[ii] = (z1[iim2]-periodicXTranslation[2])*xE22_1[iim2];
+                    Nm1c2[ii] = (z1[iim1]-periodicXTranslation[2])*xE22_1[iim1];
+                    Np1c2[ii] = (z1[iip1]+periodicXTranslation[2])*xE22_1[iip1];
+                    Np2c2[ii] = (z1[iip2]+periodicXTranslation[2])*xE22_1[iip2];
+
+		    Nm2c3[ii] = (z1[iim2]-periodicXTranslation[2])*xE23_1[iim2];
+                    Nm1c3[ii] = (z1[iim1]-periodicXTranslation[2])*xE23_1[iim1];
+                    Np1c3[ii] = (z1[iip1]+periodicXTranslation[2])*xE23_1[iip1];
+                    Np2c3[ii] = (z1[iip2]+periodicXTranslation[2])*xE23_1[iip2];
+ 
+		}
+            }
+
+            derivX->calc1stDerivField_TPB(tempX1, tempX7,  Nm2a2, Nm1a2, Np1a2, Np2a2);
+            derivX->calc1stDerivField_TPB(tempX2, tempX8,  Nm2a3, Nm1a3, Np1a3, Np2a3);
+            derivX->calc1stDerivField_TPB(tempX3, tempX9,  Nm2b2, Nm1b2, Np1b2, Np2b2);
+            derivX->calc1stDerivField_TPB(tempX4, tempX10, Nm2b3, Nm1b3, Np1b3, Np2b3);
+            derivX->calc1stDerivField_TPB(tempX5, tempX11, Nm2c2, Nm1c2, Np1c2, Np2c2);
+            derivX->calc1stDerivField_TPB(tempX6, tempX12, Nm2c3, Nm1c3, Np1c3, Np2c3);
+
+	    c2d->deallocXYZ(y1);
+	    c2d->deallocXYZ(z1);
+	    c2d->deallocXYZ(xE12_1);
+	    c2d->deallocXYZ(xE13_1);
+	    c2d->deallocXYZ(xE22_1);
+	    c2d->deallocXYZ(xE23_1);
+
+            delete[] Nm2a2;
+            delete[] Nm1a2;
+            delete[] Np1a2;
+            delete[] Np2a2;
+
+            delete[] Nm2a3;
+            delete[] Nm1a3;
+            delete[] Np1a3;
+            delete[] Np2a3;
+
+            delete[] Nm2b2;
+            delete[] Nm1b2;
+            delete[] Np1b2;
+            delete[] Np2b2;
+
+            delete[] Nm2b3;
+            delete[] Nm1b3;
+            delete[] Np1b3;
+            delete[] Np2b3;
+
+            delete[] Nm2c2;
+            delete[] Nm1c2;
+            delete[] Np1c2;
+            delete[] Np2c2;
+
+            delete[] Nm2c3;
+            delete[] Nm1c3;
+            delete[] Np1c3;
+            delete[] Np2c3;
+
+	}else{
+	    derivX->calc1stDerivField(tempX1, tempX7);
+	    derivX->calc1stDerivField(tempX2, tempX8);
+	    derivX->calc1stDerivField(tempX3, tempX9);
+	    derivX->calc1stDerivField(tempX4, tempX10);
+	    derivX->calc1stDerivField(tempX5, tempX11);
+	    derivX->calc1stDerivField(tempX6, tempX12);
+	}
+
+	c2d->transposeX2Y_MajorIndex(tempX7, dVa21);
+	c2d->transposeX2Y_MajorIndex(tempX8, dVa31);
+	c2d->transposeX2Y_MajorIndex(tempX9, dVb21);
+	c2d->transposeX2Y_MajorIndex(tempX10, dVb31);
+	c2d->transposeX2Y_MajorIndex(tempX11, dVc21);
+	c2d->transposeX2Y_MajorIndex(tempX12, dVc31);
+
+	getRange(dVa21, "dVa21", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVa31, "dVa31", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVb21, "dVb21", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVb31, "dVb31", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVc21, "dVc21", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVc31, "dVc31", pySize[0], pySize[1], pySize[2], mpiRank);
+
+
+
 
 	//Start doing the E3 derivatives...
+	double *tempZ5, *tempZ6, *tempZ7, *tempZ8;
+	double *tempZ9, *tempZ10, *tempZ11, *tempZ12;
+	c2d->allocZ(tempZ5); c2d->allocZ(tempZ9);
+	c2d->allocZ(tempZ6); c2d->allocZ(tempZ10);
+	c2d->allocZ(tempZ7); c2d->allocZ(tempZ11);
+	c2d->allocZ(tempZ8); c2d->allocZ(tempZ12);
+
+	double *y3, *z3;
+	double *xE11_3, *xE12_3;
+	double *xE21_3, *xE22_3;
+
+
+
 	c2d->transposeY2Z_MajorIndex(Va1, tempZ1);
 	c2d->transposeY2Z_MajorIndex(Va2, tempZ2);
-	derivZ->calc1stDerivField(tempZ1, tempZ3);
-	derivZ->calc1stDerivField(tempZ2, tempZ4);
-	c2d->transposeZ2Y_MajorIndex(tempZ3, dVa13);
-	c2d->transposeZ2Y_MajorIndex(tempZ4, dVa23);
+	c2d->transposeY2Z_MajorIndex(Vb1, tempZ3);
+	c2d->transposeY2Z_MajorIndex(Vb2, tempZ4);
+	c2d->transposeY2Z_MajorIndex(Vc1, tempZ5);
+	c2d->transposeY2Z_MajorIndex(Vc2, tempZ6);
 
-	c2d->transposeY2Z_MajorIndex(Vb1, tempZ1);
-	c2d->transposeY2Z_MajorIndex(Vb2, tempZ2);
-	derivZ->calc1stDerivField(tempZ1, tempZ3);
-	derivZ->calc1stDerivField(tempZ2, tempZ4);
-	c2d->transposeZ2Y_MajorIndex(tempZ3, dVb13);
-	c2d->transposeZ2Y_MajorIndex(tempZ4, dVb23);
+	if(periodicZ){
+	
+ 	    c2d->allocZ(y3);
+	    c2d->allocZ(z3);
+	    c2d->transposeY2Z_MajorIndex(y, y3);
+	    c2d->transposeY2Z_MajorIndex(z, z3);
 
-	c2d->transposeY2Z_MajorIndex(Vc1, tempZ1);
-	c2d->transposeY2Z_MajorIndex(Vc2, tempZ2);
-	derivZ->calc1stDerivField(tempZ1, tempZ3);
-	derivZ->calc1stDerivField(tempZ2, tempZ4);
-	c2d->transposeZ2Y_MajorIndex(tempZ3, dVc13);
-	c2d->transposeZ2Y_MajorIndex(tempZ4, dVc23);
+	    c2d->allocZ(xE11_3);
+	    c2d->allocZ(xE12_3);
+	    c2d->allocZ(xE21_3);
+	    c2d->allocZ(xE22_3);
+	    c2d->transposeY2Z_MajorIndex(xE11, xE11_3);
+	    c2d->transposeY2Z_MajorIndex(xE12, xE12_3);
+	    c2d->transposeY2Z_MajorIndex(xE21, xE21_3);
+	    c2d->transposeY2Z_MajorIndex(xE22, xE22_3);
+
+	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
+            Nm2a1 = new double[pzSize[1]*pzSize[0]];
+            Nm1a1 = new double[pzSize[1]*pzSize[0]];
+            Np1a1 = new double[pzSize[1]*pzSize[0]];
+            Np2a1 = new double[pzSize[1]*pzSize[0]];
+
+	    double *Nm2a2, *Nm1a2, *Np1a2, *Np2a2;
+            Nm2a2 = new double[pzSize[1]*pzSize[0]];
+            Nm1a2 = new double[pzSize[1]*pzSize[0]];
+            Np1a2 = new double[pzSize[1]*pzSize[0]];
+            Np2a2 = new double[pzSize[1]*pzSize[0]];
+
+	    double *Nm2b1, *Nm1b1, *Np1b1, *Np2b1;
+            Nm2b1 = new double[pzSize[1]*pzSize[0]];
+            Nm1b1 = new double[pzSize[1]*pzSize[0]];
+            Np1b1 = new double[pzSize[1]*pzSize[0]];
+            Np2b1 = new double[pzSize[1]*pzSize[0]];
+
+	    double *Nm2b2, *Nm1b2, *Np1b2, *Np2b2;
+            Nm2b2 = new double[pzSize[1]*pzSize[0]];
+            Nm1b2 = new double[pzSize[1]*pzSize[0]];
+            Np1b2 = new double[pzSize[1]*pzSize[0]];
+            Np2b2 = new double[pzSize[1]*pzSize[0]];
+
+	    double *Nm2c1, *Nm1c1, *Np1c1, *Np2c1;
+            Nm2c1 = new double[pzSize[1]*pzSize[0]];
+            Nm1c1 = new double[pzSize[1]*pzSize[0]];
+            Np1c1 = new double[pzSize[1]*pzSize[0]];
+            Np2c1 = new double[pzSize[1]*pzSize[0]];
+
+	    double *Nm2c2, *Nm1c2, *Np1c2, *Np2c2;
+            Nm2c2 = new double[pzSize[1]*pzSize[0]];
+            Nm1c2 = new double[pzSize[1]*pzSize[0]];
+            Np1c2 = new double[pzSize[1]*pzSize[0]];
+            Np2c2 = new double[pzSize[1]*pzSize[0]];
+
+            FOR_Y_ZPEN{
+                FOR_X_ZPEN{
+                    int ii = j*pzSize[0] + i;
+
+                    int iim2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-2;
+                    int iim1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-1;
+                    int iip1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 0;
+                    int iip2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 1;
+
+                    Nm2a1[ii] = (y3[iim2]-periodicZTranslation[1])*xE11_3[iim2];
+                    Nm1a1[ii] = (y3[iim1]-periodicZTranslation[1])*xE11_3[iim1];
+                    Np1a1[ii] = (y3[iip1]+periodicZTranslation[1])*xE11_3[iip1];
+                    Np2a1[ii] = (y3[iip2]+periodicZTranslation[1])*xE11_3[iip2];
+
+                    Nm2a2[ii] = (y3[iim2]-periodicZTranslation[1])*xE12_3[iim2];
+                    Nm1a2[ii] = (y3[iim1]-periodicZTranslation[1])*xE12_3[iim1];
+                    Np1a2[ii] = (y3[iip1]+periodicZTranslation[1])*xE12_3[iip1];
+                    Np2a2[ii] = (y3[iip2]+periodicZTranslation[1])*xE12_3[iip2];
+
+                    Nm2b1[ii] = (z3[iim2]-periodicZTranslation[2])*xE11_3[iim2];
+                    Nm1b1[ii] = (z3[iim1]-periodicZTranslation[2])*xE11_3[iim1];
+                    Np1b1[ii] = (z3[iip1]+periodicZTranslation[2])*xE11_3[iip1];
+                    Np2b1[ii] = (z3[iip2]+periodicZTranslation[2])*xE11_3[iip2];
+
+                    Nm2b2[ii] = (z3[iim2]-periodicZTranslation[2])*xE12_3[iim2];
+                    Nm1b2[ii] = (z3[iim1]-periodicZTranslation[2])*xE12_3[iim1];
+                    Np1b2[ii] = (z3[iip1]+periodicZTranslation[2])*xE12_3[iip1];
+                    Np2b2[ii] = (z3[iip2]+periodicZTranslation[2])*xE12_3[iip2];
+
+                    Nm2c1[ii] = (z3[iim2]-periodicZTranslation[2])*xE21_3[iim2];
+                    Nm1c1[ii] = (z3[iim1]-periodicZTranslation[2])*xE21_3[iim1];
+                    Np1c1[ii] = (z3[iip1]+periodicZTranslation[2])*xE21_3[iip1];
+                    Np2c1[ii] = (z3[iip2]+periodicZTranslation[2])*xE21_3[iip2];
+
+                    Nm2c2[ii] = (z3[iim2]-periodicZTranslation[2])*xE22_3[iim2];
+                    Nm1c2[ii] = (z3[iim1]-periodicZTranslation[2])*xE22_3[iim1];
+                    Np1c2[ii] = (z3[iip1]+periodicZTranslation[2])*xE22_3[iip1];
+                    Np2c2[ii] = (z3[iip2]+periodicZTranslation[2])*xE22_3[iip2];
+
+                }
+            }
+
+            derivZ->calc1stDerivField_TPB(tempZ1, tempZ7,  Nm2a1, Nm1a1, Np1a1, Np2a1);
+            derivZ->calc1stDerivField_TPB(tempZ2, tempZ8,  Nm2a2, Nm1a2, Np1a2, Np2a2);
+            derivZ->calc1stDerivField_TPB(tempZ3, tempZ9,  Nm2b1, Nm1b1, Np1b1, Np2b1);
+            derivZ->calc1stDerivField_TPB(tempZ4, tempZ10, Nm2b2, Nm1b2, Np1b2, Np2b2);
+            derivZ->calc1stDerivField_TPB(tempZ5, tempZ11, Nm2c1, Nm1c1, Np1c1, Np2c1);
+	    derivZ->calc1stDerivField_TPB(tempZ6, tempZ12, Nm2c2, Nm1c2, Np1c2, Np2c2);
+
+
+	    c2d->deallocXYZ(y3);
+	    c2d->deallocXYZ(z3);
+	    c2d->deallocXYZ(xE11_3);
+	    c2d->deallocXYZ(xE12_3);
+	    c2d->deallocXYZ(xE21_3);
+	    c2d->deallocXYZ(xE22_3);
+
+            delete[] Nm2a1;
+            delete[] Nm1a1;
+            delete[] Np1a1;
+            delete[] Np2a1;
+
+            delete[] Nm2a2;
+            delete[] Nm1a2;
+            delete[] Np1a2;
+            delete[] Np2a2;
+
+            delete[] Nm2b1;
+            delete[] Nm1b1;
+            delete[] Np1b1;
+            delete[] Np2b1;
+
+            delete[] Nm2b2;
+            delete[] Nm1b2;
+            delete[] Np1b2;
+            delete[] Np2b2;
+
+            delete[] Nm2c1;
+            delete[] Nm1c1;
+            delete[] Np1c1;
+            delete[] Np2c1;
+
+            delete[] Nm2c2;
+            delete[] Nm1c2;
+            delete[] Np1c2;
+            delete[] Np2c2;
+
+	}else{
+	    derivZ->calc1stDerivField(tempZ1, tempZ7);
+	    derivZ->calc1stDerivField(tempZ2, tempZ8);
+	    derivZ->calc1stDerivField(tempZ3, tempZ9);
+	    derivZ->calc1stDerivField(tempZ4, tempZ10);
+	    derivZ->calc1stDerivField(tempZ5, tempZ11);
+	    derivZ->calc1stDerivField(tempZ6, tempZ12);
+	}
+
+	c2d->transposeZ2Y_MajorIndex(tempZ7, dVa13);
+	c2d->transposeZ2Y_MajorIndex(tempZ8, dVa23);
+	c2d->transposeZ2Y_MajorIndex(tempZ9, dVb13);
+	c2d->transposeZ2Y_MajorIndex(tempZ10, dVb23);
+	c2d->transposeZ2Y_MajorIndex(tempZ11, dVc13);
+	c2d->transposeZ2Y_MajorIndex(tempZ12, dVc23);
+
 
 	c2d->deallocXYZ(xE11);
 	c2d->deallocXYZ(xE12);
@@ -607,6 +929,15 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->deallocXYZ(xE21);
 	c2d->deallocXYZ(xE22);
 	c2d->deallocXYZ(xE23);
+
+	getRange(dVa13, "dVa13", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVa23, "dVa23", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVb13, "dVb13", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVb23, "dVb23", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVc13, "dVc13", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(dVc23, "dVc23", pySize[0], pySize[1], pySize[2], mpiRank);
+
+
 
 	//Start calculating the Jacobian components [(dE/dx)/J]...
 	FOR_XYZ_YPEN{
@@ -620,7 +951,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 
 	    J31[ip] = dVc12[ip] - dVc21[ip];
 	    J32[ip] = dVb21[ip] - dVb12[ip];
-	    J33[ip] = dVa12[ip] - dVa12[ip];
+	    J33[ip] = dVa12[ip] - dVa21[ip];
 	}
 
 	//Free up all of this space here...

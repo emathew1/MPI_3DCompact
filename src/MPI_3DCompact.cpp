@@ -144,13 +144,15 @@ int main(int argc, char *argv[]){
 	J11[ip] = msh->J[ip]*msh->J11[ip];
     }
 
-    getRange(J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
     getRange(msh->J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J12, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J13, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J21, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J22, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J23, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J12, "J12", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J13, "J13", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J21, "J21", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J22, "J22", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J23, "J23", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J31, "J31", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J32, "J32", pySize[0], pySize[1], pySize[2], mpiRank);
+    getRange(msh->J33, "J33", pySize[0], pySize[1], pySize[2], mpiRank);
 
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
