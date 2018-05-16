@@ -72,9 +72,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 
-			x[ip] = xi + eta;
+			x[ip] = xi;
 			y[ip] = eta;
-			z[ip] = zta + eta;  
+			z[ip] = zta;  
 
 		    }
 		}
@@ -976,12 +976,6 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->deallocXYZ(dVc31);
 	c2d->deallocXYZ(dVc32);
 
-	c2d->deallocXYZ(tempX3);
-	c2d->deallocXYZ(tempX4);
-	c2d->deallocXYZ(tempZ3);
-	c2d->deallocXYZ(tempZ4);
-
-
 	//Now start computing the Jacobian determinant...
 	double *preJdet1, *preJdet2, *preJdet3;
 	double *Jdet1, *Jdet2, *Jdet3;
@@ -998,18 +992,175 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	    preJdet3[ip] = x[ip]*J31[ip] + y[ip]*J32[ip] + z[ip]*J33[ip];
 	}
 
+	getRange(preJdet1, "preJdet1", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(preJdet2, "preJdet2", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(preJdet3, "preJdet3", pySize[0], pySize[1], pySize[2], mpiRank);
+
 	//Compute the E2 component...
-	derivY->calc1stDerivField(preJdet2, Jdet2);
+	if(periodicY){
+	    double *Nm2, *Nm1, *Np1, *Np2;
+	    Nm2 = new double[pySize[0]*pySize[2]];
+	    Nm1 = new double[pySize[0]*pySize[2]];
+	    Np1 = new double[pySize[0]*pySize[2]];
+	    Np2 = new double[pySize[0]*pySize[2]];
+
+	    FOR_X_YPEN{
+		FOR_Z_YPEN{
+		    int ii = i*pySize[2] + k;
+
+		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;			     
+		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
+		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
+		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
+	
+		    Nm2[ii] = (x[iim2]-periodicYTranslation[0])*J21[iim2] + 
+			      (y[iim2]-periodicYTranslation[1])*J22[iim2] +
+			      (z[iim2]-periodicYTranslation[2])*J23[iim2];
+
+		    Nm1[ii] = (x[iim1]-periodicYTranslation[0])*J21[iim1] + 
+			      (y[iim1]-periodicYTranslation[1])*J22[iim1] +
+			      (z[iim1]-periodicYTranslation[2])*J23[iim1];
+
+		    Np1[ii] = (x[iip1]+periodicYTranslation[0])*J21[iip1] + 
+			      (y[iip1]+periodicYTranslation[1])*J22[iip1] +
+			      (z[iip1]+periodicYTranslation[2])*J23[iip1];
+
+		    Np2[ii] = (x[iip2]+periodicYTranslation[0])*J21[iip2] + 
+			      (y[iip2]+periodicYTranslation[1])*J22[iip2] +
+			      (z[iip2]+periodicYTranslation[2])*J23[iip2];
+
+		}
+	    }
+
+	    derivY->calc1stDerivField_TPB(preJdet2, Jdet2, Nm2, Nm1, Np1, Np2);
+
+	    delete[] Nm2;
+	    delete[] Nm1;
+	    delete[] Np1;
+	    delete[] Np2;
+	
+	}else{
+	    derivY->calc1stDerivField(preJdet2, Jdet2);
+	}
 
 	//Compute the E1 component....
 	c2d->transposeY2X_MajorIndex(preJdet1, tempX1);
-	derivX->calc1stDerivField(tempX1, tempX2);
-	c2d->transposeX2Y_MajorIndex(tempX2, Jdet1);
+
+
+	if(periodicX){
+
+	    c2d->transposeY2X_MajorIndex(x, tempX2);
+	    c2d->transposeY2X_MajorIndex(y, tempX3);
+	    c2d->transposeY2X_MajorIndex(z, tempX4);
+
+	    double *Nm2, *Nm1, *Np1, *Np2;
+	    Nm2 = new double[pxSize[1]*pxSize[2]];
+	    Nm1 = new double[pxSize[1]*pxSize[2]];
+	    Np1 = new double[pxSize[1]*pxSize[2]];
+	    Np2 = new double[pxSize[1]*pxSize[2]];
+
+
+	    FOR_Z_XPEN{
+                FOR_Y_XPEN{
+                    int ii = k*pxSize[1] + j;
+
+                    int iim2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-2;
+                    int iim1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-1;
+                    int iip1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 0;
+                    int iip2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 1;
+
+		    Nm2[ii] = (tempX2[iim2]-periodicXTranslation[0])*J11[iim2] + 
+			      (tempX3[iim2]-periodicXTranslation[1])*J12[iim2] +
+			      (tempX4[iim2]-periodicXTranslation[2])*J13[iim2];
+
+		    Nm1[ii] = (tempX2[iim1]-periodicXTranslation[0])*J11[iim1] + 
+			      (tempX3[iim1]-periodicXTranslation[1])*J12[iim1] +
+			      (tempX4[iim1]-periodicXTranslation[2])*J13[iim1];
+
+		    Np1[ii] = (tempX2[iip1]+periodicXTranslation[0])*J11[iip1] + 
+			      (tempX3[iip1]+periodicXTranslation[1])*J12[iip1] +
+			      (tempX4[iip1]+periodicXTranslation[2])*J13[iip1];
+
+		    Np2[ii] = (tempX2[iip2]+periodicXTranslation[0])*J11[iip2] + 
+			      (tempX3[iip2]+periodicXTranslation[1])*J12[iip2] +
+			      (tempX4[iip2]+periodicXTranslation[2])*J13[iip2];
+
+
+		}
+	    }	
+
+	    derivX->calc1stDerivField_TPB(tempX1, tempX5, Nm2, Nm1, Np1, Np2);
+
+	    delete[] Nm2;
+	    delete[] Nm1;
+	    delete[] Np1;
+	    delete[] Np2;
+
+	}else{
+	    derivX->calc1stDerivField(tempX1, tempX5);
+	}
+
+	c2d->transposeX2Y_MajorIndex(tempX5, Jdet1);
 
  	//Compute the E3 component....
 	c2d->transposeY2Z_MajorIndex(preJdet3, tempZ1);
-	derivZ->calc1stDerivField(tempZ1, tempZ2);
-	c2d->transposeZ2Y_MajorIndex(tempZ2, Jdet3);
+
+	if(periodicZ){
+
+	    c2d->transposeY2Z_MajorIndex(x, tempZ2);
+	    c2d->transposeY2Z_MajorIndex(y, tempZ3);
+	    c2d->transposeY2Z_MajorIndex(z, tempZ4);
+
+	    double *Nm2, *Nm1, *Np1, *Np2;
+	    Nm2 = new double[pzSize[0]*pzSize[1]];
+	    Nm1 = new double[pzSize[0]*pzSize[1]];
+	    Np1 = new double[pzSize[0]*pzSize[1]];
+	    Np2 = new double[pzSize[0]*pzSize[1]];
+
+            FOR_Y_ZPEN{
+                FOR_X_ZPEN{
+                    int ii = j*pzSize[0] + i;
+
+                    int iim2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-2;
+                    int iim1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-1;
+                    int iip1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 0;
+                    int iip2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 1;
+
+		    Nm2[ii] = (tempZ2[iim2]-periodicZTranslation[0])*J31[iim2] + 
+			      (tempZ3[iim2]-periodicZTranslation[1])*J32[iim2] +
+			      (tempZ4[iim2]-periodicZTranslation[2])*J33[iim2];
+
+		    Nm1[ii] = (tempZ2[iim1]-periodicZTranslation[0])*J31[iim1] + 
+			      (tempZ3[iim1]-periodicZTranslation[1])*J32[iim1] +
+			      (tempZ4[iim1]-periodicZTranslation[2])*J33[iim1];
+
+		    Np1[ii] = (tempZ2[iip1]+periodicZTranslation[0])*J31[iip1] + 
+			      (tempZ3[iip1]+periodicZTranslation[1])*J32[iip1] +
+			      (tempZ4[iip1]+periodicZTranslation[2])*J33[iip1];
+
+		    Np2[ii] = (tempZ2[iip2]+periodicZTranslation[0])*J31[iip2] + 
+			      (tempZ3[iip2]+periodicZTranslation[1])*J32[iip2] +
+			      (tempZ4[iip2]+periodicZTranslation[2])*J33[iip2];
+
+		}
+	    }
+
+	    derivZ->calc1stDerivField_TPB(tempZ1, tempZ5, Nm2, Nm1, Np1, Np2);
+	
+	    delete[] Nm2;
+	    delete[] Nm1;
+	    delete[] Np1;
+	    delete[] Np2;
+
+	}else{
+	    derivZ->calc1stDerivField(tempZ1, tempZ5);
+	}
+
+	c2d->transposeZ2Y_MajorIndex(tempZ5, Jdet3);
+
+	getRange(Jdet1, "Jdet1", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(Jdet2, "Jdet2", pySize[0], pySize[1], pySize[2], mpiRank);
+	getRange(Jdet3, "Jdet3", pySize[0], pySize[1], pySize[2], mpiRank);
 
 	//Compute the Jacobian derivative...
 	FOR_XYZ_YPEN{
@@ -1019,8 +1170,28 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	//Free up all of the spaces we've been using...
 	c2d->deallocXYZ(tempX1);
 	c2d->deallocXYZ(tempX2);
+	c2d->deallocXYZ(tempX3);
+	c2d->deallocXYZ(tempX4);
+	c2d->deallocXYZ(tempX5);
+	c2d->deallocXYZ(tempX6);
+	c2d->deallocXYZ(tempX7);
+	c2d->deallocXYZ(tempX8);
+	c2d->deallocXYZ(tempX9);
+	c2d->deallocXYZ(tempX10);
+	c2d->deallocXYZ(tempX11);
+	c2d->deallocXYZ(tempX12);
 	c2d->deallocXYZ(tempZ1);
 	c2d->deallocXYZ(tempZ2);
+	c2d->deallocXYZ(tempZ3);
+	c2d->deallocXYZ(tempZ4);
+	c2d->deallocXYZ(tempZ5);
+	c2d->deallocXYZ(tempZ6);
+	c2d->deallocXYZ(tempZ7);
+	c2d->deallocXYZ(tempZ8);
+	c2d->deallocXYZ(tempZ9);
+	c2d->deallocXYZ(tempZ10);
+	c2d->deallocXYZ(tempZ11);
+	c2d->deallocXYZ(tempZ12);
 
 	c2d->deallocXYZ(preJdet1);
 	c2d->deallocXYZ(preJdet2);
