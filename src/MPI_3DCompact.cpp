@@ -72,6 +72,7 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
+
     BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::PERIODIC_SOLVE;
     BC::BCType bcZType = BC::PERIODIC_SOLVE;
@@ -82,6 +83,20 @@ int main(int argc, char *argv[]){
     BC::BCKind bcY1 = BC::PERIODIC;
     BC::BCKind bcZ0 = BC::PERIODIC;
     BC::BCKind bcZ1 = BC::PERIODIC;
+
+
+/*
+    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+
+    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
+*/
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -105,8 +120,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 0, 
-	pCol = 0;
+    int pRow = 2, 
+	pCol = 2;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
@@ -134,25 +149,6 @@ int main(int argc, char *argv[]){
     AbstractSingleBlockMesh *msh;
     msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
     msh->solveForJacobians();
-
-
-    getRange(msh->J, "J", pySize[0], pySize[1], pySize[2], mpiRank);
- 
-    double *J11;
-    c2d->allocY(J11);
-    FOR_XYZ_YPEN{
-	J11[ip] = msh->J[ip]*msh->J11[ip];
-    }
-
-    getRange(msh->J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J12, "J12", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J13, "J13", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J21, "J21", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J22, "J22", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J23, "J23", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J31, "J31", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J32, "J32", pySize[0], pySize[1], pySize[2], mpiRank);
-    getRange(msh->J33, "J33", pySize[0], pySize[1], pySize[2], mpiRank);
 
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
