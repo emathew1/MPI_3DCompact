@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-
+/*
     BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::PERIODIC_SOLVE;
     BC::BCType bcZType = BC::PERIODIC_SOLVE;
@@ -83,9 +83,9 @@ int main(int argc, char *argv[]){
     BC::BCKind bcY1 = BC::PERIODIC;
     BC::BCKind bcZ0 = BC::PERIODIC;
     BC::BCKind bcZ1 = BC::PERIODIC;
+*/
 
 
-/*
     BC::BCType bcXType = BC::DIRICHLET_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]){
     BC::BCKind bcY1 = BC::ADIABATIC_WALL;
     BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
     BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
-*/
+
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -146,9 +146,8 @@ int main(int argc, char *argv[]){
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
     
-    AbstractSingleBlockMesh *msh;
-    msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
-    msh->solveForJacobians();
+    cs->msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
+    cs->msh->solveForJacobians();
 
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//

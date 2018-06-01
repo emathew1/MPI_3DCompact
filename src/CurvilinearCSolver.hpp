@@ -8,8 +8,6 @@
 #include "Utils.hpp"
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
-#include "AbstractSingleBlockMesh.hpp"
-//#include "AlgebraicSingleBlockMesh.hpp"
 #include "PngWriter.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
@@ -88,8 +86,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//For drawing images
 	PngWriter *png;
 
-	//Mesh object
-	AbstractSingleBlockMesh *msh;
+	//Alias'd derivative objects
+	Derivatives *derivXi, *derivEta, *derivZta;
+	Filter *filtXi, *filtEta, *filtZta;
 
 	//Constructor to use for this class...
 	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
@@ -143,10 +142,18 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    derivY = new Derivatives(dom, bc->bcYType, Derivatives::DIRY);
 	    derivZ = new Derivatives(dom, bc->bcZType, Derivatives::DIRZ);
 
+	    derivXi  = derivX;
+	    derivEta = derivY;
+	    derivZta = derivZ;
+
 	    //Initialize the filters we're going to use for each direction
 	    filtX  = new Filter(alphaF, dom, bc->bcXType, Derivatives::DIRX);
 	    filtY  = new Filter(alphaF, dom, bc->bcYType, Derivatives::DIRY);
 	    filtZ  = new Filter(alphaF, dom, bc->bcZType, Derivatives::DIRZ);
+
+	    filtXi  = filtX;
+	    filtEta = filtY;
+	    filtZta = filtZ;
 
  	    X0WallV = 0.0; X0WallW = 0.0; X1WallV = 0.0; X1WallW = 0.0;
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
@@ -166,7 +173,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    MPI_Allreduce(&pySize[0], &minYPenXSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD); 
 	    MPI_Allreduce(&pySize[2], &minYPenZSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
-	    IF_RANK0 cout << " > Mininum number of points in X direction in Y-Pencil is " << minYPenXSize << ",";
+	    IF_RANK0 cout << " > Mininum number of points in Xi direction in Y-Pencil is " << minYPenXSize << ",";
 	    if(minYPenXSize >= 7){
 		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
 		neumannLocalX = true;
@@ -176,7 +183,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 		neumannLocalX = false;
 	    }
 
-	    IF_RANK0 cout << " > Mininum number of points in Z direction in Y-Pencil is " << minYPenZSize << ",";
+	    IF_RANK0 cout << " > Mininum number of points in Zeta direction in Y-Pencil is " << minYPenZSize << ",";
 	    if(minYPenZSize >= 7){
 		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
 		neumannLocalZ = true;
@@ -186,11 +193,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 		neumannLocalZ = false;
 	    }
 
-
-	    //Get the mesh party started...
-	    //msh = new AlgebraicSingleBlockMesh(c2d, dom, derivX, derivY, derivZ, mpiRank); 
-	
-	    //msh->solveForJacobians();
 
 	    t1 = MPI_Wtime();
 	}

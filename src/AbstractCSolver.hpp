@@ -6,6 +6,7 @@
 #include "Filter.hpp"
 #include "IdealGas.hpp"
 #include "TimeStepping.hpp"
+#include "AbstractSingleBlockMesh.hpp"
 
 class AbstractCSolver{
 
@@ -40,6 +41,7 @@ class AbstractCSolver{
 	IdealGas *ig;
         Derivatives *derivX, *derivY, *derivZ;
         Filter *filtX, *filtY, *filtZ;
+	AbstractSingleBlockMesh *msh;
 
 	//Each Solver Class needs to have these functions to overwrite the pure virtual ones
 	virtual void initializeSolverData() = 0;
