@@ -77,8 +77,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nZta = zta/max_zta;
 
 			x[ip] = xi;
-			y[ip] = eta;
-			z[ip] = zta;  
+			y[ip] = 2*eta;
+			z[ip] = 2*zta;  
 
 		    }
 		}
@@ -86,7 +86,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
 		periodicX = true;
-		periodicXTranslation[0] = 1.0;
+		periodicXTranslation[0] = 2.0;
 		periodicXTranslation[1] = 0.0;
 		periodicXTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
@@ -97,7 +97,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
 		periodicYTranslation[0] = 0.0;
-		periodicYTranslation[1] = 1.0;
+		periodicYTranslation[1] = 2.0;
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;;
 	    }else{
@@ -108,7 +108,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicZ = true;
 		periodicZTranslation[0] = 0.0;
 		periodicZTranslation[1] = 0.0;
-		periodicZTranslation[2] = 1.0;
+		periodicZTranslation[2] = 2.0;
 
 		IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 
@@ -1138,24 +1138,33 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 
 	c2d->transposeZ2Y_MajorIndex(tempZ5, Jdet3);
 
-	//Compute the Jacobian derivative...
+	//Compute the Jacobian determinant...
 	FOR_XYZ_YPEN{
-	    J[ip] = (1.0/3.0)*(Jdet1[ip] + Jdet2[ip] + Jdet3[ip]);
+	    J[ip] = 1/((1.0/3.0)*(Jdet1[ip] + Jdet2[ip] + Jdet3[ip]));
+	    J11[ip] = J[ip]*J11[ip];
+	    J12[ip] = J[ip]*J12[ip];
+	    J13[ip] = J[ip]*J13[ip];
+	    J21[ip] = J[ip]*J21[ip];
+	    J22[ip] = J[ip]*J22[ip];
+	    J23[ip] = J[ip]*J23[ip];
+	    J31[ip] = J[ip]*J31[ip];
+	    J32[ip] = J[ip]*J32[ip];
+	    J33[ip] = J[ip]*J33[ip];
 	}
 
 
 	IF_RANK0 cout << "done!" << endl;
 	
         getRange(J, "J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J11, "J11/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J12, "J12/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J13, "J13/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J21, "J21/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J22, "J22/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J23, "J23/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J31, "J31/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J32, "J32/J", pySize[0], pySize[1], pySize[2], mpiRank);
-        getRange(J33, "J33/J", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J11, "J11", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J12, "J12", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J13, "J13", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J21, "J21", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J22, "J22", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J23, "J23", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J31, "J31", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J32, "J32", pySize[0], pySize[1], pySize[2], mpiRank);
+        getRange(J33, "J33", pySize[0], pySize[1], pySize[2], mpiRank);
 
 
 	IF_RANK0 cout << " > Checking the values of the metric indentities, values should be small" << endl;
