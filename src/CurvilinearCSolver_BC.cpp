@@ -11,17 +11,15 @@ void CurvilinearCSolver::setInitialConditions(){
 
     //just do the simple stuff in a loop...
     FOR_XYZ_YPEN{
-	//Conserved Variables are normalized by the Jacobian determinant
-	rho1[ip] = rho0[ip]/J[ip];
-
 	U[ip]	 = U0[ip];
 	V[ip] 	 = V0[ip];
 	W[ip] 	 = W0[ip];
 	p[ip]	 = p0[ip];
 
-	rhoU1[ip] = rho1[ip]*U[ip]/J[ip];	
-	rhoV1[ip] = rho1[ip]*V[ip]/J[ip];	
-	rhoW1[ip] = rho1[ip]*W[ip]/J[ip];
+	rho1[ip]  = rho0[ip];
+	rhoU1[ip] = rho1[ip]*U[ip];	
+	rhoV1[ip] = rho1[ip]*V[ip];	
+	rhoW1[ip] = rho1[ip]*W[ip];
 
 	Ucurv[ip] = J11[ip]*U[ip] + J12[ip]*V[ip] + J13[ip]*W[ip]; 
 	Vcurv[ip] = J21[ip]*U[ip] + J22[ip]*V[ip] + J23[ip]*W[ip]; 
@@ -38,8 +36,6 @@ void CurvilinearCSolver::setInitialConditions(){
     //Call the ideal gas relations for the slightly more involved stuff..
     FOR_XYZ_YPEN{
 	rhoE1[ip] = ig->solverhoE(rho1[ip], p[ip], U[ip], V[ip], W[ip]);
-	rhoE1[ip] /= J[ip];
-
     	T[ip]     = ig->solveT(rho1[ip], p[ip]);
         mu[ip]    = ig->solveMu(T[ip]);
         sos[ip]   = ig->solveSOS(rho1[ip], p[ip]);
@@ -266,8 +262,8 @@ void CurvilinearCSolver::setInitialConditions(){
             V[ip]  = X0WallV;
             W[ip]  = X0WallW;
             rhoU1[ip] = 0.0;
-            rhoV1[ip] = rho1[ip]*X0WallV/J[ip];
-            rhoW1[ip] = rho1[ip]*X0WallW/J[ip];
+            rhoV1[ip] = rho1[ip]*X0WallV;
+            rhoW1[ip] = rho1[ip]*X0WallW;
             T[ip] = calcNeumann(T[GETMAJIND_YPEN_Xp1],
                                 T[GETMAJIND_YPEN_Xp2],
                                 T[GETMAJIND_YPEN_Xp3],
@@ -284,8 +280,8 @@ void CurvilinearCSolver::setInitialConditions(){
             V[ip]  = X1WallV;
             W[ip]  = X1WallW;
             rhoU1[ip] = 0.0;
-            rhoV1[ip] = rho1[ip]*X1WallV/J[ip];
-            rhoW1[ip] = rho1[ip]*X1WallW/J[ip];
+            rhoV1[ip] = rho1[ip]*X1WallV;
+            rhoW1[ip] = rho1[ip]*X1WallW;
             T[ip] = calcNeumann(T[GETMAJIND_YPEN_Xm1],
                                 T[GETMAJIND_YPEN_Xm2],
                                 T[GETMAJIND_YPEN_Xm3],
@@ -301,9 +297,9 @@ void CurvilinearCSolver::setInitialConditions(){
             U[ip]  = Y0WallU;
             V[ip]  = 0.0;
             W[ip]  = Y0WallW;
-            rhoU1[ip] = rho1[ip]*Y0WallU/J[ip];
+            rhoU1[ip] = rho1[ip]*Y0WallU;
             rhoV1[ip] = 0.0;
-            rhoW1[ip] = rho1[ip]*Y0WallW/J[ip];
+            rhoW1[ip] = rho1[ip]*Y0WallW;
 //	    if(neumannLocalY){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Yp1],
                                     T[GETMAJIND_YPEN_Yp2],
@@ -341,9 +337,9 @@ void CurvilinearCSolver::setInitialConditions(){
             U[ip]  = Y1WallU;
             V[ip]  = 0.0;
             W[ip]  = Y1WallW;
-            rhoU1[ip] = rho1[ip]*Y1WallU/J[ip];
+            rhoU1[ip] = rho1[ip]*Y1WallU;
             rhoV1[ip] = 0.0;
-            rhoW1[ip] = rho1[ip]*Y1WallW/J[ip];
+            rhoW1[ip] = rho1[ip]*Y1WallW;
 //	    if(neumannLocalY){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Ym1],
                                     T[GETMAJIND_YPEN_Ym2],
@@ -381,8 +377,8 @@ void CurvilinearCSolver::setInitialConditions(){
             U[ip]  = Z0WallU;
             V[ip]  = Z0WallV;
             W[ip]  = 0.0;
-            rhoU1[ip] = rho1[ip]*Z0WallU/J[ip];
-            rhoV1[ip] = rho1[ip]*Z0WallV/J[ip];
+            rhoU1[ip] = rho1[ip]*Z0WallU;
+            rhoV1[ip] = rho1[ip]*Z0WallV;
             rhoW1[ip] = 0.0;
 //	    if(neumannLocalZ){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zp1],
@@ -427,8 +423,8 @@ void CurvilinearCSolver::setInitialConditions(){
             U[ip]  = Z1WallU;
             V[ip]  = Z1WallV;
             W[ip]  = 0.0;
-            rhoU1[ip] = rho1[ip]*Z1WallU/J[ip];
-            rhoV1[ip] = rho1[ip]*Z1WallV/J[ip];
+            rhoU1[ip] = rho1[ip]*Z1WallU;
+            rhoV1[ip] = rho1[ip]*Z1WallV;
             rhoW1[ip] = 0.0;
 //	    if(neumannLocalZ){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zm1],
@@ -476,7 +472,6 @@ void CurvilinearCSolver::setInitialConditions(){
 	    p[ip]     = ig->solvep_idealgas(rho1[ip], T[ip]);
 	    sos[ip]   = ig->solveSOS(rho1[ip],p[ip]);
 	    rhoE1[ip] = ig->solverhoE(rho1[ip], p[ip], U[ip], V[ip], W[ip]);
-	    rhoE1[ip] /= J[ip];
 
 	    Ucurv[ip] = J11[ip]*U[ip] + J12[ip]*V[ip] + J13[ip]*W[ip]; 
 	    Vcurv[ip] = J21[ip]*U[ip] + J22[ip]*V[ip] + J23[ip]*W[ip]; 
@@ -486,11 +481,11 @@ void CurvilinearCSolver::setInitialConditions(){
 
     if(spongeFlag == true){
 	FOR_XYZ_YPEN{
-	    spg->spongeRhoAvg[ip]  = rho1[ip]/J[ip];
-	    spg->spongeRhoUAvg[ip] = rhoU1[ip]/J[ip];
-	    spg->spongeRhoVAvg[ip] = rhoV1[ip]/J[ip];
-	    spg->spongeRhoWAvg[ip] = rhoW1[ip]/J[ip];
-	    spg->spongeRhoEAvg[ip] = rhoE1[ip]/J[ip];
+	    spg->spongeRhoAvg[ip]  = rho1[ip];
+	    spg->spongeRhoUAvg[ip] = rhoU1[ip];
+	    spg->spongeRhoVAvg[ip] = rhoV1[ip];
+	    spg->spongeRhoWAvg[ip] = rhoW1[ip];
+	    spg->spongeRhoEAvg[ip] = rhoE1[ip];
  	}
     }
 
@@ -1034,7 +1029,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_X0_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_1[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_1[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1044,7 +1039,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcX1 == BC::ADIABATIC_WALL  || bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_X1_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_1[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_1[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1054,7 +1049,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y0_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_2[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_2[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1064,7 +1059,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Y1_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_2[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_2[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1074,7 +1069,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z0_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_3[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_3[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;
@@ -1084,7 +1079,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 
     if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
 	FOR_Z1_YPEN_MAJ{
-	    rhok2[ip]  = -ts->dt*cont_3[ip];
+	    rhok2[ip]  = -ts->dt*J[ip]*cont_3[ip];
 	    rhoUk2[ip] = 0.0;
 	    rhoVk2[ip] = 0.0;
 	    rhoWk2[ip] = 0.0;

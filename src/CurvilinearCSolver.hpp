@@ -87,8 +87,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	PngWriter *png;
 
 	//Alias'd derivative objects
-	Derivatives *derivXi, *derivEta, *derivZta;
-	Filter *filtXi, *filtEta, *filtZta;
+	Derivatives *derivXi1, *derivXi2, *derivXi3;
+	Filter *filtXi1, *filtXi2, *filtXi3;
 
 	//Constructor to use for this class...
 	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
@@ -142,18 +142,18 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    derivY = new Derivatives(dom, bc->bcYType, Derivatives::DIRY);
 	    derivZ = new Derivatives(dom, bc->bcZType, Derivatives::DIRZ);
 
-	    derivXi  = derivX;
-	    derivEta = derivY;
-	    derivZta = derivZ;
+	    derivXi1 = derivX;
+	    derivXi2 = derivY;
+	    derivXi3 = derivZ;
 
 	    //Initialize the filters we're going to use for each direction
 	    filtX  = new Filter(alphaF, dom, bc->bcXType, Derivatives::DIRX);
 	    filtY  = new Filter(alphaF, dom, bc->bcYType, Derivatives::DIRY);
 	    filtZ  = new Filter(alphaF, dom, bc->bcZType, Derivatives::DIRZ);
 
-	    filtXi  = filtX;
-	    filtEta = filtY;
-	    filtZta = filtZ;
+	    filtXi1 = filtX;
+	    filtXi2 = filtY;
+	    filtXi3 = filtZ;
 
  	    X0WallV = 0.0; X0WallW = 0.0; X1WallV = 0.0; X1WallW = 0.0;
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;

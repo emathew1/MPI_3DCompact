@@ -261,16 +261,16 @@ void CurvilinearCSolver::preStepDerivatives(){
 
     if(useTiming) ftt1 = MPI_Wtime();
 
-    ///////////////////
-    // Y-DERIVATIVES //
-    ///////////////////
+    /////////////////////
+    // Xi2-DERIVATIVES //
+    /////////////////////
 
 
     //First we'll do all of the Y-Direction derivatives to calc tau
-    derivY->calc1stDerivField(U, Uy); //dU/dx
-    derivY->calc1stDerivField(V, Vy); //dV/dx
-    derivY->calc1stDerivField(W, Wy); //dW/dx
-    derivY->calc1stDerivField(T, Ty); //dT/dx
+    derivXi2->calc1stDerivField(U, Uy); //dU/dx
+    derivXi2->calc1stDerivField(V, Vy); //dV/dx
+    derivXi2->calc1stDerivField(W, Wy); //dW/dx
+    derivXi2->calc1stDerivField(T, Ty); //dT/dx
 
 
     if(useTiming){
@@ -525,7 +525,7 @@ void CurvilinearCSolver::solveContinuity(){
 	else
 	    spgSource = 0.0;
 		
-	rhok2[ip]  = ts->dt*(-cont_X[ip] - cont_Y[ip] - cont_Z[ip] + spgSource);
+	rhok2[ip]  = ts->dt*J[ip]*(-cont_X[ip] - cont_Y[ip] - cont_Z[ip] + spgSource);
     }
 
     if(useTiming){
@@ -555,7 +555,7 @@ void CurvilinearCSolver::solveXMomentum(){
 	    spgSource = 0.0;
 
 	rhoUk2[ip] += -momX_X[ip] - momX_Y[ip] -momX_Z[ip] + spgSource;
-	rhoUk2[ip] *= ts->dt;
+	rhoUk2[ip] *= ts->dt*J[ip];
     }
 
     if(useTiming){
@@ -588,7 +588,7 @@ void CurvilinearCSolver::solveYMomentum(){
 	    spgSource = 0.0;
 
 	rhoVk2[ip] += -momY_X[ip] -momY_Y[ip] -momY_Z[ip] + spgSource;
-        rhoVk2[ip] *= ts->dt;
+        rhoVk2[ip] *= ts->dt*J[ip];
    }
 
     if(useTiming){
@@ -620,7 +620,7 @@ void CurvilinearCSolver::solveZMomentum(){
 	    spgSource = 0.0;
 
 	rhoWk2[ip] += -momZ_X[ip] -momZ_Y[ip] -momZ_Z[ip] + spgSource;
-        rhoWk2[ip] *= ts->dt;
+        rhoWk2[ip] *= ts->dt*J[ip];
     }
 
     if(useTiming){
@@ -653,7 +653,7 @@ void CurvilinearCSolver::solveEnergy(){
             spgSource = 0.0;
 
 	rhoEk2[ip] = -engy_X[ip] - engy_Y[ip] - engy_Z[ip] + spgSource;
-	rhoEk2[ip] *= ts->dt;
+	rhoEk2[ip] *= ts->dt*J[ip];
     }
 
     if(useTiming){
