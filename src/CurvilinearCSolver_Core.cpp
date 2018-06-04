@@ -181,7 +181,7 @@ void CurvilinearCSolver::initializeSolverData(){
     }
 }
 
-/*
+
 void CurvilinearCSolver::calcDtFromCFL(){
 
     if(useTiming) ft1 = MPI_Wtime();    
@@ -232,6 +232,7 @@ void CurvilinearCSolver::calcDtFromCFL(){
 
 }
 
+/*
 void CurvilinearCSolver::preStepDerivatives(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -833,7 +834,7 @@ void CurvilinearCSolver::filterConservedData(){
 
 
 };
-
+*/
 
 void CurvilinearCSolver::updateNonConservedData(){
 
@@ -849,6 +850,9 @@ void CurvilinearCSolver::updateNonConservedData(){
 	    T[ip]   = ig->solveT(rhok[ip], p[ip]);
 	    mu[ip]  = ig->solveMu(T[ip]);
 	    sos[ip] = ig->solveSOS(rhok[ip], p[ip]);
+            Ucurv[ip] = J11[ip]*U[ip] + J12[ip]*V[ip] + J13[ip]*W[ip];
+            Vcurv[ip] = J21[ip]*U[ip] + J22[ip]*V[ip] + J23[ip]*W[ip];
+            Wcurv[ip] = J31[ip]*U[ip] + J32[ip]*V[ip] + J33[ip]*W[ip];
 	}
 
     }else if(rkLast){
@@ -861,6 +865,9 @@ void CurvilinearCSolver::updateNonConservedData(){
 	    T[ip]   = ig->solveT(rho1[ip], p[ip]);
 	    mu[ip]  = ig->solveMu(T[ip]);
 	    sos[ip] = ig->solveSOS(rho1[ip], p[ip]);
+            Ucurv[ip] = J11[ip]*U[ip] + J12[ip]*V[ip] + J13[ip]*W[ip];
+            Vcurv[ip] = J21[ip]*U[ip] + J22[ip]*V[ip] + J23[ip]*W[ip];
+            Wcurv[ip] = J31[ip]*U[ip] + J32[ip]*V[ip] + J33[ip]*W[ip];
 	}
     }
 
@@ -900,6 +907,9 @@ void CurvilinearCSolver::checkSolution(){
         getRange(U, "U", Nx, Ny, Nz, mpiRank);
         getRange(V, "V", Nx, Ny, Nz, mpiRank);
         getRange(W, "W", Nx, Ny, Nz, mpiRank);
+        getRange(Ucurv, "Ucurv", Nx, Ny, Nz, mpiRank);
+        getRange(Vcurv, "Vcurv", Nx, Ny, Nz, mpiRank);
+        getRange(Wcurv, "Wcurv", Nx, Ny, Nz, mpiRank);
         getRange(p, "P", Nx, Ny, Nz, mpiRank);
         getRange(T, "T", Nx, Ny, Nz, mpiRank);
         getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
@@ -975,7 +985,7 @@ void CurvilinearCSolver::dumpSolution(){
 
 
 }
-
+/*
 void CurvilinearCSolver::writeImages(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -1116,6 +1126,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
     delete[] ff;
 
 }
+*/
 
 void CurvilinearCSolver::checkEnd(){
 
@@ -1148,7 +1159,7 @@ void CurvilinearCSolver::checkEnd(){
     }
 
 }
-*/
+
 void CurvilinearCSolver::reportAll(){
 
    int Nx = pySize[0];

@@ -135,6 +135,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    c2d->allocY(J32);
 	    c2d->allocY(J33);
 
+
+
 	}
 
  	void solveForJacobians();
@@ -1152,6 +1154,19 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	    J33[ip] = J[ip]*J33[ip];
 	}
 
+	IF_RANK0 cout << "check" << endl;
+
+	//Copy data over to solver to make simpler to access
+//	cs->J = J;
+//	cs->J11 = J11;
+//	cs->J12 = J12;
+//	cs->J13 = J13;
+//	cs->J21 = J21;
+//	cs->J22 = J22;
+//	cs->J23 = J23;
+//	cs->J31 = J31;
+//	cs->J32 = J32;
+//	cs->J33 = J33;
 
 	IF_RANK0 cout << "done!" << endl;
 	

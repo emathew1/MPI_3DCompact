@@ -41,7 +41,10 @@ class AbstractCSolver{
 	IdealGas *ig;
         Derivatives *derivX, *derivY, *derivZ;
         Filter *filtX, *filtY, *filtZ;
+
+	//Common Msh Stuff if needed
 	AbstractSingleBlockMesh *msh;
+	double *J, *J11, *J12, *J13, *J21, *J22, *J23, *J31, *J32, *J33;
 
 	//Each Solver Class needs to have these functions to overwrite the pure virtual ones
 	virtual void initializeSolverData() = 0;
