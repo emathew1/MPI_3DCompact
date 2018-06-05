@@ -491,11 +491,11 @@ void CurvilinearCSolver::setInitialConditions(){
 
     IF_RANK0 std::cout << " > Finished initialization of flow field " << std::endl;
 
-    getRange(rho1,  "rho0/J", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-    getRange(rhoU1, "rhoU0/J", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-    getRange(rhoV1, "rhoV0/J", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-    getRange(rhoW1, "rhoW0/J", pxSize[0], pxSize[1], pxSize[2], mpiRank);
-    getRange(rhoE1, "rhoE0/J", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rho1,  "rho0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoU1, "rhoU0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoV1, "rhoV0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoW1, "rhoW0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
+    getRange(rhoE1, "rhoE0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
     getRange(T, "T0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
     getRange(p, "p0", pxSize[0], pxSize[1], pxSize[2], mpiRank);
 

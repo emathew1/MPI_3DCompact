@@ -31,7 +31,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 
 	    this->mpiRank = mpiRank;
-
+	    this->cs = cs;
 	    this->c2d = c2d;
 	    this->d = dom;
 	    this->derivX = cs->derivX;
@@ -77,8 +77,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nZta = zta/max_zta;
 
 			x[ip] = xi;
-			y[ip] = 2*eta;
-			z[ip] = 2*zta;  
+			y[ip] = eta;
+			z[ip] = zta;  
 
 		    }
 		}
@@ -86,7 +86,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
 		periodicX = true;
-		periodicXTranslation[0] = 2.0;
+		periodicXTranslation[0] = 1.0;
 		periodicXTranslation[1] = 0.0;
 		periodicXTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
@@ -97,7 +97,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
 		periodicYTranslation[0] = 0.0;
-		periodicYTranslation[1] = 2.0;
+		periodicYTranslation[1] = 1.0;
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;;
 	    }else{
@@ -108,7 +108,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicZ = true;
 		periodicZTranslation[0] = 0.0;
 		periodicZTranslation[1] = 0.0;
-		periodicZTranslation[2] = 2.0;
+		periodicZTranslation[2] = 1.0;
 
 		IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 
@@ -1157,16 +1157,16 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	IF_RANK0 cout << "check" << endl;
 
 	//Copy data over to solver to make simpler to access
-//	cs->J = J;
-//	cs->J11 = J11;
-//	cs->J12 = J12;
-//	cs->J13 = J13;
-//	cs->J21 = J21;
-//	cs->J22 = J22;
-//	cs->J23 = J23;
-//	cs->J31 = J31;
-//	cs->J32 = J32;
-//	cs->J33 = J33;
+	cs->J = J;
+	cs->J11 = J11;
+	cs->J12 = J12;
+	cs->J13 = J13;
+	cs->J21 = J21;
+	cs->J22 = J22;
+	cs->J23 = J23;
+	cs->J31 = J31;
+	cs->J32 = J32;
+	cs->J33 = J33;
 
 	IF_RANK0 cout << "done!" << endl;
 	
@@ -1181,6 +1181,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
         getRange(J32, "J32", pySize[0], pySize[1], pySize[2], mpiRank);
         getRange(J33, "J33", pySize[0], pySize[1], pySize[2], mpiRank);
 
+	
 
 	IF_RANK0 cout << " > Checking the values of the metric indentities, values should be small" << endl;
 

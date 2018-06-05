@@ -51,19 +51,19 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocY(cont_3);
 
     //24
-    c2d->allocY(momX_1);
-    c2d->allocY(momX_2);
-    c2d->allocY(momX_3);
+    c2d->allocY(mom1_1);
+    c2d->allocY(mom1_2);
+    c2d->allocY(mom1_3);
 
     //27
-    c2d->allocY(momY_1);
-    c2d->allocY(momY_2);
-    c2d->allocY(momY_3);
+    c2d->allocY(mom2_1);
+    c2d->allocY(mom2_2);
+    c2d->allocY(mom2_3);
 
     //30
-    c2d->allocY(momZ_1);
-    c2d->allocY(momZ_2);
-    c2d->allocY(momZ_3);
+    c2d->allocY(mom3_1);
+    c2d->allocY(mom3_2);
+    c2d->allocY(mom3_3);
 
     //33
     c2d->allocY(engy_1);
@@ -108,25 +108,10 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocY(p0);
 
     //61
-    c2d->allocX(U_xp);
     c2d->allocY(U);
-    c2d->allocZ(U_zp);
-
-    //64
-    c2d->allocX(V_xp);
     c2d->allocY(V);
-    c2d->allocZ(V_zp);
-
-    //67
-    c2d->allocX(W_xp);
     c2d->allocY(W);
-    c2d->allocZ(W_zp);
-
-    //70
-    c2d->allocX(T_xp);
     c2d->allocY(T);
-    c2d->allocZ(T_zp);
-
     c2d->allocY(Ucurv);
     c2d->allocY(Vcurv);
     c2d->allocY(Wcurv);
@@ -161,6 +146,9 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocY(tempY10);
     c2d->allocY(tempY11);
     c2d->allocY(tempY12);
+    c2d->allocY(tempY13);
+    c2d->allocY(tempY14);
+    c2d->allocY(tempY15);
 
     //104
     c2d->allocZ(tempZ1);
@@ -232,7 +220,7 @@ void CurvilinearCSolver::calcDtFromCFL(){
 
 }
 
-/*
+
 void CurvilinearCSolver::preStepDerivatives(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -266,50 +254,49 @@ void CurvilinearCSolver::preStepDerivatives(){
     /////////////////////
 
 
-    //First we'll do all of the Y-Direction derivatives to calc tau
-    derivXi2->calc1stDerivField(U, Uy); //dU/dx
-    derivXi2->calc1stDerivField(V, Vy); //dV/dx
-    derivXi2->calc1stDerivField(W, Wy); //dW/dx
-    derivXi2->calc1stDerivField(T, Ty); //dT/dx
+    //First we'll do all of the ~Y-Direction derivatives to calc tau
+    derivXi2->calc1stDerivField(U, dU2); 
+    derivXi2->calc1stDerivField(V, dV2); 
+    derivXi2->calc1stDerivField(W, dW2); 
+    derivXi2->calc1stDerivField(T, dT2); 
 
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > yderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " > xi2dertrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
 	ftt1 = MPI_Wtime();
     }
 
     ///////////////////
-    // X-DERIVATIVES //
+    // Xi1-DERIVATIVES //
     ///////////////////
 
-    double *dU11, *Vx1, *Wx1, *Tx1;
-    double *U1, *V1, *W1, *T1;
+    double *dU1_xp, *dV1_xp, *dW1_xp, *dT1_xp;
 
     //Point to the needed X memory
-    U1 = tempX1; Ux1 = tempX5; 
-    V1 = tempX2; Vx1 = tempX6;
-    W1 = tempX3; Wx1 = tempX7;
-    T1 = tempX4; Tx1 = tempX8;
+    U_xp = tempX1; dU1_xp = tempX5; 
+    V_xp = tempX2; dV1_xp = tempX6;
+    W_xp = tempX3; dW1_xp = tempX7;
+    T_xp = tempX4; dT1_xp = tempX8;
 
-    c2d->transposeY2X_MajorIndex(U, U1);
-    c2d->transposeY2X_MajorIndex(V, V1);
-    c2d->transposeY2X_MajorIndex(W, W1);
-    c2d->transposeY2X_MajorIndex(T, T1);
+    c2d->transposeY2X_MajorIndex(U, U_xp);
+    c2d->transposeY2X_MajorIndex(V, V_xp);
+    c2d->transposeY2X_MajorIndex(W, W_xp);
+    c2d->transposeY2X_MajorIndex(T, T_xp);
 
-    derivX->calc1stDerivField(U1, Ux1);
-    derivX->calc1stDerivField(V1, Vx1);
-    derivX->calc1stDerivField(W1, Wx1);
-    derivX->calc1stDerivField(T1, Tx1);
+    derivXi1->calc1stDerivField(U_xp, dU1_xp);
+    derivXi1->calc1stDerivField(V_xp, dV1_xp);
+    derivXi1->calc1stDerivField(W_xp, dW1_xp);
+    derivXi1->calc1stDerivField(T_xp, dT1_xp);
 
-    c2d->transposeX2Y_MajorIndex(Ux1, Ux);
-    c2d->transposeX2Y_MajorIndex(Vx1, Vx);
-    c2d->transposeX2Y_MajorIndex(Wx1, Wx);
-    c2d->transposeX2Y_MajorIndex(Tx1, Tx);
+    c2d->transposeX2Y_MajorIndex(dU1_xp, dU1);
+    c2d->transposeX2Y_MajorIndex(dV1_xp, dV1);
+    c2d->transposeX2Y_MajorIndex(dW1_xp, dW1);
+    c2d->transposeX2Y_MajorIndex(dT1_xp, dT1);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " > xi1dertrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
 	ftt1 = MPI_Wtime();
     }
 
@@ -318,39 +305,32 @@ void CurvilinearCSolver::preStepDerivatives(){
     // Z-DERIVATIVES //
     ///////////////////
 
-    double *Uz3, *Vz3, *Wz3, *Tz3;
-    double *U3,  *V3,  *W3,  *T3;
+    double *dU3_zp, *dV3_zp, *dW3_zp, *dT3_zp;
 
     //Point to the needed Z memory
-    Uz3 = tempZ1;
-    Vz3 = tempZ2;
-    Wz3 = tempZ3;
-    Tz3 = tempZ4;
+    U_zp = tempZ1; dU3_zp = tempZ5;
+    V_zp = tempZ2; dV3_zp = tempZ6;
+    W_zp = tempZ3; dW3_zp = tempZ7;
+    T_zp = tempZ4; dT3_zp = tempZ8;
 
-    //Point to the Z memory
-    U3 = tempZ5;
-    V3 = tempZ6;
-    W3 = tempZ7;
-    T3 = tempZ8; 
+    c2d->transposeY2Z_MajorIndex(U, U_zp);
+    c2d->transposeY2Z_MajorIndex(V, V_zp);
+    c2d->transposeY2Z_MajorIndex(W, W_zp);
+    c2d->transposeY2Z_MajorIndex(T, T_zp);
 
-    c2d->transposeY2Z_MajorIndex(U, U3);
-    c2d->transposeY2Z_MajorIndex(V, V3);
-    c2d->transposeY2Z_MajorIndex(W, W3);
-    c2d->transposeY2Z_MajorIndex(T, T3);
+    derivXi3->calc1stDerivField(U_zp, dU3_zp);
+    derivXi3->calc1stDerivField(V_zp, dV3_zp);
+    derivXi3->calc1stDerivField(W_zp, dW3_zp);
+    derivXi3->calc1stDerivField(T_zp, dT3_zp);
 
-    derivZ->calc1stDerivField(U3, Uz3);
-    derivZ->calc1stDerivField(V3, Vz3);
-    derivZ->calc1stDerivField(W3, Wz3);
-    derivZ->calc1stDerivField(T3, Tz3);
-
-    c2d->transposeZ2Y_MajorIndex(Uz3, Uz);
-    c2d->transposeZ2Y_MajorIndex(Vz3, Vz);
-    c2d->transposeZ2Y_MajorIndex(Wz3, Wz);
-    c2d->transposeZ2Y_MajorIndex(Tz3, Tz);
+    c2d->transposeZ2Y_MajorIndex(dU3_zp, dU3);
+    c2d->transposeZ2Y_MajorIndex(dV3_zp, dV3);
+    c2d->transposeZ2Y_MajorIndex(dW3_zp, dW3);
+    c2d->transposeZ2Y_MajorIndex(dT3_zp, dT3);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > zderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " > xi3derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
 	ftt1 = MPI_Wtime();
     }
 
@@ -359,138 +339,235 @@ void CurvilinearCSolver::preStepDerivatives(){
     // CALC TAU COMPONENTS & EQN COMPONENTS//
     /////////////////////////////////////////
 
-    double *preMomX_X, *preMomX_Y, *preMomX_Z; 
-    double *preMomY_X, *preMomY_Y, *preMomY_Z; 
-    double *preMomZ_X, *preMomZ_Y, *preMomZ_Z; 
-    double *preEngy_X, *preEngy_Y, *preEngy_Z; 
+    double *preCont_1, *preCont_2, *preCont_3;
+    double *preMom1_1, *preMom1_2, *preMom1_3; 
+    double *preMom2_1, *preMom2_2, *preMom2_3; 
+    double *preMom3_1, *preMom3_2, *preMom3_3; 
+    double *preEngy_1, *preEngy_2, *preEngy_3; 
 
-    preMomX_X = tempY1;  preMomX_Y = tempY2;  preMomX_Z = tempY3;
-    preMomY_X = tempY4;  preMomY_Y = tempY5;  preMomY_Z = tempY6;
-    preMomZ_X = tempY7;  preMomZ_Y = tempY8;  preMomZ_Z = tempY9;
-    preEngy_X = tempY10; preEngy_Y = tempY11; preEngy_Z = tempY12;
+    preMom1_1 = tempY1;  preMom1_2 = tempY2;  preMom1_3 = tempY3;
+    preMom2_1 = tempY4;  preMom2_2 = tempY5;  preMom2_3 = tempY6;
+    preMom3_1 = tempY7;  preMom3_2 = tempY8;  preMom3_3 = tempY9;
+    preEngy_1 = tempY10; preEngy_2 = tempY11; preEngy_3 = tempY12;
+    preCont_1 = tempY13; preCont_2 = tempY14; preCont_3 = tempY15;
+    
+
+    double b_1, b_2, b_3;
+    double q_1, q_2, q_3;
 
     //Now recalculate properties in the new space
     FOR_XYZ_YPEN{
-	Tauxx[ip] = mu[ip]*((4.0/3.0)*Ux[ip] - (2.0/3.0)*(Vy[ip] + Wz[ip]));
-	Tauyy[ip] = mu[ip]*((4.0/3.0)*Vy[ip] - (2.0/3.0)*(Ux[ip] + Wz[ip]));
-	Tauzz[ip] = mu[ip]*((4.0/3.0)*Wz[ip] - (2.0/3.0)*(Ux[ip] + Vy[ip]));
-	Tauxy[ip] = mu[ip]*(Uy[ip] + Vx[ip]);
-	Tauxz[ip] = mu[ip]*(Uz[ip] + Wx[ip]);
-	Tauyz[ip] = mu[ip]*(Vz[ip] + Wy[ip]);
 
-	preMomX_X[ip] = rhoUP[ip]*U[ip] + p[ip] - Tauxx[ip];
-	preMomX_Y[ip] = rhoUP[ip]*V[ip] - Tauxy[ip];
-	preMomX_Z[ip] = rhoUP[ip]*W[ip] - Tauxz[ip];
+	//Viscous stress tensor
+	Tau11[ip] =  (4.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
+		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
+		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
 
-	preMomY_X[ip] = rhoVP[ip]*U[ip] - Tauyx[ip];
-	preMomY_Y[ip] = rhoVP[ip]*V[ip] + p[ip] - Tauyy[ip];
-	preMomY_Z[ip] = rhoVP[ip]*W[ip] - Tauyz[ip];
+	Tau22[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
+		     (4.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
+		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
 
-	preMomZ_X[ip] = rhoWP[ip]*U[ip] - Tauzx[ip];
-	preMomZ_Y[ip] = rhoWP[ip]*V[ip] - Tauzy[ip];
-	preMomZ_Z[ip] = rhoWP[ip]*W[ip] + p[ip] - Tauzz[ip];
+	Tau33[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
+		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
+		     (4.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
 
-	preEngy_X[ip] = rhoEP[ip]*U[ip] + U[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Tx[ip] - U[ip]*Tauxx[ip] - V[ip]*Tauyx[ip] - W[ip]*Tauzx[ip];
-	preEngy_Y[ip] = rhoEP[ip]*V[ip] + V[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Ty[ip] - U[ip]*Tauxy[ip] - V[ip]*Tauyy[ip] - W[ip]*Tauzy[ip];
-	preEngy_Z[ip] = rhoEP[ip]*W[ip] + W[ip]*p[ip] - (ig->cp/ig->Pr)*mu[ip]*Tz[ip] - U[ip]*Tauxz[ip] - V[ip]*Tauyz[ip] - W[ip]*Tauzz[ip];
+	Tau12[ip] =  J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip] + \
+		     J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
+
+	Tau13[ip] =  J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip] + \
+		     J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
+
+	Tau23[ip] =  J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip] + \
+		     J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
+
+	Tau11[ip] *= mu[ip];
+	Tau22[ip] *= mu[ip];
+	Tau33[ip] *= mu[ip];
+	Tau12[ip] *= mu[ip];
+	Tau13[ip] *= mu[ip];
+	Tau23[ip] *= mu[ip];
+
+	//Thermal conduction terms
+	q_1 = (ig->cp/ig->Pr)*mu[ip]*(J11[ip]*dT1[ip] + J21[ip]*dT2[ip] + J31[ip]*dT3[ip]);
+	q_2 = (ig->cp/ig->Pr)*mu[ip]*(J12[ip]*dT1[ip] + J22[ip]*dT2[ip] + J32[ip]*dT3[ip]);
+	q_3 = (ig->cp/ig->Pr)*mu[ip]*(J13[ip]*dT1[ip] + J23[ip]*dT2[ip] + J33[ip]*dT3[ip]);
+
+	//Viscous work + thermal conduction terms
+	b_1 = U[ip]*Tau11[ip] + V[ip]*Tau12[ip] + W[ip]*Tau13[ip] + q_1;
+	b_2 = U[ip]*Tau21[ip] + V[ip]*Tau22[ip] + W[ip]*Tau23[ip] + q_2;
+	b_3 = U[ip]*Tau31[ip] + V[ip]*Tau32[ip] + W[ip]*Tau33[ip] + q_3;
+
+
+	//Continuity Terms
+	preCont_1[ip] = (1.0/J[ip])*(rhoP[ip]*Ucurv[ip]);
+	preCont_2[ip] = (1.0/J[ip])*(rhoP[ip]*Vcurv[ip]);
+	preCont_3[ip] = (1.0/J[ip])*(rhoP[ip]*Wcurv[ip]);
+
+	//Combined Euler + viscous terms
+	double F1, G1;
+	double F2, G2;
+	double F3, G3;
+
+	F1 = rhoUP[ip]*Ucurv[ip] + J11[ip]*p[ip];
+	F2 = rhoUP[ip]*Vcurv[ip] + J21[ip]*p[ip];
+	F3 = rhoUP[ip]*Wcurv[ip] + J31[ip]*p[ip];
+
+	G1 = J11[ip]*Tau11[ip] + J12[ip]*Tau21[ip] + J13[ip]*Tau31[ip];
+	G2 = J21[ip]*Tau11[ip] + J22[ip]*Tau21[ip] + J23[ip]*Tau31[ip];
+	G3 = J31[ip]*Tau11[ip] + J32[ip]*Tau21[ip] + J33[ip]*Tau31[ip];
+
+	preMom1_1[ip] = (1.0/J[ip])*(F1 - G1);
+	preMom1_2[ip] = (1.0/J[ip])*(F2 - G2);
+	preMom1_3[ip] = (1.0/J[ip])*(F3 - G3);
+
+
+
+	F1 = rhoVP[ip]*Ucurv[ip] + J12[ip]*p[ip];
+	F2 = rhoVP[ip]*Vcurv[ip] + J22[ip]*p[ip];
+	F3 = rhoVP[ip]*Wcurv[ip] + J32[ip]*p[ip];
+
+	G1 = J11[ip]*Tau12[ip] + J12[ip]*Tau22[ip] + J13[ip]*Tau32[ip];
+	G2 = J21[ip]*Tau12[ip] + J22[ip]*Tau22[ip] + J23[ip]*Tau32[ip];
+	G3 = J31[ip]*Tau12[ip] + J32[ip]*Tau22[ip] + J33[ip]*Tau32[ip];
+
+	preMom2_1[ip] = (1.0/J[ip])*(F1 - G1);
+	preMom2_2[ip] = (1.0/J[ip])*(F2 - G2);
+	preMom2_3[ip] = (1.0/J[ip])*(F3 - G3);
+
+
+
+	F1 = rhoWP[ip]*Ucurv[ip] + J13[ip]*p[ip];
+	F2 = rhoWP[ip]*Vcurv[ip] + J23[ip]*p[ip];
+	F3 = rhoWP[ip]*Wcurv[ip] + J33[ip]*p[ip];
+
+	G1 = J11[ip]*Tau13[ip] + J12[ip]*Tau23[ip] + J13[ip]*Tau33[ip];
+	G2 = J21[ip]*Tau13[ip] + J22[ip]*Tau23[ip] + J23[ip]*Tau33[ip];
+	G3 = J31[ip]*Tau13[ip] + J32[ip]*Tau23[ip] + J33[ip]*Tau33[ip];
+
+	preMom3_1[ip] = (1.0/J[ip])*(F1 - G1);
+	preMom3_2[ip] = (1.0/J[ip])*(F2 - G2);
+	preMom3_3[ip] = (1.0/J[ip])*(F3 - G3);
+
+
+
+	F1 = (rhoEP[ip] + p[ip])*Ucurv[ip];
+	F2 = (rhoEP[ip] + p[ip])*Vcurv[ip];
+	F3 = (rhoEP[ip] + p[ip])*Wcurv[ip];
+
+	G1 = J11[ip]*b_1 + J12[ip]*b_2 + J13[ip]*b_3;
+	G2 = J21[ip]*b_1 + J22[ip]*b_2 + J23[ip]*b_3;
+	G3 = J31[ip]*b_1 + J32[ip]*b_2 + J33[ip]*b_3;
+
+
+	preEngy_1[ip] = (1.0/J[ip])*(F1 - G1);
+	preEngy_2[ip] = (1.0/J[ip])*(F2 - G2);
+	preEngy_3[ip] = (1.0/J[ip])*(F3 - G3);
 
     }
+
+	int Nx = pySize[0];
+	int Ny = pySize[1];
+	int Nz = pySize[2];
+
+    getRange(preMom3_3, "preMom3_3", Nx, Ny, Nz, mpiRank); 
+    getRange(preMom2_2, "preMom2_2", Nx, Ny, Nz, mpiRank); 
+    getRange(preMom1_1, "preMom1_1", Nx, Ny, Nz, mpiRank); 
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
 	IF_RANK0 cout << " > Tau&Components Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
 
-    ///////////////////
-    // Y-DERIVATIVES //
-    ///////////////////
+    /////////////////////
+    // Xi2-DERIVATIVES //
+    /////////////////////
    
-    derivY->calc1stDerivField(rhoVP,     cont_Y);
-    derivY->calc1stDerivField(preMomX_Y, momX_Y);
-    derivY->calc1stDerivField(preMomY_Y, momY_Y);
-    derivY->calc1stDerivField(preMomZ_Y, momZ_Y);
-    derivY->calc1stDerivField(preEngy_Y, engy_Y);
+    derivXi2->calc1stDerivField(preCont_2, cont_2);
+    derivXi2->calc1stDerivField(preMom1_2, mom1_2);
+    derivXi2->calc1stDerivField(preMom2_2, mom2_2);
+    derivXi2->calc1stDerivField(preMom3_2, mom3_2);
+    derivXi2->calc1stDerivField(preEngy_2, engy_2);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > yderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " > 2derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+    }
+
+    /////////////////////
+    // Xi1-DERIVATIVES //
+    /////////////////////
+
+    double *preCont_1_xp, *preMom1_1_xp, *preMom2_1_xp, *preMom3_1_xp, *preEngy_1_xp;
+    preCont_1_xp = tempX1; 
+    preMom1_1_xp = tempX2; 
+    preMom2_1_xp = tempX3; 
+    preMom3_1_xp = tempX4; 
+    preEngy_1_xp = tempX5; 
+
+    double *cont_1_xp, *mom1_1_xp, *mom2_1_xp, *mom3_1_xp, *engy_1_xp;
+    cont_1_xp = tempX6; 
+    mom1_1_xp = tempX7; 
+    mom2_1_xp = tempX8; 
+    mom3_1_xp = tempX9; 
+    engy_1_xp = tempX10; 
+
+    c2d->transposeY2X_MajorIndex(preCont_1, preCont_1_xp);
+    c2d->transposeY2X_MajorIndex(preMom1_1, preMom1_1_xp);
+    c2d->transposeY2X_MajorIndex(preMom2_1, preMom2_1_xp);
+    c2d->transposeY2X_MajorIndex(preMom3_1, preMom3_1_xp);
+    c2d->transposeY2X_MajorIndex(preEngy_1, preEngy_1_xp);
+
+    derivX->calc1stDerivField(preCont_1_xp, cont_1_xp); 
+    derivX->calc1stDerivField(preMom1_1_xp, mom1_1_xp); 
+    derivX->calc1stDerivField(preMom2_1_xp, mom2_1_xp); 
+    derivX->calc1stDerivField(preMom3_1_xp, mom3_1_xp); 
+    derivX->calc1stDerivField(preEngy_1_xp, engy_1_xp); 
+
+    c2d->transposeX2Y_MajorIndex(cont_1_xp, cont_1);
+    c2d->transposeX2Y_MajorIndex(mom1_1_xp, mom1_1);
+    c2d->transposeX2Y_MajorIndex(mom2_1_xp, mom2_1);
+    c2d->transposeX2Y_MajorIndex(mom3_1_xp, mom3_1);
+    c2d->transposeX2Y_MajorIndex(engy_1_xp, engy_1);
+
+    if(useTiming){
+	ftt2 = MPI_Wtime();
+	IF_RANK0 cout << " > 1derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
 
     ///////////////////
-    // X-DERIVATIVES //
+    // Xi3-DERIVATIVES //
     ///////////////////
 
-    double *rhoUP1, *preMomX_X1, *preMomY_X1, *preMomZ_X1, *preEngy_X1;
-    rhoUP1     = tempX1; 
-    preMomX_X1 = tempX2; 
-    preMomY_X1 = tempX3; 
-    preMomZ_X1 = tempX4; 
-    preEngy_X1 = tempX5; 
+    double *preCont_3_zp, *preMom1_3_zp, *preMom2_3_zp, *preMom3_3_zp, *preEngy_3_zp;
+    double *cont_3_zp, *mom1_3_zp, *mom2_3_zp, *mom3_3_zp, *engy_3_zp;
 
-    double *cont_X1, *momX_X1, *momY_X1, *momZ_X1, *engy_X1;
-    cont_X1 = tempX6; 
-    momX_X1 = tempX7; 
-    momY_X1 = tempX8; 
-    momZ_X1 = tempX9; 
-    engy_X1 = tempX10; 
+    preCont_3_zp = tempZ1; cont_3_zp = tempZ6;
+    preMom1_3_zp = tempZ2; mom1_3_zp = tempZ7;
+    preMom2_3_zp = tempZ3; mom2_3_zp = tempZ8;
+    preMom3_3_zp = tempZ4; mom3_3_zp = tempZ9;
+    preEngy_3_zp = tempZ5; engy_3_zp = tempZ10;
 
-    c2d->transposeY2X_MajorIndex(rhoUP,     rhoUP1);
-    c2d->transposeY2X_MajorIndex(preMomX_X, preMomX_X1);
-    c2d->transposeY2X_MajorIndex(preMomY_X, preMomY_X1);
-    c2d->transposeY2X_MajorIndex(preMomZ_X, preMomZ_X1);
-    c2d->transposeY2X_MajorIndex(preEngy_X, preEngy_X1);
+    c2d->transposeY2Z_MajorIndex(preCont_3, preCont_3_zp);
+    c2d->transposeY2Z_MajorIndex(preMom1_3, preMom1_3_zp);
+    c2d->transposeY2Z_MajorIndex(preMom2_3, preMom2_3_zp);
+    c2d->transposeY2Z_MajorIndex(preMom3_3, preMom3_3_zp);
+    c2d->transposeY2Z_MajorIndex(preEngy_3, preEngy_3_zp);
 
-    derivX->calc1stDerivField(rhoUP1,     cont_X1); 
-    derivX->calc1stDerivField(preMomX_X1, momX_X1); 
-    derivX->calc1stDerivField(preMomY_X1, momY_X1); 
-    derivX->calc1stDerivField(preMomZ_X1, momZ_X1); 
-    derivX->calc1stDerivField(preEngy_X1, engy_X1); 
+    derivXi3->calc1stDerivField(preCont_3_zp, cont_3_zp);
+    derivXi3->calc1stDerivField(preMom1_3_zp, mom1_3_zp);
+    derivXi3->calc1stDerivField(preMom2_3_zp, mom2_3_zp);
+    derivXi3->calc1stDerivField(preMom3_3_zp, mom3_3_zp);
+    derivXi3->calc1stDerivField(preEngy_3_zp, engy_3_zp);
 
-    c2d->transposeX2Y_MajorIndex(cont_X1, cont_X);
-    c2d->transposeX2Y_MajorIndex(momX_X1, momX_X);
-    c2d->transposeX2Y_MajorIndex(momY_X1, momY_X);
-    c2d->transposeX2Y_MajorIndex(momZ_X1, momZ_X);
-    c2d->transposeX2Y_MajorIndex(engy_X1, engy_X);
+    c2d->transposeZ2Y_MajorIndex(cont_3_zp, cont_3);
+    c2d->transposeZ2Y_MajorIndex(mom1_3_zp, mom1_3);
+    c2d->transposeZ2Y_MajorIndex(mom2_3_zp, mom2_3);
+    c2d->transposeZ2Y_MajorIndex(mom3_3_zp, mom3_3);
+    c2d->transposeZ2Y_MajorIndex(engy_3_zp, engy_3);
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > xderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
-    }
-
-    ///////////////////
-    // Z-DERIVATIVES //
-    ///////////////////
-
-    double *rhoWP3, *preMomX_Z3, *preMomY_Z3, *preMomZ_Z3, *preEngy_Z3;
-    double *cont_Z3, *momX_Z3, *momY_Z3, *momZ_Z3, *engy_Z3;
-
-    rhoWP3     = tempZ1; cont_Z3 = tempZ6;
-    preMomX_Z3 = tempZ2; momX_Z3 = tempZ7;
-    preMomY_Z3 = tempZ3; momY_Z3 = tempZ8;
-    preMomZ_Z3 = tempZ4; momZ_Z3 = tempZ9;
-    preEngy_Z3 = tempZ5; engy_Z3 = tempZ10;
-
-    c2d->transposeY2Z_MajorIndex(rhoWP,     rhoWP3);
-    c2d->transposeY2Z_MajorIndex(preMomX_Z, preMomX_Z3);
-    c2d->transposeY2Z_MajorIndex(preMomY_Z, preMomY_Z3);
-    c2d->transposeY2Z_MajorIndex(preMomZ_Z, preMomZ_Z3);
-    c2d->transposeY2Z_MajorIndex(preEngy_Z, preEngy_Z3);
-
-    derivZ->calc1stDerivField(rhoWP3,     cont_Z3);
-    derivZ->calc1stDerivField(preMomX_Z3, momX_Z3);
-    derivZ->calc1stDerivField(preMomY_Z3, momY_Z3);
-    derivZ->calc1stDerivField(preMomZ_Z3, momZ_Z3);
-    derivZ->calc1stDerivField(preEngy_Z3, engy_Z3);
-
-    c2d->transposeZ2Y_MajorIndex(cont_Z3, cont_Z);
-    c2d->transposeZ2Y_MajorIndex(momX_Z3, momX_Z);
-    c2d->transposeZ2Y_MajorIndex(momY_Z3, momY_Z);
-    c2d->transposeZ2Y_MajorIndex(momZ_Z3, momZ_Z);
-    c2d->transposeZ2Y_MajorIndex(engy_Z3, engy_Z);
-
-    if(useTiming){
-	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > zderivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " > 3derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
 
 
@@ -504,7 +581,7 @@ void CurvilinearCSolver::preStepDerivatives(){
 
 }
 
-
+/*
 void CurvilinearCSolver::solveContinuity(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -1167,49 +1244,49 @@ void CurvilinearCSolver::reportAll(){
    int Nz = pySize[2];
 
    IF_RANK0   cout << "REPORT ALL" << endl;
-/*
-   getRange(Ux, "Ux", Nx, Ny, Nz, mpiRank);
-   getRange(Uy, "Uy", Nx, Ny, Nz, mpiRank);
-   getRange(Uz, "Uz", Nx, Ny, Nz, mpiRank);
+
+   getRange(dU1, "dU1", Nx, Ny, Nz, mpiRank);
+   getRange(dU2, "dU2", Nx, Ny, Nz, mpiRank);
+   getRange(dU3, "dU3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(Vx, "Vx", Nx, Ny, Nz, mpiRank);
-   getRange(Vy, "Vy", Nx, Ny, Nz, mpiRank);
-   getRange(Vz, "Vz", Nx, Ny, Nz, mpiRank);
+   getRange(dV1, "dV1", Nx, Ny, Nz, mpiRank);
+   getRange(dV2, "dV2", Nx, Ny, Nz, mpiRank);
+   getRange(dV3, "dV3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(Wx, "Wx", Nx, Ny, Nz, mpiRank);
-   getRange(Wy, "Wy", Nx, Ny, Nz, mpiRank);
-   getRange(Wz, "Wz", Nx, Ny, Nz, mpiRank);
+   getRange(dW1, "dW1", Nx, Ny, Nz, mpiRank);
+   getRange(dW2, "dW2", Nx, Ny, Nz, mpiRank);
+   getRange(dW3, "dW3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(Tx, "Tx", Nx, Ny, Nz, mpiRank);
-   getRange(Ty, "Ty", Nx, Ny, Nz, mpiRank);
-   getRange(Tz, "Tz", Nx, Ny, Nz, mpiRank);
+   getRange(dT1, "dT1", Nx, Ny, Nz, mpiRank);
+   getRange(dT2, "dT2", Nx, Ny, Nz, mpiRank);
+   getRange(dT3, "dT3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(Tauxx, "Tauxx", Nx, Ny, Nz, mpiRank);
-   getRange(Tauyy, "Tauyy", Nx, Ny, Nz, mpiRank);
-   getRange(Tauzz, "Tauzz", Nx, Ny, Nz, mpiRank);
-   getRange(Tauxy, "Tauxy", Nx, Ny, Nz, mpiRank);
-   getRange(Tauyz, "Tauyz", Nx, Ny, Nz, mpiRank);
-   getRange(Tauxz, "Tauxz", Nx, Ny, Nz, mpiRank);
+   getRange(Tau11, "Tau11", Nx, Ny, Nz, mpiRank);
+   getRange(Tau22, "Tau22", Nx, Ny, Nz, mpiRank);
+   getRange(Tau33, "Tau33", Nx, Ny, Nz, mpiRank);
+   getRange(Tau12, "Tau12", Nx, Ny, Nz, mpiRank);
+   getRange(Tau23, "Tau23", Nx, Ny, Nz, mpiRank);
+   getRange(Tau13, "Tau13", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(cont_X, "cont_X", Nx, Ny, Nz, mpiRank);
-   getRange(cont_Y, "cont_Y", Nx, Ny, Nz, mpiRank);
-   getRange(cont_Z, "cont_Z", Nx, Ny, Nz, mpiRank);
+   getRange(cont_1, "cont_1", Nx, Ny, Nz, mpiRank);
+   getRange(cont_2, "cont_2", Nx, Ny, Nz, mpiRank);
+   getRange(cont_3, "cont_3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momX_X, "momX_X", Nx, Ny, Nz, mpiRank);
-   getRange(momX_Y, "momX_Y", Nx, Ny, Nz, mpiRank);
-   getRange(momX_Z, "momX_Z", Nx, Ny, Nz, mpiRank);
+   getRange(mom1_1, "mom1_1", Nx, Ny, Nz, mpiRank);
+   getRange(mom1_2, "mom1_2", Nx, Ny, Nz, mpiRank);
+   getRange(mom1_3, "mom1_3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momY_X, "momY_X", Nx, Ny, Nz, mpiRank);
-   getRange(momY_Y, "momY_Y", Nx, Ny, Nz, mpiRank);
-   getRange(momY_Z, "momY_Z", Nx, Ny, Nz, mpiRank);
+   getRange(mom2_1, "mom2_1", Nx, Ny, Nz, mpiRank);
+   getRange(mom2_2, "mom2_2", Nx, Ny, Nz, mpiRank);
+   getRange(mom2_3, "mom2_3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(momZ_X, "momZ_X", Nx, Ny, Nz, mpiRank);
-   getRange(momZ_Y, "momZ_Y", Nx, Ny, Nz, mpiRank);
-   getRange(momZ_Z, "momZ_Z", Nx, Ny, Nz, mpiRank);
+   getRange(mom3_1, "mom3_1", Nx, Ny, Nz, mpiRank);
+   getRange(mom3_2, "mom3_2", Nx, Ny, Nz, mpiRank);
+   getRange(mom3_3, "mom3_3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
-   getRange(engy_X, "engy_X", Nx, Ny, Nz, mpiRank);
-   getRange(engy_Y, "engy_Y", Nx, Ny, Nz, mpiRank);
-   getRange(engy_Z, "engy_Z", Nx, Ny, Nz, mpiRank);
+   getRange(engy_1, "engy_1", Nx, Ny, Nz, mpiRank);
+   getRange(engy_2, "engy_2", Nx, Ny, Nz, mpiRank);
+   getRange(engy_3, "engy_3", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
    getRange(rho1, "rho1", Nx, Ny, Nz, mpiRank);
    getRange(rhok, "rhok", Nx, Ny, Nz, mpiRank);
@@ -1245,6 +1322,5 @@ void CurvilinearCSolver::reportAll(){
    getRange(sos, "sos", Nx, Ny, Nz, mpiRank);
    IF_RANK0 cout << " " << endl;
 
-*/
 }
 

@@ -57,9 +57,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *Tau31,  *Tau32,  *Tau33;
 
 	double *cont_1, *cont_2, *cont_3;
-	double *momX_1, *momX_2, *momX_3;
-	double *momY_1, *momY_2, *momY_3;
-	double *momZ_1, *momZ_2, *momZ_3;
+	double *mom1_1, *mom1_2, *mom1_3;
+	double *mom2_1, *mom2_2, *mom2_3;
+	double *mom3_1, *mom3_2, *mom3_3;
 	double *engy_1, *engy_2, *engy_3;
 
 	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
@@ -67,7 +67,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
-	double *tempY11, *tempY12;
+	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
 
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
@@ -240,20 +240,21 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void initializeSolverData();
 
 	void preStep(){
-/*
+
    	    if(timeStep == 0){
-        	dumpSolution();
-        	writeImages();
+//        	dumpSolution();
+//        	writeImages();
     	    }
     	    calcDtFromCFL();
-*/
+
 	}
 
 	void preSubStep(){
-/*
+
     	    preStepBCHandling();
     	    preStepDerivatives();
-*/
+	    reportAll();
+
 	}
 
 	void solveEqnSet(){
