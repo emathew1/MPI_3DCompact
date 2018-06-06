@@ -52,12 +52,12 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 250;
+    int maxTimeStep  = 200;
     double maxTime   = 3000.0;
-    int filterStep   = 1;
+    int filterStep   = 5;
     int checkStep    = 1;
     int dumpStep     = 2500;
-    int imageStep    = 25;
+    int imageStep    = 2;
     TimeStepping *ts = new TimeStepping(timeSteppingType, 
 					CFL, 
 					maxTimeStep, 
@@ -107,9 +107,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 150,
-           Ny = 150,
-           Nz = 150;
+    int    Nx = 50,
+           Ny = 50,
+           Nz = 50;
     double Lx = 1.0,
            Ly = 1.0,
            Lz = 1.0;;
@@ -188,11 +188,7 @@ int main(int argc, char *argv[]){
     }
 
 
-    cs->setInitialConditions();
-    cs->preStep();
-    cs->preSubStep();    
-   
-//    rk->executeSolverLoop();  
+    rk->executeSolverLoop();  
 
     //Now lets kill MPI
     MPI_Finalize();

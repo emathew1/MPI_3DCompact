@@ -465,14 +465,6 @@ void CurvilinearCSolver::preStepDerivatives(){
 
     }
 
-	int Nx = pySize[0];
-	int Ny = pySize[1];
-	int Nz = pySize[2];
-
-    getRange(preMom3_3, "preMom3_3", Nx, Ny, Nz, mpiRank); 
-    getRange(preMom2_2, "preMom2_2", Nx, Ny, Nz, mpiRank); 
-    getRange(preMom1_1, "preMom1_1", Nx, Ny, Nz, mpiRank); 
-
     if(useTiming){
 	ftt2 = MPI_Wtime();
 	IF_RANK0 cout << " > Tau&Components Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
@@ -581,7 +573,7 @@ void CurvilinearCSolver::preStepDerivatives(){
 
 }
 
-/*
+
 void CurvilinearCSolver::solveContinuity(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -597,12 +589,12 @@ void CurvilinearCSolver::solveContinuity(){
 
     FOR_XYZ_YPEN{
 
-	if(spongeFlag)
-	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
-	else
+//	if(spongeFlag)
+//	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
+//	else
 	    spgSource = 0.0;
 		
-	rhok2[ip]  = ts->dt*J[ip]*(-cont_X[ip] - cont_Y[ip] - cont_Z[ip] + spgSource);
+	rhok2[ip]  = ts->dt*J[ip]*(-cont_1[ip] - cont_2[ip] - cont_3[ip] + spgSource/J[ip]);
     }
 
     if(useTiming){
@@ -626,12 +618,12 @@ void CurvilinearCSolver::solveXMomentum(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-	if(spongeFlag)
-	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
-	else
+//	if(spongeFlag)
+//	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
+//	else
 	    spgSource = 0.0;
 
-	rhoUk2[ip] += -momX_X[ip] - momX_Y[ip] -momX_Z[ip] + spgSource;
+	rhoUk2[ip] += -mom1_1[ip] - mom1_2[ip] -mom1_3[ip] + spgSource/J[ip];
 	rhoUk2[ip] *= ts->dt*J[ip];
     }
 
@@ -659,12 +651,12 @@ void CurvilinearCSolver::solveYMomentum(){
 
     FOR_XYZ_YPEN{ 
 
-        if(spongeFlag)
-            spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
-	else
+//        if(spongeFlag)
+//            spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
+//	else
 	    spgSource = 0.0;
 
-	rhoVk2[ip] += -momY_X[ip] -momY_Y[ip] -momY_Z[ip] + spgSource;
+	rhoVk2[ip] += -mom2_1[ip] -mom2_2[ip] -mom2_3[ip] + spgSource/J[ip];
         rhoVk2[ip] *= ts->dt*J[ip];
    }
 
@@ -691,12 +683,12 @@ void CurvilinearCSolver::solveZMomentum(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-        if(spongeFlag)
-            spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
-        else
+//        if(spongeFlag)
+//           spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
+//        else
 	    spgSource = 0.0;
 
-	rhoWk2[ip] += -momZ_X[ip] -momZ_Y[ip] -momZ_Z[ip] + spgSource;
+	rhoWk2[ip] += -mom3_1[ip] -mom3_2[ip] -mom3_3[ip] + spgSource/J[ip];
         rhoWk2[ip] *= ts->dt*J[ip];
     }
 
@@ -724,12 +716,12 @@ void CurvilinearCSolver::solveEnergy(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-        if(spongeFlag)
-            spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
-        else
+//        if(spongeFlag)
+//            spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
+//        else
             spgSource = 0.0;
 
-	rhoEk2[ip] = -engy_X[ip] - engy_Y[ip] - engy_Z[ip] + spgSource;
+	rhoEk2[ip] = -engy_1[ip] - engy_2[ip] - engy_3[ip] + spgSource/J[ip];
 	rhoEk2[ip] *= ts->dt*J[ip];
     }
 
@@ -911,11 +903,12 @@ void CurvilinearCSolver::filterConservedData(){
 
 
 };
-*/
+
 
 void CurvilinearCSolver::updateNonConservedData(){
 
     if(useTiming) ft1 = MPI_Wtime();
+
 
     if(!rkLast){
 
@@ -930,6 +923,7 @@ void CurvilinearCSolver::updateNonConservedData(){
             Ucurv[ip] = J11[ip]*U[ip] + J12[ip]*V[ip] + J13[ip]*W[ip];
             Vcurv[ip] = J21[ip]*U[ip] + J22[ip]*V[ip] + J23[ip]*W[ip];
             Wcurv[ip] = J31[ip]*U[ip] + J32[ip]*V[ip] + J33[ip]*W[ip];
+
 	}
 
     }else if(rkLast){
@@ -948,14 +942,49 @@ void CurvilinearCSolver::updateNonConservedData(){
 	}
     }
 
-    
+
     if(useTiming){
 	ft2 = MPI_Wtime();
 	IF_RANK0 cout << " > updNonCons Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;
     }
+/*
+    cout << "RHO" << endl; 
+    FOR_Z_YPEN{
+        FOR_Y_YPEN{
+            FOR_X_YPEN{
+                int ip = GETMAJIND_YPEN;
+	 	cout << rhok[ip] << " ";
+            }
+	    cout << endl;
+        }
+	cout << endl;
+    } 
 
 
-
+    cout << "RHOU" << endl; 
+    FOR_Z_YPEN{
+        FOR_Y_YPEN{
+            FOR_X_YPEN{
+                int ip = GETMAJIND_YPEN;
+	 	cout << rhoUk[ip] << " ";
+            }
+	    cout << endl;
+        }
+	cout << endl;
+    }
+ 
+    cout << "RHOV" << endl; 
+    FOR_Z_YPEN{
+        FOR_Y_YPEN{
+            FOR_X_YPEN{
+                int ip = GETMAJIND_YPEN;
+	 	cout << rhoVk[ip] << " ";
+            }
+	    cout << endl;
+        }
+	cout << endl;
+    } 
+*/
 }
 
 void CurvilinearCSolver::checkSolution(){
@@ -1062,7 +1091,7 @@ void CurvilinearCSolver::dumpSolution(){
 
 
 }
-/*
+
 void CurvilinearCSolver::writeImages(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -1075,7 +1104,7 @@ void CurvilinearCSolver::writeImages(){
 	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
 	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
-	writePlaneImageForVariable(U, "uXZ", timeStepString, 1, 0.5);
+	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);
 	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
 
     if(useTiming){
@@ -1203,7 +1232,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
     delete[] ff;
 
 }
-*/
+
 
 void CurvilinearCSolver::checkEnd(){
 
@@ -1317,6 +1346,9 @@ void CurvilinearCSolver::reportAll(){
    getRange(U, "U", Nx, Ny, Nz, mpiRank);
    getRange(V, "V", Nx, Ny, Nz, mpiRank);
    getRange(W, "W", Nx, Ny, Nz, mpiRank);
+   getRange(Ucurv, "Ucurv", Nx, Ny, Nz, mpiRank);
+   getRange(Vcurv, "Vcurv", Nx, Ny, Nz, mpiRank);
+   getRange(Wcurv, "Wcurv", Nx, Ny, Nz, mpiRank);
    getRange(T, "T", Nx, Ny, Nz, mpiRank);
    getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
    getRange(sos, "sos", Nx, Ny, Nz, mpiRank);

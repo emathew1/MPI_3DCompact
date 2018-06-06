@@ -84,7 +84,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double Z0WallU, Z0WallV, Z1WallU, Z1WallV;
 
 	//For drawing images
-	PngWriter *png;
+	PngWriter *pngXY;
+	PngWriter *pngXZ;
+	PngWriter *pngYZ;
 
 	//Alias'd derivative objects
 	Derivatives *derivXi1, *derivXi2, *derivXi3;
@@ -160,12 +162,15 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
 
 	    //only rank 0 write images for now...
-	    IF_RANK0{
-		png = new PngWriter(Nx, Ny); 
-	    }else{
-		png = NULL;
-	    }
-	
+            IF_RANK0{
+                pngXY = new PngWriter(Nx, Ny);
+                pngXZ = new PngWriter(Nz, Nx);
+                pngYZ = new PngWriter(Ny, Nz);
+            }else{
+                pngXY = NULL;
+                pngXZ = NULL;
+                pngYZ = NULL;
+            }
 
 	    int minYPenXSize;
 	    int minYPenZSize;
@@ -243,7 +248,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
    	    if(timeStep == 0){
 //        	dumpSolution();
-//        	writeImages();
+        	writeImages();
     	    }
     	    calcDtFromCFL();
 
@@ -253,39 +258,37 @@ class CurvilinearCSolver: public AbstractCSolver{
 
     	    preStepBCHandling();
     	    preStepDerivatives();
-	    reportAll();
 
 	}
 
 	void solveEqnSet(){
-/*
+
     	    solveContinuity();
             solveXMomentum();
     	    solveYMomentum();
     	    solveZMomentum();
     	    solveEnergy();
-*/	    
+	    
 	}
 
 	void postSubStep(){
-/*
+
     	    postStepBCHandling();
-*/
+
 	}
 
 	void updateData(){
-/*
+
     	    if(rkLast){
         	filterConservedData();
     	    }
-    	    updateNonConservedData();
-
-*/
+    
+	    updateNonConservedData();
 	}
 
 	void postStep(){
-/*
-    	    updateSponge();
+
+    	    //updateSponge();
     	    checkSolution();
 
     	    if(timeStep%ts->dumpStep == 0)
@@ -297,7 +300,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    temporalCalculations();
 
     	    checkEnd();
-*/
+
 	}
 
 
