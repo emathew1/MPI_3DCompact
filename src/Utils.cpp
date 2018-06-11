@@ -267,3 +267,48 @@ void getRangeValue(double *phi, int Nx, int Ny, int Nz, int mpiRank, double &glo
 
 }
 
+bool isPointInBox(double p[3], double vertex[3][8]){
+
+
+    //Do bounding box check first
+    double x_max = -10000000.0;
+    double x_min =  10000000.0;
+    double y_max = -10000000.0;
+    double y_min =  10000000.0;
+    double z_max = -10000000.0;
+    double z_min =  10000000.0;
+
+    for(int ip = 0; ip < 8; ip++){
+
+	x_max = max(x_max, vertex[0][ip]);
+	y_max = max(y_max, vertex[1][ip]);
+	z_max = max(z_max, vertex[2][ip]);
+
+	x_min = min(x_min, vertex[0][ip]);
+	y_min = min(y_min, vertex[1][ip]);
+	z_min = min(z_min, vertex[2][ip]);
+
+    }
+
+    bool isInBB = false;
+    if(p[0] <= x_max && p[0] >= x_min){
+	if(p[1] <= y_max && p[1] >= y_max){
+	    if(p[2] <= z_max && p[2] >= z_max){
+		isInBB = true;
+	    }
+	}
+    }
+
+    //We are in the bounding box, continue with volume check
+    if(isInBB){
+	//get box center...
+	double b_center[3] = {0,0,0};
+	for(int ip = 0; ip < 8; ip++){
+	    FOR_I3 b_center[i] += vertex[i][ip]; 
+	}
+	FOR_I3 b_center[i] /= 8.0;
+
+
+    }
+
+}
