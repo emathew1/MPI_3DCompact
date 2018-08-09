@@ -52,8 +52,8 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 200;
-    double maxTime   = 3000.0;
+    int maxTimeStep  = 1;
+    double maxTime   = 300.0;
     int filterStep   = 5;
     int checkStep    = 1;
     int dumpStep     = 2500;
@@ -186,6 +186,35 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
+   
+    //Test out the tet volume solver
+
+    double vertex[8][3];
+    for(int ip = 0; ip < 8; ip++){
+	for(int jp = 0; jp < 3; jp++){
+	    vertex[ip][jp] = 0.0;
+	}
+    }
+    vertex[1][2] = 1.0;
+    vertex[2][1] = 1.0;
+    vertex[3][1] = 1.0;
+    vertex[3][2] = 1.0;
+    vertex[4][0] = 1.0;
+    vertex[5][0] = 1.0;
+    vertex[5][2] = 1.0;
+    vertex[6][0] = 1.0;
+    vertex[6][1] = 1.0;
+    vertex[7][0] = 1.0;
+    vertex[7][1] = 1.0;
+    vertex[7][2] = 1.0;
+
+    double P[3] = {0.0, 0.0, 0.0};
+    double P2[3] = {1.5, 0.5, 0.5};
+
+    IF_RANK0{ cout << "volume = " << getHexaVolume(vertex) << endl;};
+    IF_RANK0{ cout << "volume = " << getHexaVolumeWithPoint(vertex, P2) << endl;};
+    IF_RANK0{ cout << "is in Hexa? " << isPointInHexa(P2, vertex) << endl;};
 
 
     rk->executeSolverLoop();  

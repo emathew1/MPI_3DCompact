@@ -267,7 +267,7 @@ void getRangeValue(double *phi, int Nx, int Ny, int Nz, int mpiRank, double &glo
 
 }
 
-bool isPointInBox(double p[3], double vertex[3][8]){
+bool isPointInHexa(double p[3], double vertex[8][3]){
 
 
     //Do bounding box check first
@@ -280,35 +280,111 @@ bool isPointInBox(double p[3], double vertex[3][8]){
 
     for(int ip = 0; ip < 8; ip++){
 
-	x_max = max(x_max, vertex[0][ip]);
-	y_max = max(y_max, vertex[1][ip]);
-	z_max = max(z_max, vertex[2][ip]);
+	x_max = max(x_max, vertex[ip][0]);
+	y_max = max(y_max, vertex[ip][1]);
+	z_max = max(z_max, vertex[ip][2]);
 
-	x_min = min(x_min, vertex[0][ip]);
-	y_min = min(y_min, vertex[1][ip]);
-	z_min = min(z_min, vertex[2][ip]);
+	x_min = min(x_min, vertex[ip][0]);
+	y_min = min(y_min, vertex[ip][1]);
+	z_min = min(z_min, vertex[ip][2]);
 
     }
 
     bool isInBB = false;
     if(p[0] <= x_max && p[0] >= x_min){
-	if(p[1] <= y_max && p[1] >= y_max){
-	    if(p[2] <= z_max && p[2] >= z_max){
+	if(p[1] <= y_max && p[1] >= y_min){
+	    if(p[2] <= z_max && p[2] >= z_min){
 		isInBB = true;
 	    }
 	}
     }
 
+    isInBB = true;
     //We are in the bounding box, continue with volume check
     if(isInBB){
-	//get box center...
-	double b_center[3] = {0,0,0};
-	for(int ip = 0; ip < 8; ip++){
-	    FOR_I3 b_center[i] += vertex[i][ip]; 
+
+	double volWithCentroid = getHexaVolume(vertex);
+	double volWithPoint    = getHexaVolumeWithPoint(vertex, p);
+
+	double eps = 1e-12;
+
+	if(fabs(volWithPoint - volWithCentroid) < eps){
+	    return true;
+	}else{	
+	    return false;
 	}
-	FOR_I3 b_center[i] /= 8.0;
 
 
+    }else{
+	return false;
     }
 
 }
+
+double getHexaVolume(double vertex[8][3]){
+
+    //get hexa center...only guaranteed for convex polyhedra?
+    double h_center[3] = {0,0,0};
+    for(int ip = 0; ip < 8; ip++){
+        FOR_I3 h_center[i] += vertex[ip][i];
+    }
+    FOR_I3 h_center[i] /= 8.0;
+
+    //THESE ARE IN A SPECIFIC ORDER!!!
+    double *A = vertex[0]; //{0.0, 0.0, 0.0} 
+    double *B = vertex[2]; //{0.0, 1.0, 0.0}
+    double *C = vertex[4]; //{1.0, 0.0, 0.0}
+    double *D = vertex[6]; //{1.0, 1.0, 0.0}
+    double *E = vertex[1]; //{0.0, 0.0, 1.0}
+    double *F = vertex[3]; //{0.0, 1.0, 1.0}
+    double *G = vertex[5]; //{1.0, 0.0, 1.0}
+    double *H = vertex[7]; //{1.0, 1.0, 1.0}
+
+    double volume_hexa = 0.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(A, B, C, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(B, D, C, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(G, F, E, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(F, G, H, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(E, B, A, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(B, E, F, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(C, D, G, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(H, G, D, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(A, C, G, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(C, G, E, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(F, D, B, h_center))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(D, F, H, h_center))/6.0;
+
+    return volume_hexa;
+};
+
+double getHexaVolumeWithPoint(double vertex[8][3], double P[3]){
+
+    //THESE ARE IN A SPECIFIC ORDER!!!
+    double *A = vertex[0]; //{0.0, 0.0, 0.0} 
+    double *B = vertex[2]; //{0.0, 1.0, 0.0}
+    double *C = vertex[4]; //{1.0, 0.0, 0.0}
+    double *D = vertex[6]; //{1.0, 1.0, 0.0}
+    double *E = vertex[1]; //{0.0, 0.0, 1.0}
+    double *F = vertex[3]; //{0.0, 1.0, 1.0}
+    double *G = vertex[5]; //{1.0, 0.0, 1.0}
+    double *H = vertex[7]; //{1.0, 1.0, 1.0}
+
+    double volume_hexa = 0.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(A, B, C, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(B, D, C, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(G, F, E, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(F, G, H, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(E, B, A, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(B, E, F, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(C, D, G, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(H, G, D, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(A, C, G, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(C, G, E, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(F, D, B, P))/6.0;
+    volume_hexa += fabs(SIGNED_TET_VOLUME_6(D, F, H, P))/6.0;
+
+
+
+
+    return volume_hexa;
+};

@@ -7,6 +7,10 @@
 #define FOR_J3 for(int j = 0; j < 3; j++)
 #define FOR_K3 for(int k = 0; k < 3; k++)
 
+#define SIGNED_TET_VOLUME_6(A,B,C,D) (((B)[0]-(A)[0])*(((C)[1]-(A)[1])*((D)[2]-(A)[2])-((C)[2]-(A)[2])*((D)[1]-(A)[1])) + \
+                                      ((B)[1]-(A)[1])*(((C)[2]-(A)[2])*((D)[0]-(A)[0])-((C)[0]-(A)[0])*((D)[2]-(A)[2])) + \
+                                      ((B)[2]-(A)[2])*(((C)[0]-(A)[0])*((D)[1]-(A)[1])-((C)[1]-(A)[1])*((D)[0]-(A)[0])))
+
 //Need to be sure that Nx,Ny,Nz are defined within scope to use these
 //General indexing...
 #define GETMAJIND_XPEN k*pxSize[0]*pxSize[1] + j*pxSize[0] + i
