@@ -9,6 +9,7 @@
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
 #include "PngWriter.hpp"
+#include "Adt.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -91,6 +92,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//Alias'd derivative objects
 	Derivatives *derivXi1, *derivXi2, *derivXi3;
 	Filter *filtXi1, *filtXi2, *filtXi3;
+
+	//Our Adt search object
+	Adt<double> *adt;
 
 	//Constructor to use for this class...
 	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
@@ -198,6 +202,116 @@ class CurvilinearCSolver: public AbstractCSolver{
 		neumannLocalZ = false;
 	    }
 
+
+	    //Initialize the ADT object for interpolation and locating points in the grid...
+	    
+	    int Nlocal = pySize[0]*pySize[1]*pySize[2];
+	    double (*boundBoxMin)[3] = new double[Nlocal][3];
+	    double (*boundBoxMax)[3] = new double[Nlocal][3];
+
+	    //Get our coordinates in neighbors across partitions using halo updates
+	    double *x_halo = NULL;
+	    double *y_halo = NULL;
+	    double *z_halo = NULL;
+
+	    //Halo supported only for non-major arrays right now, kind of a pain...
+	    double *x_temp1, *y_temp1, *z_temp1;
+	    c2d->allocX(x_temp1); 
+	    c2d->allocX(y_temp1); 
+            c2d->allocX(z_temp1);	
+
+	    MPI_Barrier(MPI_COMM_WORLD);
+	    IF_RANK0 cout << "here1" << endl;
+	
+
+	    //TODO TODO TODO
+	    //This can't be done yet since x, y, & z havent' even been allocated yet!!
+	    //This should be moved to some other location in the code after the initilization 
+	    // of the mesh object!!!
+	    // PERHAPS ADT SHOULD BE A PART OF THE MESH OBJECT, DUHH
+	    //TODO TODO TODO	    
+ 
+	    //So move to x-pencil then to non y-major y_pencil...
+	    c2d->transposeY2X_MajorIndex(msh->x, x_temp1);
+	    c2d->transposeY2X_MajorIndex(msh->y, y_temp1);
+	    c2d->transposeY2X_MajorIndex(msh->z, z_temp1);
+
+	    MPI_Barrier(MPI_COMM_WORLD);
+	    IF_RANK0 cout << "here2" << endl;
+
+	    //Then back over to y-pencil in x-major array...
+	    double *x_temp2, *y_temp2, *z_temp2;
+	    c2d->allocY(x_temp2); c2d->allocY(y_temp2); c2d->allocY(z_temp2);	
+
+	    c2d->transposeX2Y(x_temp1, x_temp2);
+	    c2d->transposeX2Y(y_temp1, y_temp2);
+	    c2d->transposeX2Y(z_temp1, z_temp2);
+
+	    delete[] x_temp1;
+	    delete[] y_temp1;
+	    delete[] z_temp1;
+
+	    c2d->updateHalo(x_temp2, x_halo, 1, 1);
+	    c2d->updateHalo(y_temp2, y_halo, 1, 1);
+	    c2d->updateHalo(z_temp2, z_halo, 1, 1);
+
+	    delete[] x_temp2;
+	    delete[] y_temp2;
+	    delete[] z_temp2;
+
+	    //Cycle through the halo arrays of coordinates
+	    for(int kp = 0; kp < pySize[2]; kp++){
+		for(int jp = 0; jp < pySize[1]; jp++){
+		    for(int ip = 0; ip < pxSize[0]; ip++){
+
+			//This is the non-halo array index
+			int ii = kp*pySize[1]*pySize[0] + jp*pySize[0] + ip;
+
+			//Cycle through the points making up a "box" of points
+
+			//This is the halo array index for the same point
+		        int iih_0_0_0 = (kp+1)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 1;
+			
+			//Halo array index for i, j, k+1
+			int iih_0_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp)*(pySize[0]+2) + ip + 1;
+
+			//Halo array index for i, j+1, k
+			int iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
+
+			//Halo array index for i, j+1, k+1
+			int iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
+			
+			//Halo array index for i+1, j, k
+			int iih_1_0_0 = (kp+1)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
+
+			//Halo array index for i+1, j, k+1
+			int iih_1_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
+
+			//Halo array index for i+1, j+1, k
+			int iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
+	
+	 		//Halo array index for i+1, j+1, k+1
+			int iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
+
+			if(bc->bcXType == BC::PERIODIC_SOLVE){
+
+			}
+	
+
+			if(bc->bcYType == BC::PERIODIC_SOLVE){
+
+			}
+
+			if(bc->bcZType == BC::PERIODIC_SOLVE){
+
+			}
+
+		   }
+		}
+	    }
+
+
+	    //adt = new Adt<double>(Nboxes, bbmin, bbmax);	
 
 	    t1 = MPI_Wtime();
 	}

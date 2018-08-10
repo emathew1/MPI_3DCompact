@@ -191,26 +191,42 @@ int main(int argc, char *argv[]){
     //Test out the tet volume solver
 
     double vertex[8][3];
-    for(int ip = 0; ip < 8; ip++){
-	for(int jp = 0; jp < 3; jp++){
-	    vertex[ip][jp] = 0.0;
-	}
-    }
+    
+
+    vertex[0][0] = 0.0;
+    vertex[0][1] = 0.0;
+    vertex[0][2] = 0.0;
+  
+    vertex[1][0] = 0.0;
+    vertex[1][1] = 0.0;
     vertex[1][2] = 1.0;
+
+    vertex[2][0] = 1.0;
     vertex[2][1] = 1.0;
+    vertex[2][2] = 0.0;
+
+    vertex[3][0] = 1.0;
     vertex[3][1] = 1.0;
     vertex[3][2] = 1.0;
+
     vertex[4][0] = 1.0;
+    vertex[4][1] = 0.0;
+    vertex[4][2] = 0.0;
+
     vertex[5][0] = 1.0;
+    vertex[5][1] = 0.0;
     vertex[5][2] = 1.0;
-    vertex[6][0] = 1.0;
+
+    vertex[6][0] = 2.0;
     vertex[6][1] = 1.0;
-    vertex[7][0] = 1.0;
+    vertex[6][2] = 0.0;
+
+    vertex[7][0] = 2.0;
     vertex[7][1] = 1.0;
     vertex[7][2] = 1.0;
 
     double P[3] = {0.0, 0.0, 0.0};
-    double P2[3] = {1.5, 0.5, 0.5};
+    double P2[3] = {0.499999, 0.5, 0.5};
 
     IF_RANK0{ cout << "volume = " << getHexaVolume(vertex) << endl;};
     IF_RANK0{ cout << "volume = " << getHexaVolumeWithPoint(vertex, P2) << endl;};

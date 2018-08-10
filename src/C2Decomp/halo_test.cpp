@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
     }
  
     int nx = 100,  ny = 150, nz = 131;
-    int pRow = 0, pCol = 0;
+    int pRow = 2, pCol = 2;
     bool periodicBC[3] = {true, true, true};
 
     if(!mpiRank) cout << "initializing " << endl;
