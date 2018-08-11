@@ -2,6 +2,7 @@
 #define _CABSTRACTSINGLEBLOCKMESHH_
 
 #include "Derivatives.hpp"
+#include "Adt.hpp"
 
 class AbstractSingleBlockMesh{
 
@@ -19,6 +20,8 @@ class AbstractSingleBlockMesh{
 	int Nx, Ny, Nz;
 
 	Derivatives *derivX, *derivY, *derivZ;
+
+	Adt<double> *adt;
 
 	//Each RK Class needs to have these functions to overwrite the pure virtual ones
 	virtual void solveForJacobians() = 0;

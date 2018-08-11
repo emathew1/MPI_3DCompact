@@ -136,6 +136,139 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    c2d->allocY(J33);
 
 
+	    //Initialize the ADT object for interpolation and locating points in the grid...
+	    IF_RANK0 cout << " > Initializing ADT..." << endl;
+
+            //Get our coordinates in neighbors across partitions using halo updates
+            double *x_halo = NULL;
+            double *y_halo = NULL;
+            double *z_halo = NULL;
+
+            //Halo supported only for non-major arrays right now, kind of a pain...
+            double *x_temp1, *y_temp1, *z_temp1;
+            c2d->allocX(x_temp1);
+            c2d->allocX(y_temp1);
+            c2d->allocX(z_temp1);
+
+            //So move to x-pencil then to non y-major y_pencil...
+            c2d->transposeY2X_MajorIndex(x, x_temp1);
+            c2d->transposeY2X_MajorIndex(y, y_temp1);
+            c2d->transposeY2X_MajorIndex(z, z_temp1);
+
+            //Then back over to y-pencil in x-major array...
+            double *x_temp2, *y_temp2, *z_temp2;
+            c2d->allocY(x_temp2); c2d->allocY(y_temp2); c2d->allocY(z_temp2);
+
+            c2d->transposeX2Y(x_temp1, x_temp2);
+            c2d->transposeX2Y(y_temp1, y_temp2);
+            c2d->transposeX2Y(z_temp1, z_temp2);
+
+            delete[] x_temp1;
+            delete[] y_temp1;
+            delete[] z_temp1;
+
+            c2d->updateHalo(x_temp2, x_halo, 1, 1);
+            c2d->updateHalo(y_temp2, y_halo, 1, 1);
+            c2d->updateHalo(z_temp2, z_halo, 1, 1);
+
+            delete[] x_temp2;
+            delete[] y_temp2;
+            delete[] z_temp2;
+
+	    
+	    int Nlocal = pySize[0]*pySize[1]*pySize[2];
+            double (*boundBoxMin)[3] = new double[Nlocal][3];
+            double (*boundBoxMax)[3] = new double[Nlocal][3];
+
+
+            //Cycle through the halo arrays of coordinates
+            for(int kp = 0; kp < pySize[2]; kp++){
+                for(int jp = 0; jp < pySize[1]; jp++){
+                    for(int ip = 0; ip < pySize[0]; ip++){
+
+                        //This is the non-halo array index
+                        int ii = kp*pySize[1]*pySize[0] + jp*pySize[0] + ip;
+
+                        //Cycle through the points making up a "box" of points
+
+                        //This is the halo array index for the same point
+                        int iih_0_0_0 = (kp+1)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 1;
+
+                        //Halo array index for i, j, k+1
+                        int iih_0_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp)*(pySize[0]+2) + ip + 1;
+
+                        //Halo array index for i, j+1, k
+                        int iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
+
+                        //Halo array index for i, j+1, k+1
+                        int iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
+
+                        //Halo array index for i+1, j, k
+                        int iih_1_0_0 = (kp+1)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
+
+                        //Halo array index for i+1, j, k+1
+                        int iih_1_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
+
+                        //Halo array index for i+1, j+1, k
+                        int iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
+
+                        //Halo array index for i+1, j+1, k+1
+                        int iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
+
+			double x_max = -1.0e100; 
+			double y_max = -1.0e100; 
+			double z_max = -1.0e100; 
+			double x_min =  1.0e100;
+			double y_min =  1.0e100;
+			double z_min =  1.0e100;
+			
+
+			if(pyStart[0] + ip == Nx-1){//At the end of the domain
+                            if(periodicX){
+                            
+			    }else{ //If not periodic, bounding box is non-existent, hopefully never found on search
+				x_max = x[ii];
+				x_min = x[ii];
+				y_max = y[ii];
+				y_min = y[ii];
+				z_min = z[ii];
+				z_min = z[ii];
+			    }
+			}
+
+			if(jp == Ny-1){ //In the y-pencil so end of index is end of domain
+                            if(periodicY){
+
+                            }else{ //If not periodic, bounding box is non-existent, hopefully never found on search
+				x_max = x[ii];
+				x_min = x[ii];
+				y_max = y[ii];
+				y_min = y[ii];
+				z_min = z[ii];
+				z_min = z[ii];
+			    }
+			}
+
+
+			if(pzStart[2] + kp == Nz-1){//At end of domain
+                            if(periodicZ){
+
+                            }else{ //If not periodic, bounding box is non-existent, hopefully never found on search
+				x_max = x[ii];
+				x_min = x[ii];
+				y_max = y[ii];
+				y_min = y[ii];
+				z_min = z[ii];
+				z_min = z[ii];
+			    }
+			}
+
+                   }
+                }
+            }
+
+	    //adt = new Adt<double>(Nboxes, bbmin, bbmax);
+
 
 	}
 
