@@ -189,6 +189,11 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                         //This is the non-halo array index
                         int ii = kp*pySize[1]*pySize[0] + jp*pySize[0] + ip;
 
+                        //This is the non-halo array index, y-major
+                        int ii_major = ip*pySize[2]*pySize[1] + kp*pySize[1] + jp;
+
+
+
                         //Cycle through the points making up a "box" of points
 
                         //This is the halo array index for the same point
@@ -280,14 +285,14 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			    /////////////////
 
 			    if(zEndFlag && periodicZ){
-				x_max = fmax(x_max, x_halo[iih_0_0_1]) + periodicZTranslation[0];
-                                x_min = fmin(x_min, x_halo[iih_0_0_1]) + periodicZTranslation[0];
+				x_max = fmax(x_max, x_halo[iih_0_0_1] + periodicZTranslation[0]);
+                                x_min = fmin(x_min, x_halo[iih_0_0_1] + periodicZTranslation[0]);
 
-                                y_max = fmax(y_max, y_halo[iih_0_0_1]) + periodicZTranslation[1];
-                                y_min = fmin(y_min, y_halo[iih_0_0_1]) + periodicZTranslation[1];
+                                y_max = fmax(y_max, y_halo[iih_0_0_1] + periodicZTranslation[1]);
+                                y_min = fmin(y_min, y_halo[iih_0_0_1] + periodicZTranslation[1]);
 
-                                z_max = fmax(z_max, z_halo[iih_0_0_1]) + periodicZTranslation[2];
-                                z_min = fmin(z_min, z_halo[iih_0_0_1]) + periodicZTranslation[2];
+                                z_max = fmax(z_max, z_halo[iih_0_0_1] + periodicZTranslation[2]);
+                                z_min = fmin(z_min, z_halo[iih_0_0_1] + periodicZTranslation[2]);
 			    }else{ //If here, we're an interior point
 				x_max = fmax(x_max, x_halo[iih_0_0_1]);
                                 x_min = fmin(x_min, x_halo[iih_0_0_1]);
@@ -305,14 +310,14 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			    /////////////////
 
 			    if(yEndFlag && periodicY){
-				x_max = fmax(x_max, x_halo[iih_0_1_0]) + periodicYTranslation[0];
-                                x_min = fmin(x_min, x_halo[iih_0_1_0]) + periodicYTranslation[0];
+				x_max = fmax(x_max, x_halo[iih_0_1_0] + periodicYTranslation[0]);
+                                x_min = fmin(x_min, x_halo[iih_0_1_0] + periodicYTranslation[0]);
 
-                                y_max = fmax(y_max, y_halo[iih_0_1_0]) + periodicYTranslation[1];
-                                y_min = fmin(y_min, y_halo[iih_0_1_0]) + periodicYTranslation[1];
+                                y_max = fmax(y_max, y_halo[iih_0_1_0] + periodicYTranslation[1]);
+                                y_min = fmin(y_min, y_halo[iih_0_1_0] + periodicYTranslation[1]);
 
-                                z_max = fmax(z_max, z_halo[iih_0_1_0]) + periodicYTranslation[2];
-                                z_min = fmin(z_min, z_halo[iih_0_1_0]) + periodicYTranslation[2];
+                                z_max = fmax(z_max, z_halo[iih_0_1_0] + periodicYTranslation[2]);
+                                z_min = fmin(z_min, z_halo[iih_0_1_0] + periodicYTranslation[2]);
 			    }else{// If, here we're an interior point
 				x_max = fmax(x_max, x_halo[iih_0_1_0]);
                                 x_min = fmin(x_min, x_halo[iih_0_1_0]);
@@ -324,38 +329,40 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                                 z_min = fmin(z_min, z_halo[iih_0_1_0]);
 			    }
 
+			    /////////////////
+			    //Next do 0 1 1//
+			    /////////////////
 
-			    //Next do 0 1 1
 			    if(zEndFlag && periodicZ){
 				if(yEndFlag && periodicY){
-				    x_max = fmax(x_max, x_halo[iih_0_1_1]) + periodicZTranslation[0] + periodicYTranslation[0];
-                                    x_min = fmin(x_min, x_halo[iih_0_1_1]) + periodicZTranslation[0] + periodicYTranslation[0];
+				    x_max = fmax(x_max, x_halo[iih_0_1_1] + periodicZTranslation[0] + periodicYTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_0_1_1] + periodicZTranslation[0] + periodicYTranslation[0]);
 
-                                    y_max = fmax(y_max, y_halo[iih_0_1_1]) + periodicZTranslation[1] + periodicYTranslation[1];
-                                    y_min = fmin(y_min, y_halo[iih_0_1_1]) + periodicZTranslation[1] + periodicYTranslation[1];
+                                    y_max = fmax(y_max, y_halo[iih_0_1_1] + periodicZTranslation[1] + periodicYTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_0_1_1] + periodicZTranslation[1] + periodicYTranslation[1]);
 
-                                    z_max = fmax(z_max, z_halo[iih_0_1_1]) + periodicZTranslation[2] + periodicYTranslation[2];
-                                    z_min = fmin(z_min, z_halo[iih_0_1_1]) + periodicZTranslation[2] + periodicYTranslation[2];
+                                    z_max = fmax(z_max, z_halo[iih_0_1_1] + periodicZTranslation[2] + periodicYTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_0_1_1] + periodicZTranslation[2] + periodicYTranslation[2]);
 				}else{
-				    x_max = fmax(x_max, x_halo[iih_0_1_1]) + periodicZTranslation[0]; 
-                                    x_min = fmin(x_min, x_halo[iih_0_1_1]) + periodicZTranslation[0];
+				    x_max = fmax(x_max, x_halo[iih_0_1_1] + periodicZTranslation[0]); 
+                                    x_min = fmin(x_min, x_halo[iih_0_1_1] + periodicZTranslation[0]);
 
-                                    y_max = fmax(y_max, y_halo[iih_0_1_1]) + periodicZTranslation[1];
-                                    y_min = fmin(y_min, y_halo[iih_0_1_1]) + periodicZTranslation[1];
+                                    y_max = fmax(y_max, y_halo[iih_0_1_1] + periodicZTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_0_1_1] + periodicZTranslation[1]);
 
-                                    z_max = fmax(z_max, z_halo[iih_0_1_1]) + periodicZTranslation[2];
-                                    z_min = fmin(z_min, z_halo[iih_0_1_1]) + periodicZTranslation[2];
+                                    z_max = fmax(z_max, z_halo[iih_0_1_1] + periodicZTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_0_1_1] + periodicZTranslation[2]);
 				}
 			    }else{ // in interior domain in z-direction
 				if(yEndFlag && periodicY){
-				    x_max = fmax(x_max, x_halo[iih_0_1_1]) + periodicYTranslation[0]; 
-                                    x_min = fmin(x_min, x_halo[iih_0_1_1]) + periodicYTranslation[0];
+				    x_max = fmax(x_max, x_halo[iih_0_1_1] + periodicYTranslation[0]); 
+                                    x_min = fmin(x_min, x_halo[iih_0_1_1] + periodicYTranslation[0]);
 
-                                    y_max = fmax(y_max, y_halo[iih_0_1_1]) + periodicYTranslation[1];
-                                    y_min = fmin(y_min, y_halo[iih_0_1_1]) + periodicYTranslation[1];
+                                    y_max = fmax(y_max, y_halo[iih_0_1_1] + periodicYTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_0_1_1] + periodicYTranslation[1]);
 
-                                    z_max = fmax(z_max, z_halo[iih_0_1_1]) + periodicYTranslation[2];
-                                    z_min = fmin(z_min, z_halo[iih_0_1_1]) + periodicYTranslation[2];
+                                    z_max = fmax(z_max, z_halo[iih_0_1_1] + periodicYTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_0_1_1] + periodicYTranslation[2]);
 				}else{//If we're here, we're interior 
 				    x_max = fmax(x_max, x_halo[iih_0_1_1]);
                                     x_min = fmin(x_min, x_halo[iih_0_1_1]);
@@ -368,16 +375,19 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 				}
 			    }
 
-			    //Next do 1 0 0 
+			    /////////////////
+			    //Next do 1 0 0//
+			    /////////////////
+
 			    if(xEndFlag && periodicX){
-			        x_max = fmax(x_max, x_halo[iih_1_0_0]) + periodicXTranslation[0];
-                                x_min = fmin(x_min, x_halo[iih_1_0_0]) + periodicXTranslation[0];
+			        x_max = fmax(x_max, x_halo[iih_1_0_0] + periodicXTranslation[0]);
+                                x_min = fmin(x_min, x_halo[iih_1_0_0] + periodicXTranslation[0]);
 
-                                y_max = fmax(y_max, y_halo[iih_1_0_0]) + periodicXTranslation[1];
-                                y_min = fmin(y_min, y_halo[iih_1_0_0]) + periodicXTranslation[1];
+                                y_max = fmax(y_max, y_halo[iih_1_0_0] + periodicXTranslation[1]);
+                                y_min = fmin(y_min, y_halo[iih_1_0_0] + periodicXTranslation[1]);
 
-                                z_max = fmax(z_max, z_halo[iih_1_0_0]) + periodicXTranslation[2];
-                                z_min = fmin(z_min, z_halo[iih_1_0_0]) + periodicXTranslation[2];
+                                z_max = fmax(z_max, z_halo[iih_1_0_0] + periodicXTranslation[2]);
+                                z_min = fmin(z_min, z_halo[iih_1_0_0] + periodicXTranslation[2]);
 			    }else{
 			        x_max = fmax(x_max, x_halo[iih_1_0_0]);
                                 x_min = fmin(x_min, x_halo[iih_1_0_0]);
@@ -389,79 +399,188 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                                 z_min = fmin(z_min, z_halo[iih_1_0_0]);
 			    }
 	
-			    //Next do 1 0 1
+			    /////////////////
+			    //Next do 1 0 1//
+			    /////////////////
+
 			    if(xEndFlag && periodicX){	
 				if(zEndFlag && periodicZ){
+				    x_max = fmax(x_max, x_halo[iih_1_0_1] + periodicXTranslation[0] + periodicZTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_0_1] + periodicXTranslation[0] + periodicZTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_0_1] + periodicXTranslation[1] + periodicZTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_0_1] + periodicXTranslation[1] + periodicZTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_0_1] + periodicXTranslation[2] + periodicZTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_0_1] + periodicXTranslation[2] + periodicZTranslation[2]);
 				}else{
+				    x_max = fmax(x_max, x_halo[iih_1_0_1] + periodicXTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_0_1] + periodicXTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_0_1] + periodicXTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_0_1] + periodicXTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_0_1] + periodicXTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_0_1] + periodicXTranslation[2]);
 				}
 
 			    }else{
 				if(zEndFlag && periodicZ){
-				
-				}else{
+				    x_max = fmax(x_max, x_halo[iih_1_0_1] + periodicZTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_0_1] + periodicZTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_0_1] + periodicZTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_0_1] + periodicZTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_0_1] + periodicZTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_0_1] + periodicZTranslation[2]);			
+				}else{
+				    x_max = fmax(x_max, x_halo[iih_1_0_1]);
+                                    x_min = fmin(x_min, x_halo[iih_1_0_1]);
+
+                                    y_max = fmax(y_max, y_halo[iih_1_0_1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_0_1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_0_1]);
+                                    z_min = fmin(z_min, z_halo[iih_1_0_1]);			
 				}
 
 			    }
 
-			    //Next do 1 1 0 
+		            /////////////////
+			    //Next do 1 1 0// 
+			    /////////////////	
+	
 			    if(xEndFlag && periodicX){
 				if(yEndFlag && periodicY){
+				    x_max = fmax(x_max, x_halo[iih_1_1_0] + periodicXTranslation[0] + periodicYTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_1_0] + periodicXTranslation[0] + periodicYTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_1_0] + periodicXTranslation[1] + periodicYTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_1_0] + periodicXTranslation[1] + periodicYTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_1_0] + periodicXTranslation[2] + periodicYTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_1_0] + periodicXTranslation[2] + periodicYTranslation[2]);
 				}else{
+				    x_max = fmax(x_max, x_halo[iih_1_1_0] + periodicXTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_1_0] + periodicXTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_1_0] + periodicXTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_1_0] + periodicXTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_1_0] + periodicXTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_1_0] + periodicXTranslation[2]);
 				}
 			    }else{
 				if(yEndFlag && periodicY){
+				    x_max = fmax(x_max, x_halo[iih_1_1_0] + periodicYTranslation[0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_1_0] + periodicYTranslation[0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_1_0] + periodicYTranslation[1]);
+                                    y_min = fmin(y_min, y_halo[iih_1_1_0] + periodicYTranslation[1]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_1_0] + periodicYTranslation[2]);
+                                    z_min = fmin(z_min, z_halo[iih_1_1_0] + periodicYTranslation[2]);
 				}else{
+				    x_max = fmax(x_max, x_halo[iih_1_1_0]);
+                                    x_min = fmin(x_min, x_halo[iih_1_1_0]);
 
+                                    y_max = fmax(y_max, y_halo[iih_1_1_0]);
+                                    y_min = fmin(y_min, y_halo[iih_1_1_0]);
+
+                                    z_max = fmax(z_max, z_halo[iih_1_1_0]);
+                                    z_min = fmin(z_min, z_halo[iih_1_1_0]);
 				}
 			    }
 
-			    //Finally do 1 1 1
+			    ////////////////////
+			    //Finally do 1 1 1//
+			    ////////////////////
+
 			    if(xEndFlag && periodicX){
-
 				if(yEndFlag && periodicY){
-
 				    if(zEndFlag && periodicZ){
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicYTranslation[0] + periodicZTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicYTranslation[0] + periodicZTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicYTranslation[1] + periodicZTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicYTranslation[1] + periodicZTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2] + periodicZTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2] + periodicZTranslation[2]);
 				    }else{
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicYTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicYTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicYTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicYTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2]);
 				    }
-
 				}else{
-
                                     if(zEndFlag && periodicZ){
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicZTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicZTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicZTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicZTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicZTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicZTranslation[2]);
                                     }else{
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicXTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicXTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicXTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicXTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicXTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicXTranslation[2]);
                                     }
-
 				}	
-
 			    }else{
-
 				if(yEndFlag && periodicY){
-
                                     if(zEndFlag && periodicZ){
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicYTranslation[0] + periodicZTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicYTranslation[0] + periodicZTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicYTranslation[1] + periodicZTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicYTranslation[1] + periodicZTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicYTranslation[2] + periodicZTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicYTranslation[2] + periodicZTranslation[2]);
                                     }else{
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicYTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicYTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicYTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicYTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicYTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicYTranslation[2]);
                                     }
-
 				}else{
-
                                     if(zEndFlag && periodicZ){
+				        x_max = fmax(x_max, x_halo[iih_1_1_1] + periodicZTranslation[0]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1] + periodicZTranslation[0]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1] + periodicZTranslation[1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1] + periodicZTranslation[1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1] + periodicZTranslation[2]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1] + periodicZTranslation[2]);
                                     }else{
+				        x_max = fmax(x_max, x_halo[iih_1_1_1]);
+                                        x_min = fmin(x_min, x_halo[iih_1_1_1]);
 
+                                        y_max = fmax(y_max, y_halo[iih_1_1_1]);
+                                        y_min = fmin(y_min, y_halo[iih_1_1_1]);
+
+                                        z_max = fmax(z_max, z_halo[iih_1_1_1]);
+                                        z_min = fmin(z_min, z_halo[iih_1_1_1]);
                                     }
-
 				}
-
 			    }
 
 	
@@ -474,12 +593,33 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			    z_min = z[ii];
 			}
 
-                   }
+
+			//We'll usually be accessing this in the major indexing fashion
+             	        boundBoxMin[ii_major][0] = x_min;
+             	        boundBoxMin[ii_major][1] = y_min;
+             	        boundBoxMin[ii_major][2] = z_min;
+			
+;
+		        boundBoxMax[ii_major][0] = x_max; 
+		        boundBoxMax[ii_major][1] = y_max; 
+		        boundBoxMax[ii_major][2] = z_max; 
+                    }
                 }
             }
 
-	    //adt = new Adt<double>(Nboxes, bbmin, bbmax);
+	    FOR_XYZ_YPEN{
+		FOR_I3{
+		    double delta = 1.0E-6*(boundBoxMax[ip][i] - boundBoxMin[ip][i]);
+		    boundBoxMax[ip][i] += delta;
+		    boundBoxMin[ip][i] -= delta;
+		}
+	    }
 
+	    IF_RANK0 cout << " > Done getting bounding boxes for the CV's, initializing ADT... " << endl;
+
+	    adt = new Adt<double>(Nlocal, boundBoxMin, boundBoxMax);
+
+	    IF_RANK0 cout << " > Done!" << endl;
 
 	}
 
