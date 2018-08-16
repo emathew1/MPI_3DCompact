@@ -643,6 +643,9 @@ int AlgebraicSingleBlockMesh::findCVForPoint(double p[3]){
     int a = -1;
     for(int ip = 0; ip < cvListSize; ip++){
 
+
+	//TODO Need to add isPointInHexa() to nail down which CV in this loop
+
 	a = cvList[ip];
 	cout << a << endl;
 	cout << x[a] << " " << y[a] << " " << z[a] << endl;
