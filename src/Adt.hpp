@@ -13,7 +13,7 @@
 
 //#define ADT_LIST_MAX 8192
 // TODO XXXXXX: get rid of this eventually by using the "vector<int> bboxVec" calls...
-#define ADT_LIST_MAX 1000000
+#define ADT_LIST_MAX 8192
 
 using namespace std ; 
 

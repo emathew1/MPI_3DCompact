@@ -621,12 +621,37 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    IF_RANK0 cout << " > Done!" << endl;
 
+
+	    IF_RANK0 cout << " > Test to see if breaks " << endl;
+	    double test_p[3] = {0.995, 0.995, 0.005};
+	    cout << findCVForPoint(test_p) << endl;
+
 	}
 
  	void solveForJacobians();
 
+	int findCVForPoint(double p[3]);
 
 };
+
+int AlgebraicSingleBlockMesh::findCVForPoint(double p[3]){
+
+    int cvListSize, cvList[8192];
+
+    adt->buildListForPoint(cvListSize, cvList, p);
+
+    int a = -1;
+    for(int ip = 0; ip < cvListSize; ip++){
+
+	a = cvList[ip];
+	cout << a << endl;
+	cout << x[a] << " " << y[a] << " " << z[a] << endl;
+
+    }
+
+    return a;    
+
+}
 
 
 void AlgebraicSingleBlockMesh::solveForJacobians(){
