@@ -385,6 +385,5 @@ double getHexaVolumeWithPoint(double vertex[8][3], double P[3]){
 
 
 
-
     return volume_hexa;
 };

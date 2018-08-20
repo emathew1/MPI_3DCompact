@@ -26,6 +26,10 @@ class AbstractSingleBlockMesh{
 	//Each RK Class needs to have these functions to overwrite the pure virtual ones
 	virtual void solveForJacobians() = 0;
 
+	virtual void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo) = 0;
+	
+	virtual int findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo) = 0;
+
 };
 
 #endif

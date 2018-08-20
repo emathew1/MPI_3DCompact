@@ -73,16 +73,16 @@ int main(int argc, char *argv[]){
     //Boundary Condition Info//
     ///////////////////////////
 
-    BC::BCType bcXType = BC::PERIODIC_SOLVE;
+    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
     BC::BCType bcYType = BC::PERIODIC_SOLVE;
-    BC::BCType bcZType = BC::PERIODIC_SOLVE;
+    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::PERIODIC;
-    BC::BCKind bcX1 = BC::PERIODIC;
+    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
     BC::BCKind bcY0 = BC::PERIODIC;
     BC::BCKind bcY1 = BC::PERIODIC;
-    BC::BCKind bcZ0 = BC::PERIODIC;
-    BC::BCKind bcZ1 = BC::PERIODIC;
+    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
 
 
 /*
@@ -188,50 +188,15 @@ int main(int argc, char *argv[]){
     }
 
    
-    //Test out the tet volume solver
+    //Test out the adt search implementation and box of point finder
+    double p[3] = {0.985, 0.985, 0.985};
 
-    double vertex[8][3];
-    
+    //Need the coordinate halo arrays
+    double *xHalo, *yHalo, *zHalo;
+    cs->msh->generateCoordinateHaloArrays(xHalo, yHalo, zHalo);
+    int icv = cs->msh->findCVForPoint(p, xHalo, yHalo, zHalo);
 
-    vertex[0][0] = 0.0;
-    vertex[0][1] = 0.0;
-    vertex[0][2] = 0.0;
-  
-    vertex[1][0] = 0.0;
-    vertex[1][1] = 0.0;
-    vertex[1][2] = 1.0;
-
-    vertex[2][0] = 1.0;
-    vertex[2][1] = 1.0;
-    vertex[2][2] = 0.0;
-
-    vertex[3][0] = 1.0;
-    vertex[3][1] = 1.0;
-    vertex[3][2] = 1.0;
-
-    vertex[4][0] = 1.0;
-    vertex[4][1] = 0.0;
-    vertex[4][2] = 0.0;
-
-    vertex[5][0] = 1.0;
-    vertex[5][1] = 0.0;
-    vertex[5][2] = 1.0;
-
-    vertex[6][0] = 2.0;
-    vertex[6][1] = 1.0;
-    vertex[6][2] = 0.0;
-
-    vertex[7][0] = 2.0;
-    vertex[7][1] = 1.0;
-    vertex[7][2] = 1.0;
-
-    double P[3] = {0.0, 0.0, 0.0};
-    double P2[3] = {0.499999, 0.5, 0.5};
-
-    IF_RANK0{ cout << "volume = " << getHexaVolume(vertex) << endl;};
-    IF_RANK0{ cout << "volume = " << getHexaVolumeWithPoint(vertex, P2) << endl;};
-    IF_RANK0{ cout << "is in Hexa? " << isPointInHexa(P2, vertex) << endl;};
-
+    cout << " Rank = " << mpiRank << ", point icv = " << icv << endl;
 
     rk->executeSolverLoop();  
 
