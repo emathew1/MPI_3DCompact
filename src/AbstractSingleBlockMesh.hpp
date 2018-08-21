@@ -28,6 +28,9 @@ class AbstractSingleBlockMesh{
 
 	virtual void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo) = 0;
 	
+	virtual void getOrderedBlockCoordinates(int ip, int jp, int kp, double *x_halo, double *y_halo, double *z_halo, double box_p[8][3]) = 0;
+	virtual void getOrderedBlockXiCoordinates(int ip, int jp, int kp, double box_pxi[8][3]) = 0;
+
 	virtual int findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo) = 0;
 
 };

@@ -112,9 +112,11 @@ int main(int argc, char *argv[]){
     int    Nx = 50,
            Ny = 50,
            Nz = 50;
+
+    //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
            Ly = 1.0,
-           Lz = 1.0;;
+           Lz = 1.0;
     Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 
@@ -189,27 +191,18 @@ int main(int argc, char *argv[]){
         }
     }
 
-   
-    //Test out the adt search implementation and box of point finder
-    double p[3] = {0.985, 0.985, 0.985};
+    int N = 100;
+    double (*pp)[3] = new double[N][3];
 
-    //Need the coordinate halo arrays
-    double *xHalo, *yHalo, *zHalo;
-    cs->msh->generateCoordinateHaloArrays(xHalo, yHalo, zHalo);
-    int icv = cs->msh->findCVForPoint(p, xHalo, yHalo, zHalo);
+    for(int ii = 0; ii < N; ii++){
+	double xx = (double)ii/((double)(N)) + 1E-6;
+        pp[ii][0] = xx; 
+        pp[ii][1] = xx; 
+        pp[ii][2] = xx; 
+    }
 
-    cout << " Rank = " << mpiRank << ", point icv = " << icv << endl;
 
-    double (*pp)[3] = new double[2][3];
-    pp[0][0] = 0.985; 
-    pp[0][1] = 0.985; 
-    pp[0][2] = 0.985; 
-
-    pp[1][0] = 0.5;
-    pp[1][1] = 0.5;
-    pp[1][2] = 0.5;
-
-    CurvilinearInterpolator *ci = new CurvilinearInterpolator(cs, pp, 2);
+    CurvilinearInterpolator *ci = new CurvilinearInterpolator(cs, pp, N);
 
     rk->executeSolverLoop();  
 
