@@ -24,6 +24,8 @@ using namespace std;
 #include "AbstractRK.hpp"
 #include "TVDRK3.hpp"
 
+#include "CurvilinearInterpolator.hpp"
+
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
 
@@ -197,6 +199,17 @@ int main(int argc, char *argv[]){
     int icv = cs->msh->findCVForPoint(p, xHalo, yHalo, zHalo);
 
     cout << " Rank = " << mpiRank << ", point icv = " << icv << endl;
+
+    double (*pp)[3] = new double[2][3];
+    pp[0][0] = 0.985; 
+    pp[0][1] = 0.985; 
+    pp[0][2] = 0.985; 
+
+    pp[1][0] = 0.5;
+    pp[1][1] = 0.5;
+    pp[1][2] = 0.5;
+
+    CurvilinearInterpolator *ci = new CurvilinearInterpolator(cs, pp, 2);
 
     rk->executeSolverLoop();  
 

@@ -9,7 +9,6 @@
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
 #include "PngWriter.hpp"
-#include "Adt.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -92,9 +91,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//Alias'd derivative objects
 	Derivatives *derivXi1, *derivXi2, *derivXi3;
 	Filter *filtXi1, *filtXi2, *filtXi3;
-
-	//Our Adt search object
-	Adt<double> *adt;
 
 	//Constructor to use for this class...
 	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
