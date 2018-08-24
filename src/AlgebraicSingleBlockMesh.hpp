@@ -23,10 +23,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	double periodicYTranslation[3];
 	double periodicZTranslation[3];
 
-	double periodicXiTranslation;
-	double periodicEtaTranslation;
-	double periodicZtaTranslation;
-
 	bool periodicX;
 	bool periodicY;
 	bool periodicZ;
@@ -95,8 +91,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicXTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
 
-		//Periodicity of the transformed Coordinates
-		periodicXiTranslation = 1.0;
 	    }else{
 		periodicX = false;
 	    }
@@ -108,8 +102,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
 
-		//Periodicity of the transformed Coordinates
-		periodicEtaTranslation = 1.0;
 	    }else{
 		periodicY = false; 
 	    }
@@ -122,8 +114,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 		IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 
-		//Periodicity of the transformed Coordinates
-		periodicZtaTranslation = 1.0;
 	    }else{
 		periodicZ = false;
 	    }
@@ -279,21 +269,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 void AlgebraicSingleBlockMesh::getOrderedBlockXiCoordinates(int ip, int jp, int kp, double box_pxi[8][3]){
 
-        bool xEndFlag = false;
-        if(pyStart[0] + ip == Nx-1){
-            xEndFlag = true;
-        }
-
-        bool yEndFlag = false;
-        if(jp == Ny-1){
-            yEndFlag = true;
-        }
-
-        bool zEndFlag = false;
-        if(pyStart[2] + kp == Nz-1){
-            zEndFlag = true;
-        }
-
         double dxi, deta, dzta;
 
         //This is correct if the domain bounds have been properly set to their max xi, eta, and zeta values in the
@@ -306,49 +281,28 @@ void AlgebraicSingleBlockMesh::getOrderedBlockXiCoordinates(int ip, int jp, int 
         box_pxi[1][0] = dxi *(double)ip;
         box_pxi[2][0] = dxi *(double)ip;
         box_pxi[3][0] = dxi *(double)ip;
-	if(xEndFlag && periodicX){
-            box_pxi[4][0] = periodicXiTranslation;
-            box_pxi[5][0] = periodicXiTranslation;
-            box_pxi[6][0] = periodicXiTranslation;
-            box_pxi[7][0] = periodicXiTranslation;
-	}else{
-            box_pxi[4][0] = dxi *(double)(ip+1);
-            box_pxi[5][0] = dxi *(double)(ip+1);
-            box_pxi[6][0] = dxi *(double)(ip+1);
-            box_pxi[7][0] = dxi *(double)(ip+1);
-	}
+        box_pxi[4][0] = dxi *(double)(ip+1);
+        box_pxi[5][0] = dxi *(double)(ip+1);
+        box_pxi[6][0] = dxi *(double)(ip+1);
+        box_pxi[7][0] = dxi *(double)(ip+1);
 
         box_pxi[0][1] = deta*(double)jp;
         box_pxi[1][1] = deta*(double)jp;
+        box_pxi[2][1] = deta*(double)(jp+1);
+        box_pxi[3][1] = deta*(double)(jp+1);
         box_pxi[4][1] = deta*(double)jp;
         box_pxi[5][1] = deta*(double)jp;
-	if(yEndFlag && periodicY){
-            box_pxi[2][1] = periodicEtaTranslation;
-            box_pxi[3][1] = periodicEtaTranslation;
-            box_pxi[6][1] = periodicEtaTranslation;
-            box_pxi[7][1] = periodicEtaTranslation;
-	}else{
-            box_pxi[2][1] = deta*(double)(jp+1);
-            box_pxi[3][1] = deta*(double)(jp+1);
-            box_pxi[6][1] = deta*(double)(jp+1);
-            box_pxi[7][1] = deta*(double)(jp+1);
-	}
+        box_pxi[6][1] = deta*(double)(jp+1);
+        box_pxi[7][1] = deta*(double)(jp+1);
 
         box_pxi[0][2] = dzta*(double)kp;
+        box_pxi[1][2] = dzta*(double)(kp+1);
         box_pxi[2][2] = dzta*(double)kp;
+        box_pxi[3][2] = dzta*(double)(kp+1);
         box_pxi[4][2] = dzta*(double)kp;
+        box_pxi[5][2] = dzta*(double)(kp+1);
         box_pxi[6][2] = dzta*(double)kp;
-	if(zEndFlag && periodicZ){
-            box_pxi[1][2] = periodicZtaTranslation;
-            box_pxi[3][2] = periodicZtaTranslation;
-            box_pxi[5][2] = periodicZtaTranslation;
-            box_pxi[7][2] = periodicZtaTranslation;
-	}else{
-            box_pxi[1][2] = dzta*(double)(kp+1);
-            box_pxi[3][2] = dzta*(double)(kp+1);
-            box_pxi[5][2] = dzta*(double)(kp+1);
-            box_pxi[7][2] = dzta*(double)(kp+1);
-	}
+        box_pxi[7][2] = dzta*(double)(kp+1);
 
 };
 

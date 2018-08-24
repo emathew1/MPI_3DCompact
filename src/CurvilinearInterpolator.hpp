@@ -19,6 +19,9 @@ class CurvilinearInterpolator{
     AbstractCSolver *cs;
     double (*pointList)[3];
     vector<int> icvList;
+    vector<double> pointListX;
+    vector<double> pointListY;
+    vector<double> pointListZ;
     int localPointFoundCount, globalPointFoundCount;
 
     //Weights for the components of the box to interpolate
@@ -44,6 +47,9 @@ class CurvilinearInterpolator{
   	    if(icv != -1){
 		localPointFoundCount++;
 		icvList.push_back(icv);
+		pointListX.push_back(p[0]);
+		pointListY.push_back(p[1]);
+		pointListZ.push_back(p[2]);
 	    }
 	}
 
@@ -54,7 +60,7 @@ class CurvilinearInterpolator{
 	}
 
 	//allocate the local weights
-	Ni = new double[localPointFoundCount++][8];
+	Ni = new double[localPointFoundCount][8];
 
 	//For each of local found points
 	for(int ii = 0; ii < localPointFoundCount; ii++){
@@ -113,6 +119,60 @@ class CurvilinearInterpolator{
 		for(int j = 0; j < 3; j++){
 		    f[i][j] /= (1.0/8.0);
 		}
+	    }
+
+	    bool done = false;
+	    int iter = 0;
+	    
+	    double e1 = 0.0, e2 = 0.0, e3 = 0.0; 
+	    while(!done){
+
+		iter++;
+	        double error_tol = 1E-6;
+
+		if(iter == 1){
+		    
+		}
+
+		double alpha = f[0][0] + f[1][0]*e1 + f[2][0]*e2 + f[3][0]*e3 + f[4][0]*e1*e2 + \
+			       f[5][0]*e2*e3 + f[6][0]*e1*e3 + f[7][0]*e1*e2*e3 - pointListX[ii]; 
+		double beta  = f[0][1] + f[1][1]*e1 + f[2][1]*e2 + f[3][1]*e3 + f[4][1]*e1*e2 + \
+			       f[5][1]*e2*e3 + f[6][1]*e1*e3 + f[7][1]*e1*e2*e3 - pointListY[ii]; 
+		double gamma = f[0][2] + f[1][2]*e1 + f[2][2]*e2 + f[3][2]*e3 + f[4][2]*e1*e2 + \
+			       f[5][2]*e2*e3 + f[6][2]*e1*e3 + f[7][2]*e1*e2*e3 - pointListZ[ii]; 
+
+
+	   	double J[3][3];
+
+		J[0][0] = f[1][0] + f[4][0]*e2 + f[6][0]*e3 + f[7][0]*e2*e3;
+		J[1][0] = f[1][1] + f[4][1]*e2 + f[6][1]*e3 + f[7][1]*e2*e3;
+		J[2][0] = f[1][2] + f[4][2]*e2 + f[6][2]*e3 + f[7][2]*e2*e3;
+
+
+		J[0][1] = f[2][0] + f[4][0]*e1 + f[5][0]*e3 + f[7][0]*e1*e3;
+		J[1][1] = f[2][1] + f[4][1]*e1 + f[5][1]*e3 + f[7][1]*e1*e3;
+		J[2][1] = f[2][2] + f[4][2]*e1 + f[5][2]*e3 + f[7][2]*e1*e3;
+
+
+		J[0][2] = f[3][0] + f[5][0]*e2 + f[6][0]*e1 + f[7][0]*e1*e2;
+		J[1][2] = f[3][1] + f[5][1]*e2 + f[6][1]*e1 + f[7][1]*e1*e2;
+		J[2][2] = f[3][2] + f[5][2]*e2 + f[6][2]*e1 + f[7][2]*e1*e2;
+
+		double Jinv[3][3];
+		
+		double A, B, C, D, E, F, G, H, I;
+		A =  (J[1][1]*J[2][2] - J[1][2]*J[2][1]);
+		B = -(J[1][0]*J[2][2] - J[1][2]*J[2][0]);
+		C =  (J[1][0]*J[2][1] - J[1][1]*J[2][0]);
+		D = -(J[0][1]*J[2][2] - J[0][2]*J[2][1]);
+		E =  (J[0][0]*J[2][2] - J[0][2]*J[2][0]);
+		F = -(J[0][0]*J[2][1] - J[0][1]*J[2][0]); 
+		G =  (J[0][1]*J[1][2] - J[0][2]*J[1][1]);
+		H = -(J[0][0]*J[1][2] - J[0][2]*J[1][0]);
+		I =  (J[0][0]*J[1][1] - J[0][1]*J[1][0]);
+
+		double Jdet = J[0][0]*A + J[1][1]*B + J[2][2]*C;
+
 	    }
 
 	
