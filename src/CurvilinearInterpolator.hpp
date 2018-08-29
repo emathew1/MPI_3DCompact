@@ -12,6 +12,7 @@ class CurvilinearInterpolator{
 
   public:
 
+    int mpiRank;
     int pxSize[3], pySize[3], pzSize[3];
     int pxStart[3], pyStart[3], pzStart[3];
     int pxEnd[3], pyEnd[3], pzEnd[3];
@@ -32,6 +33,7 @@ class CurvilinearInterpolator{
 	this->pointList = pointList;
 
 	cs->dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
+	mpiRank = cs->mpiRank;
 
 	//Start getting the points to interpolate
 	double *xHalo, *yHalo, *zHalo;
@@ -124,15 +126,16 @@ class CurvilinearInterpolator{
 	    bool done = false;
 	    int iter = 0;
 	    
+	    IF_RANK0{
+		cout << " p = " << pointListX[ii] << " " << pointListY[ii] << " " << pointListZ[ii] << endl;
+	        cout << " f = " << f[0][0] << endl;
+	    }
+
 	    double e1 = 0.0, e2 = 0.0, e3 = 0.0; 
 	    while(!done){
 
 		iter++;
-	        double error_tol = 1E-6;
-
-		if(iter == 1){
-		    
-		}
+	        double error_tol = 1E-12;
 
 		double alpha = f[0][0] + f[1][0]*e1 + f[2][0]*e2 + f[3][0]*e3 + f[4][0]*e1*e2 + \
 			       f[5][0]*e2*e3 + f[6][0]*e1*e3 + f[7][0]*e1*e2*e3 - pointListX[ii]; 
@@ -196,10 +199,17 @@ class CurvilinearInterpolator{
 		eps[1] = fabs(e2_new-e2); 
 		eps[2] = fabs(e3_new-e3); 
 
-		if(eps[0] < 1e-6 && eps[1] < 1e-6 && eps[2] < 1e-6){
+		if(eps[0] < error_tol && eps[1] < error_tol && eps[2] < error_tol){
 		    done = true;
 		}
 
+		e1 = e1_new;
+		e2 = e2_new;
+		e3 = e3_new;
+
+		IF_RANK0{
+		   cout << "iter = " << iter << ", e_new = " << e1_new << ", " << e2_new << ", " << e3_new << endl;
+		}
 	    }
 
 	
