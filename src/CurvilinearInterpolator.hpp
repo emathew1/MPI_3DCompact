@@ -173,6 +173,33 @@ class CurvilinearInterpolator{
 
 		double Jdet = J[0][0]*A + J[1][1]*B + J[2][2]*C;
 
+		
+		Jinv[0][0] = A/Jdet;
+		Jinv[1][0] = B/Jdet;
+		Jinv[2][0] = C/Jdet;
+		Jinv[0][1] = D/Jdet;
+		Jinv[1][1] = E/Jdet;
+		Jinv[2][1] = F/Jdet;
+		Jinv[0][2] = G/Jdet;
+		Jinv[1][2] = H/Jdet;
+		Jinv[2][2] = I/Jdet;
+
+		double delta[3];
+		FOR_I3	delta[i] = alpha*Jinv[i][0] + beta*Jinv[i][1] + gamma*Jinv[i][2];
+			
+		double e1_new = e1 - delta[0];
+		double e2_new = e2 - delta[1];
+		double e3_new = e3 - delta[2];
+ 
+		double eps[3];
+		eps[0] = fabs(e1_new-e1); 
+		eps[1] = fabs(e2_new-e2); 
+		eps[2] = fabs(e3_new-e3); 
+
+		if(eps[0] < 1e-6 && eps[1] < 1e-6 && eps[2] < 1e-6){
+		    done = true;
+		}
+
 	    }
 
 	
