@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o 
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o 
 
 default: MPI_3DCompact
 
@@ -58,6 +58,9 @@ CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp
+	$(CC) $(CFLAGS) -c $<
+
+CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp
 	$(CC) $(CFLAGS) -c $<
 
 clean: 

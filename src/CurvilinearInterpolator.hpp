@@ -1,11 +1,12 @@
 #ifndef _CURVILINEARINTEROLATORH_
 #define _CURVILINEARINTEROLATORH_
 
+#include "AbstractCSolver.hpp"
+#include "AbstractSingleBlockMesh.hpp"
 #include "Macros.hpp"
 #include "Utils.hpp"
 #include "Domain.hpp"
 #include "BC.hpp"
-#include "AbstractSingleBlockMesh.hpp"
 #include <vector>
 
 class CurvilinearInterpolator{
@@ -67,7 +68,6 @@ class CurvilinearInterpolator{
 	//For each of local found points
 	for(int ii = 0; ii < localPointFoundCount; ii++){
 
-	    double f[8][3];
 		
 	    //To confuse things even more, box is oriented differently
 	    //point 1 ->  1  1  1, box_p index -> 7
@@ -92,6 +92,32 @@ class CurvilinearInterpolator{
 	    //Get the coordinates for this point
 	    cs->msh->getOrderedBlockCoordinates(ip, jp, kp, xHalo, yHalo, zHalo, box_p); 
 
+
+	    //Just implement inverse distance weighting for now since we're just using it for visualization
+	    
+	    //Get the distance from the point to the corners of the box
+	    double d2[8], p[3];
+	    p[0] = pointListX[ii];
+	    p[1] = pointListY[ii];
+	    p[2] = pointListZ[ii];
+	    for(int i = 0; i < 8; i++){
+		d2[i] = 0.0;
+		FOR_J3{
+		    d2[i] += (box_p[i][j]-p[j])*(box_p[i][j]-p[j]); 
+		}
+	    }
+
+	    double total_weight = 0.0;
+	    for(int i = 0; i < 8; i++){
+		total_weight += 1.0/d2[i];
+	    }	       
+ 
+	    for(int i = 0; i < 8; i++){
+		Ni[ii][i] = (1.0/d2[i])/total_weight;
+	    }
+	    
+
+/* PARTIAL INCOMPLETE/INCORRECT IMPLEMENTATION OF LINEAR INTERPOLATION
 	    //reorder to make things easier to program
 	    double xp[8][3];
 	    FOR_I3{
@@ -104,6 +130,9 @@ class CurvilinearInterpolator{
 		xp[6][i] = box_p[0][i];
 		xp[7][i] = box_p[4][i];
 	    }
+
+
+	    double f[8][3];
 
 	    //Get the f values for x, y, & z
 	    FOR_I3{
@@ -211,12 +240,17 @@ class CurvilinearInterpolator{
 		   cout << "iter = " << iter << ", e_new = " << e1_new << ", " << e2_new << ", " << e3_new << endl;
 		}
 	    }
-
+*/
 	
 	}
 
     }
 
+    void getDataHalo(double *dataIn, double *dataHalo);
+
+    void getOrderedBlockData(int ip, int jp, int kp, double *dataHalo, double box_data[8]);
+
+    void interpolateData(double *dataIn);  
 
 };
 
