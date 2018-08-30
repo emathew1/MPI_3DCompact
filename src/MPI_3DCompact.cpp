@@ -204,6 +204,15 @@ int main(int argc, char *argv[]){
 
     CurvilinearInterpolator *ci = new CurvilinearInterpolator(cs, pp, N);
 
+    double *interpedDataOut = new double[ci->localPointFoundCount];
+    ci->interpolateData(cs->p0, interpedDataOut);
+
+    IF_RANK0{
+	for(int ip = 0; ip < ci->localPointFoundCount; ip++){
+	    cout << interpedDataOut[ip] << endl;
+	}
+    }
+
     rk->executeSolverLoop();  
 
     //Now lets kill MPI

@@ -17,6 +17,8 @@ class CurvilinearInterpolator{
     int pxSize[3], pySize[3], pzSize[3];
     int pxStart[3], pyStart[3], pzStart[3];
     int pxEnd[3], pyEnd[3], pzEnd[3];
+    int Nx, Ny, Nz;
+    bool periodicX, periodicY, periodicZ;
 
     AbstractCSolver *cs;
     double (*pointList)[3];
@@ -30,8 +32,17 @@ class CurvilinearInterpolator{
     double (*Ni)[8];
 
     CurvilinearInterpolator(AbstractCSolver *cs, double (*pointList)[3], int Npoints){
-	this->cs = cs;;
+
+	//Getting geometry and solver data from the input objects
+	this->cs = cs;
 	this->pointList = pointList;
+	this->Nx = cs->msh->Nx;
+	this->Ny = cs->msh->Ny;
+	this->Nz = cs->msh->Nz;
+
+	this->periodicX = cs->msh->periodicX;
+	this->periodicY = cs->msh->periodicY;
+	this->periodicZ = cs->msh->periodicZ;
 
 	cs->dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 	mpiRank = cs->mpiRank;
@@ -246,11 +257,11 @@ class CurvilinearInterpolator{
 
     }
 
-    void getDataHalo(double *dataIn, double *dataHalo);
+    void getDataHalo(double *dataIn, double *&dataHalo);
 
     void getOrderedBlockData(int ip, int jp, int kp, double *dataHalo, double box_data[8]);
 
-    void interpolateData(double *dataIn);  
+    void interpolateData(double *dataIn, double *interpedDataOut);  
 
 };
 

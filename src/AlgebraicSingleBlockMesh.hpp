@@ -3,29 +3,15 @@
 
 #include "Macros.hpp"
 #include "Utils.hpp"
-#include "Derivatives.hpp"
 #include "AbstractSingleBlockMesh.hpp"
-#include "AbstractCSolver.hpp"
 
 class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
     public:
 
-	C2Decomp *c2d;
-	AbstractCSolver *cs;
-	Domain *d;
-
-        int pxSize[3], pySize[3], pzSize[3]; 
-        int pxStart[3], pyStart[3], pzStart[3];
-        int pxEnd[3], pyEnd[3], pzEnd[3];
-
-	double periodicXTranslation[3];
-	double periodicYTranslation[3];
-	double periodicZTranslation[3];
-
-	bool periodicX;
-	bool periodicY;
-	bool periodicZ;
+        C2Decomp *c2d;
+        AbstractCSolver *cs;
+        Domain *d;
 
 	AlgebraicSingleBlockMesh(C2Decomp *c2d, AbstractCSolver *cs, Domain *dom, int mpiRank){
 

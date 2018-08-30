@@ -7,7 +7,7 @@
 class AbstractSingleBlockMesh{
 
     public:
-	
+
 	int mpiRank;
 	double *x, *y, *z;
 
@@ -18,6 +18,16 @@ class AbstractSingleBlockMesh{
 
 	double max_xi, max_eta, max_zta;
 	int Nx, Ny, Nz;
+
+        int pxSize[3], pySize[3], pzSize[3];
+        int pxStart[3], pyStart[3], pzStart[3];
+        int pxEnd[3], pyEnd[3], pzEnd[3];
+
+        double periodicXTranslation[3];
+        double periodicYTranslation[3];
+        double periodicZTranslation[3];
+
+	bool periodicX, periodicY, periodicZ;
 
 	Derivatives *derivX, *derivY, *derivZ;
 
