@@ -43,6 +43,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    c2d->allocY(z);
 
 
+	    //Get the global mins/maxes
+	    double x_min_local[3] = {1e10, 1e10, 1e10};
+	    double x_max_local[3] = {-1e10, -1e10, -1e10};
 
 	    //Generate the mesh algebraically...
 	    FOR_Z_YPEN{
@@ -66,9 +69,23 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			y[ip] = eta;
 			z[ip] = zta;  
 
+			//Since we're already in this loop, calculate the local max and mins
+			x_min_local[0] = fmin(x_min_local[0], x[ip]);
+			x_min_local[1] = fmin(x_min_local[1], y[ip]);
+			x_min_local[2] = fmin(x_min_local[2], z[ip]);
+	
+			x_max_local[0] = fmax(x_max_local[0], x[ip]);
+			x_max_local[1] = fmax(x_max_local[1], y[ip]);
+			x_max_local[2] = fmax(x_max_local[2], z[ip]);
+
 		    }
 		}
 	    }
+
+	    //Reduce to get the global bounding box
+	    MPI_Allreduce(x_min_local, x_min, 3, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+	    MPI_Allreduce(x_max_local, x_max, 3, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
 		periodicX = true;

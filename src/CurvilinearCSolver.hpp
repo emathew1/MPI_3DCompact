@@ -9,6 +9,7 @@
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"
 #include "PngWriter.hpp"
+#include "CurvilinearInterpolator.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -27,6 +28,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	int totRank;
 
 	double t1, t2;
+
+
 	
 	//Track the current time and timestep
         int timeStep;
@@ -87,6 +90,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	PngWriter *pngXY;
 	PngWriter *pngXZ;
 	PngWriter *pngYZ;
+	int png_res[3];
 
 	//Alias'd derivative objects
 	Derivatives *derivXi1, *derivXi2, *derivXi3;
@@ -162,14 +166,18 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
 
 	    //only rank 0 write images for now...
+	    //Resolution of all images...
+	    png_res[0] = 512;
+	    png_res[1] = 512;
+	    png_res[2] = 512;
             IF_RANK0{
-                pngXY = new PngWriter(Nx, Ny);
-                pngXZ = new PngWriter(Nz, Nx);
-                pngYZ = new PngWriter(Ny, Nz);
+                pngXY = new PngWriter(png_res[0], png_res[1]);
+                pngYZ = new PngWriter(png_res[1], png_res[2]);
+                pngXZ = new PngWriter(png_res[1], png_res[2]);
             }else{
                 pngXY = NULL;
-                pngXZ = NULL;
                 pngYZ = NULL;
+                pngXZ = NULL;
             }
 
 	    int minYPenXSize;

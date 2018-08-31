@@ -54,12 +54,12 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 1;
+    int maxTimeStep  = 5000;
     double maxTime   = 300.0;
     int filterStep   = 5;
     int checkStep    = 1;
     int dumpStep     = 2500;
-    int imageStep    = 2;
+    int imageStep    = 25;
     TimeStepping *ts = new TimeStepping(timeSteppingType, 
 					CFL, 
 					maxTimeStep, 
@@ -109,12 +109,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 50,
+    int    Nx = 100,
            Ny = 50,
            Nz = 50;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
-    double Lx = 1.0,
+    double Lx = 2.0,
            Ly = 1.0,
            Lz = 1.0;
     Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
@@ -124,8 +124,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 2, 
-	pCol = 2;
+    int pRow = 0, 
+	pCol = 0;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
@@ -207,9 +207,22 @@ int main(int argc, char *argv[]){
     double *interpedDataOut = new double[ci->localPointFoundCount];
     ci->interpolateData(cs->p0, interpedDataOut);
 
+    double *wholeDataLocal = new double[N];
+    double *wholeDataGlob  = new double[N];
+    for(int ip = 0; ip < N; ip++){
+	wholeDataLocal[ip] = 0.0;
+    }
+
+    for(int ip = 0; ip < ci->localPointFoundCount; ip++){
+	wholeDataLocal[ci->pointIndex[ip]] = interpedDataOut[ip];
+    }
+
+    //Gather all of the data together...
+    MPI_Reduce(wholeDataLocal, wholeDataGlob, N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
     IF_RANK0{
-	for(int ip = 0; ip < ci->localPointFoundCount; ip++){
-	    cout << interpedDataOut[ip] << endl;
+	for(int ip = 0; ip < N; ip++){
+	    cout << wholeDataGlob[ip] << endl;
 	}
     }
 

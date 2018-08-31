@@ -1122,92 +1122,152 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
     //plane == 1, XZ (Y-normal Plane)
     //plane == 2, XY (Z-normal Plane)
 
-    int N1 = 0, N2 = 0;
+    int N1 = 0, N2 = 0; 
     PngWriter *png = NULL;
 
+    double (*pointList)[3] = NULL;
+
     if(plane == 0){
-	N1 = Ny;
-	N2 = Nz;
+	N1 = png_res[1];
+	N2 = png_res[2];
+	pointList = new double[N1*N2][3];
+
+	IF_RANK0 png = pngYZ;
+
+	//Get the plane location coordinate
+	double x_plane = fraction*(msh->x_max[0]-msh->x_min[0]) + msh->x_min[0];
+
+	//Get the coordinates for this case...
+	//each pixel should represent a equal area box
 	
-	IF_RANK0 png = pngYZ;	
+	//See which case is the limiting box size
+	double d1 = (msh->x_max[1]-msh->x_min[1])/((double)N1+1.0);
+	double d2 = (msh->x_max[2]-msh->x_min[2])/((double)N2+1.0);
+
+	//limited by the larger box...
+	double dx = fmax(d1, d2);
+
+	//Doing the pixed kind of as a "cell centered" location
+	double base1 = msh->x_min[1] + dx/2;
+	double base2 = msh->x_min[2] + dx/2;
+
+	//Finally calculating the positions of the pixels
+	for(int ip = 0; ip < N1; ip++){
+	    for(int jp = 0; jp < N2; jp++){
+		int ii = ip*N2 + jp;
+		pointList[ii][0] = x_plane;
+		pointList[ii][1] = base1 + dx*(double)ip;
+		pointList[ii][2] = base2 + dx*(double)jp;
+	    }
+	}
 
     }else if(plane == 1){
-	N1 = Nz;
-	N2 = Nx;
 
-	IF_RANK0 png = pngXZ;	
+	N1 = png_res[2];
+	N2 = png_res[0];
+	pointList = new double[N1*N2][3];
+
+	//Get the plane location coordinate
+	double y_plane = fraction*(msh->x_max[1] - msh->x_min[1]) + msh->x_min[1];
+
+	//See which case is the limited box size
+	double d1 = (msh->x_max[2] - msh->x_min[2])/((double)N1 + 1.0);
+	double d2 = (msh->x_max[0] - msh->x_min[0])/((double)N2 + 1.0);
+
+	double dx = fmax(d1, d2);
+
+	//Get the base locations
+	double base1 = msh->x_min[2] + dx/2;
+	double base2 = msh->x_min[0] + dx/2;
+
+	//Now calculate the positions of the pixels
+	for(int ip = 0; ip < N1; ip++){
+	    for(int jp = 0; jp < N2; jp++){
+		int ii = ip*N2 + jp;
+		pointList[ii][0] = base2 + dx*(double)jp;
+		pointList[ii][1] = y_plane;
+		pointList[ii][2] = base1 + dx*(double)ip;
+
+	    }
+	}
+
+	IF_RANK0 png = pngXZ;
 
     }else if(plane == 2){
-	N1 = Nx;
-	N2 = Ny;
+ 
+	N1 = png_res[0];
+	N2 = png_res[1];
+	pointList = new double[N1*N2][3];
 
-	IF_RANK0 png = pngXY;	
+	//Get the plane location coordinate
+	double z_plane = fraction*(msh->x_max[2]-msh->x_min[2]) + msh->x_min[2];
+
+	//See which case is the limited box size
+	double d1 = (msh->x_max[0] - msh->x_min[0])/((double)N1 + 1.0);
+	double d2 = (msh->x_max[1] - msh->x_min[1])/((double)N2 + 1.0);
+
+	double dx = fmax(d1, d2);
+
+	//Get the base locations
+	double base1 = msh->x_min[0] + dx/2;
+	double base2 = msh->x_min[1] + dx/2;
+
+	//Now calculate the positions of the pixels
+	for(int ip = 0; ip < N1; ip++){
+	    for(int jp = 0; jp < N2; jp++){
+	        int ii = ip*N2 + jp;
+		pointList[ii][0] = base1 + dx*(double)ip;
+		pointList[ii][1] = base2 + dx*(double)jp;	
+		pointList[ii][2] = z_plane;
+	    }
+	}
+
+	IF_RANK0 png = pngXY;
+   }else{
+	cout << "Shouldn't be here in image writer?" << endl;
+   }
+    
+
+    //TODO RESTRUCTURE IMAGE GENERATION SO THAT THIS IS ONLY DONE ONCE INSTEAD OF EACH TIME...
+    CurvilinearInterpolator *ci = new CurvilinearInterpolator(this, pointList, N1*N2);
+
+    double *ff_ci = new double[N1*N2];
+    ci->interpolateData(var, ff_ci);
+  
+    double *ff_local = new double[N1*N2];
+    double *ff       = new double[N1*N2];
+    for(int ip = 0; ip < N1*N2; ip++){
+	ff_local[ip] = -1000000;
     }
     
-    double *ff = new double[N1*N2];
-    for(int ip = 0; ip < N1*N2; ip++) ff[ip] = -1000000.0;
-
-
-    FOR_Z_YPEN{
-	FOR_Y_YPEN{
-	    FOR_X_YPEN{
-		int gi = GETGLOBALXIND_YPEN;
-		int gj = GETGLOBALYIND_YPEN;
-		int gk = GETGLOBALZIND_YPEN;
-	
-		int ip = GETMAJIND_YPEN;
-
-		if(plane == 0){
-		    if(gi == (int)(Nx*fraction)){
-			ff[gk*Ny + gj] = var[ip];
-		    }
-		}else if(plane == 1){
-		    if(gj == (int)(Ny*fraction)){
-			ff[gi*Nz + gk] = var[ip];
-		    }
-		}else if(plane == 2){
-		    if(gk == (int)(Nz*fraction)){
-			ff[gj*Nx + gi] = var[ip];
-		    }
-		}else{
-		   IF_RANK0 cout << "Unrecognized plane value, must be 1, 2, or 3! May crash? " << endl;
-		}
-
-	    }
-	}
+    for(int ip = 0; ip < ci->localPointFoundCount; ip++){
+	ff_local[ci->pointIndex[ip]] = ff_ci[ip];
     }
 
-    double *gf;
+    delete[] ff_ci;
+    delete ci;
+
+
+    MPI_Reduce(ff_local, ff, N1*N2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    delete[] ff_local;
+
     IF_RANK0{
-	gf = new double[N1*N2];
-    }else{
-  	gf = NULL;
-    }
-
-    MPI_Reduce(ff, gf, N1*N2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-
-    IF_RANK0{
-
-	//Make sure all of the values were filled
-	for(int ip = 0; ip < N1*N2; ip++){
-
-	    if(gf[ip] == -1000000.0){
-		cout << "Error: image matrix not completely filled!" << endl;
-	    }
-	}
 
 	//get the max/min value in the plane...
 	double dataMin =  100000000.0;
 	double dataMax = -100000000.0;
 	for(int ip = 0; ip < N1*N2; ip++){
-	    dataMin = fmin(dataMin, gf[ip]);
-	    dataMax = fmax(dataMax, gf[ip]);
+	    if(ff[ip] != -1000000.0){
+	        dataMin = fmin(dataMin, ff[ip]);
+	        dataMax = fmax(dataMax, ff[ip]);
+	    }
 	}
 
 	//Scale pixel value to local min and max
 	int *g = new int[N1*N2];
 	for(int ip = 0; ip < N1*N2; ip++){
-	   double gtemp = (gf[ip] - dataMin)/(dataMax - dataMin); 
+	   double gtemp = (ff[ip] - dataMin)/(dataMax - dataMin); 
 	   g[ip] = (int)(gtemp*255.0);
 	}
 
@@ -1215,7 +1275,11 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	    for(int ip = 0; ip < N1; ip++){
 		int ii = jp*N1 + ip;
 		//Grayscale image...
-		png->set(ip, jp, g[ii], g[ii], g[ii]);
+		if(ff[ii] != -1000000.0){
+		    png->set(ip, jp, g[ii], g[ii], g[ii]);
+		}else{
+		    png->set(ip, jp, 73, 175, 205);
+		}
 	    }
 	}
 
@@ -1226,10 +1290,10 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	png->write(imageName.c_str());
 
 	delete[] g;
-	delete[] gf;
     }
 
     delete[] ff;
+    delete[] pointList;
 
 }
 

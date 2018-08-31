@@ -23,6 +23,7 @@ class CurvilinearInterpolator{
     AbstractCSolver *cs;
     double (*pointList)[3];
     vector<int> icvList;
+    vector<int> pointIndex;
     vector<double> pointListX;
     vector<double> pointListY;
     vector<double> pointListZ;
@@ -30,6 +31,15 @@ class CurvilinearInterpolator{
 
     //Weights for the components of the box to interpolate
     double (*Ni)[8];
+
+    ~CurvilinearInterpolator(){
+	delete[] Ni;
+	icvList.clear();
+	pointIndex.clear();
+	pointListX.clear();
+	pointListY.clear();
+	pointListZ.clear();
+    }
 
     CurvilinearInterpolator(AbstractCSolver *cs, double (*pointList)[3], int Npoints){
 
@@ -61,6 +71,7 @@ class CurvilinearInterpolator{
   	    if(icv != -1){
 		localPointFoundCount++;
 		icvList.push_back(icv);
+		pointIndex.push_back(ip);
 		pointListX.push_back(p[0]);
 		pointListY.push_back(p[1]);
 		pointListZ.push_back(p[2]);

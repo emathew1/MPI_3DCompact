@@ -16,6 +16,7 @@ class AbstractSingleBlockMesh{
 	double *J21, *J22, *J23;
 	double *J31, *J32, *J33;
 
+	double x_min[3], x_max[3];
 	double max_xi, max_eta, max_zta;
 	int Nx, Ny, Nz;
 
