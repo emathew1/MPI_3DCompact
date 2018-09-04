@@ -54,9 +54,9 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.8;
-    int maxTimeStep  = 5000;
+    int maxTimeStep  = 200;
     double maxTime   = 300.0;
-    int filterStep   = 5;
+    int filterStep   = 1;
     int checkStep    = 1;
     int dumpStep     = 2500;
     int imageStep    = 25;
@@ -75,17 +75,16 @@ int main(int argc, char *argv[]){
     //Boundary Condition Info//
     ///////////////////////////
 
-    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::PERIODIC_SOLVE;
-    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcX1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcX0 = BC::PERIODIC;
+    BC::BCKind bcX1 = BC::PERIODIC;
     BC::BCKind bcY0 = BC::PERIODIC;
     BC::BCKind bcY1 = BC::PERIODIC;
-    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
-
+    BC::BCKind bcZ0 = BC::PERIODIC;
+    BC::BCKind bcZ1 = BC::PERIODIC;
 
 /*
     BC::BCType bcXType = BC::DIRICHLET_SOLVE;
@@ -109,12 +108,12 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 100,
+    int    Nx = 50,
            Ny = 50,
            Nz = 50;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
-    double Lx = 2.0,
+    double Lx = 1.0,
            Ly = 1.0,
            Lz = 1.0;
     Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
@@ -159,6 +158,11 @@ int main(int argc, char *argv[]){
     AbstractRK *rk;
     rk = new TVDRK3(cs);
 
+    IF_RANK0{
+	cout << cs->msh->x_max[0] << endl;
+	cout << cs->msh->x_max[1] << endl;
+	cout << cs->msh->x_max[2] << endl;
+    }
 
     ///////////////////////////////
     //Set flow initial conditions//
@@ -173,12 +177,12 @@ int main(int argc, char *argv[]){
 		int jj = GETGLOBALYIND_YPEN;		
 		int kk = GETGLOBALZIND_YPEN;
 
-		double x  = d->x[ii];
-		double x0 = Lx/2; 		
-		double y  = d->y[jj]; 		
-		double y0 = Ly/2; 		
-		double z  = d->z[kk]; 		
-		double z0 = Lz/2; 		
+		double x  = cs->msh->x[ip];
+		double x0 = cs->msh->x_max[0]/2; 		
+		double y  = cs->msh->y[ip]; 		
+		double y0 = cs->msh->x_max[1]/2; 		
+		double z  = cs->msh->z[ip]; 		
+		double z0 = cs->msh->x_max[2]/2; 		
 
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
@@ -189,41 +193,6 @@ int main(int argc, char *argv[]){
                 cs->W0[ip]   = 0.0;
             }
         }
-    }
-
-    int N = 100;
-    double (*pp)[3] = new double[N][3];
-
-    for(int ii = 0; ii < N; ii++){
-	double xx = (double)ii/((double)(N)) + 1E-6;
-        pp[ii][0] = xx; 
-        pp[ii][1] = xx; 
-        pp[ii][2] = xx; 
-    }
-
-
-    CurvilinearInterpolator *ci = new CurvilinearInterpolator(cs, pp, N);
-
-    double *interpedDataOut = new double[ci->localPointFoundCount];
-    ci->interpolateData(cs->p0, interpedDataOut);
-
-    double *wholeDataLocal = new double[N];
-    double *wholeDataGlob  = new double[N];
-    for(int ip = 0; ip < N; ip++){
-	wholeDataLocal[ip] = 0.0;
-    }
-
-    for(int ip = 0; ip < ci->localPointFoundCount; ip++){
-	wholeDataLocal[ci->pointIndex[ip]] = interpedDataOut[ip];
-    }
-
-    //Gather all of the data together...
-    MPI_Reduce(wholeDataLocal, wholeDataGlob, N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-
-    IF_RANK0{
-	for(int ip = 0; ip < N; ip++){
-	    cout << wholeDataGlob[ip] << endl;
-	}
     }
 
     rk->executeSolverLoop();  

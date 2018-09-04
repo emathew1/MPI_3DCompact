@@ -65,7 +65,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 
-			x[ip] = xi;
+			x[ip] = xi+1.5*eta;
 			y[ip] = eta;
 			z[ip] = zta;  
 
@@ -100,7 +100,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
-		periodicYTranslation[0] = 0.0;
+		periodicYTranslation[0] = 1.5;
 		periodicYTranslation[1] = 1.0;
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
@@ -625,6 +625,7 @@ int AlgebraicSingleBlockMesh::findCVForPoint(double p[3], double *x_halo, double
 
 	if(isPointInHexa(p, box_p)){
 	    base_index = cvList[ii];
+	    break;
 	}else{
 	    base_index = -1;
 	}

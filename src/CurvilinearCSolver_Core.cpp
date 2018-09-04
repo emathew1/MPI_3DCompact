@@ -1237,7 +1237,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
     double *ff_local = new double[N1*N2];
     double *ff       = new double[N1*N2];
     for(int ip = 0; ip < N1*N2; ip++){
-	ff_local[ip] = -1000000;
+	ff_local[ip] = -1000000.0;
     }
     
     for(int ip = 0; ip < ci->localPointFoundCount; ip++){
@@ -1258,7 +1258,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	double dataMin =  100000000.0;
 	double dataMax = -100000000.0;
 	for(int ip = 0; ip < N1*N2; ip++){
-	    if(ff[ip] != -1000000.0){
+	    if(ff[ip] > -100000.0){
 	        dataMin = fmin(dataMin, ff[ip]);
 	        dataMax = fmax(dataMax, ff[ip]);
 	    }
@@ -1275,7 +1275,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	    for(int ip = 0; ip < N1; ip++){
 		int ii = jp*N1 + ip;
 		//Grayscale image...
-		if(ff[ii] != -1000000.0){
+		if(ff[ii] > -100000.0){
 		    png->set(ip, jp, g[ii], g[ii], g[ii]);
 		}else{
 		    png->set(ip, jp, 73, 175, 205);
