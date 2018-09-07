@@ -179,7 +179,7 @@ void CurvilinearCSolver::calcDtFromCFL(){
     c2d->allocY(UChar_dx);
 
     FOR_XYZ_YPEN{
-	UChar_dx[ip] = (fabs(U[ip]) + sos[ip])/dom->dx + (fabs(V[ip])+sos[ip])/dom->dy + (fabs(W[ip]) + sos[ip])/dom->dz;
+	UChar_dx[ip] = J11[ip]*(fabs(U[ip]) + sos[ip])/dom->dx + J22[ip]*(fabs(V[ip])+sos[ip])/dom->dy + J33[ip]*(fabs(W[ip]) + sos[ip])/dom->dz;
     }
 
     //Get the largest value in the domain
