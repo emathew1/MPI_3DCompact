@@ -289,4 +289,83 @@ class SpongeBC{
 
 };
 
+class CurvilinearSpongeBC{
+
+    public:
+
+	Domain *domain;
+	IdealGas *idealGas;
+	BC *bc;
+
+	int Nx, Ny, Nz, N;
+
+        int pxSize[3], pySize[3], pzSize[3]; 
+        int pxStart[3], pyStart[3], pzStart[3];
+        int pxEnd[3], pyEnd[3], pzEnd[3];
+
+	double avgT;
+	double epsP;
+	double spongeP;
+	double spongeStrength;
+	double spongeLX;
+	double spongeLY;
+	double spongeLZ;
+
+	double *sigma;
+	double *spongeRhoAvg;
+	double *spongeRhoUAvg;
+	double *spongeRhoVAvg;
+	double *spongeRhoWAvg;
+	double *spongeRhoEAvg;
+    
+	SpongeBC(Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
+
+	    
+	    IF_RANK0 std::cout << endl;
+	    IF_RANK0 std::cout << " > Sponge BC found, initializing Sponge average fields and strength fields..." << std::endl;
+	
+	    this->domain = domain;
+	    this->idealGas = idealGas;
+	    this->bc = bc;
+
+	    domain->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
+
+
+	    this->Nx = domain->gNx;
+	    this->Ny = domain->gNy;
+	    this->Nz = domain->gNz;
+	    N = Nx*Ny*Nz;
+
+	    c2d->allocY(sigma);
+	    c2d->allocY(spongeRhoAvg);
+	    c2d->allocY(spongeRhoUAvg);
+	    c2d->allocY(spongeRhoVAvg);
+	    c2d->allocY(spongeRhoWAvg);
+	    c2d->allocY(spongeRhoEAvg);
+
+	    avgT = 10.0;
+	    epsP = 0.005;
+	    spongeP = 1.0/idealGas->gamma;
+	    spongeStrength = 12.0;
+	    spongeLX = 0.125*domain->gLx;
+	    spongeLY = 0.125*domain->gLy;
+	    spongeLZ = 0.125*domain->gLz;
+
+
+	    //Need to initialize the sponge sigma to zero
+	    FOR_XYZ_YPEN sigma[ip] = 0.0;
+	
+	    //If rectangular sponge BC
+
+	    //If cylindrical sponge BC
+
+	    //If spherical sponge BC
+
+
+	    IF_RANK0 std::cout << " > Done initializing sponge!" << std::endl;
+
+	}
+
+};
+
 #endif
