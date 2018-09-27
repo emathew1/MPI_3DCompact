@@ -5,6 +5,7 @@
 #include "Macros.hpp"
 #include "Domain.hpp"
 #include "IdealGas.hpp"
+#include "CurvilinearCSolver.hpp"
 #include "BC.hpp"
 
 class SpongeBC{
@@ -293,6 +294,7 @@ class CurvilinearSpongeBC{
 
     public:
 
+	CurvilinearCSolver *cs;
 	Domain *domain;
 	IdealGas *idealGas;
 	BC *bc;
@@ -318,12 +320,13 @@ class CurvilinearSpongeBC{
 	double *spongeRhoWAvg;
 	double *spongeRhoEAvg;
     
-	SpongeBC(Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
+	SpongeBC(CurvilinearCSolver *cs, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
 
 	    
 	    IF_RANK0 std::cout << endl;
 	    IF_RANK0 std::cout << " > Sponge BC found, initializing Sponge average fields and strength fields..." << std::endl;
 	
+	    this->cs = cs;
 	    this->domain = domain;
 	    this->idealGas = idealGas;
 	    this->bc = bc;
@@ -347,15 +350,13 @@ class CurvilinearSpongeBC{
 	    epsP = 0.005;
 	    spongeP = 1.0/idealGas->gamma;
 	    spongeStrength = 12.0;
-	    spongeLX = 0.125*domain->gLx;
-	    spongeLY = 0.125*domain->gLy;
-	    spongeLZ = 0.125*domain->gLz;
-
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;
 	
 	    //If rectangular sponge BC
+	    initRectSpongeBC();
+ 
 
 	    //If cylindrical sponge BC
 
@@ -363,6 +364,124 @@ class CurvilinearSpongeBC{
 
 
 	    IF_RANK0 std::cout << " > Done initializing sponge!" << std::endl;
+
+	}
+
+
+
+	initRectSpongeBC(){
+
+
+	    //Default the maximum ends of the sponge to the domain max, can and may be changed for curvilinear domains
+	    double spongeXMin = cs->msh->x_min[0];
+	    double spongeXMax = cs->msh->x_max[0];
+
+	    double spongeYMin = cs->msh->x_min[1];
+	    double spongeYMax = cs->msh->x_max[1];
+
+	    double spongeZMin = cs->msh->x_min[2];
+	    double spongeZMax = cs->msh->x_max[2];
+
+	    //Default to an 1/8th of the domain size in that direction 
+	    spongeLX = 0.125*(spongeXMax-spongeXmin);;
+	    spongeLY = 0.125*(spongeYMax-spongeYmin);;
+	    spongeLZ = 0.125*(spongeZMax-spongeZmin);;
+
+	    //Need to initialize the sponge sigma to zero
+	    FOR_XYZ_YPEN sigma[ip] = 0.0;
+	
+	    //Use this data to initialize the sponge zones / sponge sigma strength...
+	    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE){
+		FOR_X_YPEN{
+		    FOR_Y_YPEN{
+			FOR_Z_YPEN{
+		    	    int ip = GETMAJIND_YPEN;
+			    double dx = cs->msh->x[ip]-spongeXmin;
+		            if(dx < spongeLX){
+		        	double spongeX = (spongeLX - dx)/spongeLX;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
+			    }
+		        }
+		    }
+	  	}
+	    }
+
+	    if(bc->bcX1 == BC::RECT_CURVILINEARSPONGE){
+	        FOR_X_YPEN{
+		    FOR_Y_YPEN{
+		        FOR_Z_YPEN{
+			    int ip = GETMAJIND_YPEN;
+			    double dx = spongeXmax - cs->msh->x[ip];
+		    	    if(dx < spongeLX){
+		        	double spongeX = (cs->msh->x[ip] - (spongeXmax - spongeLX))/spongeLX;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
+			    }
+		        }
+		    }
+	  	}
+	    }     
+
+	    //LEFT OFF HERE
+
+	    if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE){
+	        FOR_Y_YPEN{
+		    int jp = GETGLOBALYIND_YPEN;
+		    if(domain->y[jp] < spongeLY){
+		        double spongeY = (spongeLY - domain->y[jp])/spongeLY;
+		        FOR_X_YPEN{
+			    FOR_Z_YPEN{
+			        int ii = GETMAJIND_YPEN;
+			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ii]);
+			    }
+		        }
+		    }
+		}
+	    }
+	
+	    if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE){
+		FOR_Y_YPEN{
+		    int jp = GETGLOBALYIND_YPEN;
+		    if(domain->y[jp] > domain->gLy - spongeLY){
+		        double spongeY = (domain->y[jp] - (domain->gLy - spongeLY))/spongeLY;
+		        FOR_X_YPEN{
+		            FOR_Z_YPEN{
+			        int ii = GETMAJIND_YPEN;
+			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ii]);
+			    }
+		        }
+		    }
+		}
+	    }    
+
+	    if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE){
+		FOR_Z_YPEN{
+		    int kp = GETGLOBALZIND_YPEN;
+		    if(domain->z[kp] < spongeLZ){
+		        double spongeZ = (spongeLZ - domain->z[kp])/spongeLZ;
+		        FOR_X_YPEN{
+		            FOR_Y_YPEN{
+			        int ii = GETMAJIND_YPEN;
+			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ii]);
+			    }
+		        }
+		    }
+		}
+  	    }
+	
+	    if(bc->bcZ1 == BC::RECT_CURIVLINEARSPONGE){
+	        FOR_Z_YPEN{
+		    int kp = GETGLOBALZIND_YPEN;
+		    if(domain->z[kp] > domain->gLz - spongeLZ){
+		        double spongeZ = (domain->z[kp] - (domain->gLz - spongeLZ))/spongeLZ;
+		        FOR_X_YPEN{
+		            FOR_Y_YPEN{
+			        int ii = GETMAJIND_YPEN;
+			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ii]);
+			    }
+		        }
+		    }
+		}
+	    }    
 
 	}
 
