@@ -36,7 +36,7 @@ Derivatives.o: Derivatives.cpp Derivatives.hpp Domain.hpp BC.hpp Utils.hpp Macro
 Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-UniformCSolver_BC.o: UniformCSolver_BC.cpp UniformCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
+UniformCSolver_BC.o: UniformCSolver_BC.cpp UniformCSolver.hpp AbstractSingleBlockMesh.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp
 	$(CC) $(CFLAGS) -c $<
 
 UniformCSolver_Core.o: UniformCSolver_Core.cpp UniformCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp PngWriter.hpp

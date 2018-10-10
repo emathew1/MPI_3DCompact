@@ -5,8 +5,9 @@
 #include "Macros.hpp"
 #include "Domain.hpp"
 #include "IdealGas.hpp"
-#include "CurvilinearCSolver.hpp"
 #include "BC.hpp"
+#include "AbstractSingleBlockMesh.hpp"
+
 
 class SpongeBC{
 
@@ -294,7 +295,7 @@ class CurvilinearSpongeBC{
 
     public:
 
-	CurvilinearCSolver *cs;
+	AbstractSingleBlockMesh *msh;
 	Domain *domain;
 	IdealGas *idealGas;
 	BC *bc;
@@ -320,13 +321,13 @@ class CurvilinearSpongeBC{
 	double *spongeRhoWAvg;
 	double *spongeRhoEAvg;
     
-	SpongeBC(CurvilinearCSolver *cs, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
+	CurvilinearSpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
 
 	    
 	    IF_RANK0 std::cout << endl;
 	    IF_RANK0 std::cout << " > Sponge BC found, initializing Sponge average fields and strength fields..." << std::endl;
 	
-	    this->cs = cs;
+	    this->msh = msh;
 	    this->domain = domain;
 	    this->idealGas = idealGas;
 	    this->bc = bc;
@@ -369,23 +370,23 @@ class CurvilinearSpongeBC{
 
 
 
-	initRectSpongeBC(){
+	void initRectSpongeBC(){
 
 
 	    //Default the maximum ends of the sponge to the domain max, can and may be changed for curvilinear domains
-	    double spongeXMin = cs->msh->x_min[0];
-	    double spongeXMax = cs->msh->x_max[0];
+	    double spongeXMin = msh->x_min[0];
+	    double spongeXMax = msh->x_max[0];
 
-	    double spongeYMin = cs->msh->x_min[1];
-	    double spongeYMax = cs->msh->x_max[1];
+	    double spongeYMin = msh->x_min[1];
+	    double spongeYMax = msh->x_max[1];
 
-	    double spongeZMin = cs->msh->x_min[2];
-	    double spongeZMax = cs->msh->x_max[2];
+	    double spongeZMin = msh->x_min[2];
+	    double spongeZMax = msh->x_max[2];
 
 	    //Default to an 1/8th of the domain size in that direction 
-	    spongeLX = 0.125*(spongeXMax-spongeXmin);;
-	    spongeLY = 0.125*(spongeYMax-spongeYmin);;
-	    spongeLZ = 0.125*(spongeZMax-spongeZmin);;
+	    spongeLX = 0.125*(spongeXMax-spongeXMin);;
+	    spongeLY = 0.125*(spongeYMax-spongeYMin);;
+	    spongeLZ = 0.125*(spongeZMax-spongeZMin);;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;
@@ -396,7 +397,7 @@ class CurvilinearSpongeBC{
 		    FOR_Y_YPEN{
 			FOR_Z_YPEN{
 		    	    int ip = GETMAJIND_YPEN;
-			    double dx = cs->msh->x[ip]-spongeXmin;
+			    double dx = msh->x[ip]-spongeXMin;
 		            if(dx < spongeLX){
 		        	double spongeX = (spongeLX - dx)/spongeLX;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
@@ -411,9 +412,9 @@ class CurvilinearSpongeBC{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
 			    int ip = GETMAJIND_YPEN;
-			    double dx = spongeXmax - cs->msh->x[ip];
+			    double dx = spongeXMax - msh->x[ip];
 		    	    if(dx < spongeLX){
-		        	double spongeX = (cs->msh->x[ip] - (spongeXmax - spongeLX))/spongeLX;
+		        	double spongeX = (msh->x[ip] - (spongeXMax - spongeLX))/spongeLX;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -468,7 +469,7 @@ class CurvilinearSpongeBC{
 		}
   	    }
 	
-	    if(bc->bcZ1 == BC::RECT_CURIVLINEARSPONGE){
+	    if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE){
 	        FOR_Z_YPEN{
 		    int kp = GETGLOBALZIND_YPEN;
 		    if(domain->z[kp] > domain->gLz - spongeLZ){
