@@ -422,17 +422,15 @@ class CurvilinearSpongeBC{
 	  	}
 	    }     
 
-	    //LEFT OFF HERE
-
 	    if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE){
-	        FOR_Y_YPEN{
-		    int jp = GETGLOBALYIND_YPEN;
-		    if(domain->y[jp] < spongeLY){
-		        double spongeY = (spongeLY - domain->y[jp])/spongeLY;
-		        FOR_X_YPEN{
-			    FOR_Z_YPEN{
-			        int ii = GETMAJIND_YPEN;
-			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ii]);
+	        FOR_X_YPEN{
+	            FOR_Y_YPEN{
+			FOR_Z_YPEN{
+		            int ip = GETMAJIND_YPEN;
+			    double dy = msh->y[ip]-spongeYMin;	
+		            if(dy < spongeLY){
+		                double spongeY = (spongeLY - dy)/spongeLY;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ip]);
 			    }
 		        }
 		    }
@@ -440,14 +438,14 @@ class CurvilinearSpongeBC{
 	    }
 	
 	    if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE){
-		FOR_Y_YPEN{
-		    int jp = GETGLOBALYIND_YPEN;
-		    if(domain->y[jp] > domain->gLy - spongeLY){
-		        double spongeY = (domain->y[jp] - (domain->gLy - spongeLY))/spongeLY;
-		        FOR_X_YPEN{
-		            FOR_Z_YPEN{
-			        int ii = GETMAJIND_YPEN;
-			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ii]);
+		FOR_X_YPEN{
+		    FOR_Y_YPEN{
+		        FOR_Z_YPEN{
+		            int ip = GETMAJIND_YPEN;
+			    double dy = spongeYMax-msh->y[ip];
+		            if(dy < spongeLY){
+		                double spongeY = (msh->y[ip] - (spongeYMax - spongeLY))/spongeLY;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ip]);
 			    }
 		        }
 		    }
@@ -455,14 +453,14 @@ class CurvilinearSpongeBC{
 	    }    
 
 	    if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE){
-		FOR_Z_YPEN{
-		    int kp = GETGLOBALZIND_YPEN;
-		    if(domain->z[kp] < spongeLZ){
-		        double spongeZ = (spongeLZ - domain->z[kp])/spongeLZ;
-		        FOR_X_YPEN{
-		            FOR_Y_YPEN{
-			        int ii = GETMAJIND_YPEN;
-			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ii]);
+		FOR_X_YPEN{
+		    FOR_Y_YPEN{
+		        FOR_Z_YPEN{
+		            int ip = GETMAJIND_YPEN;
+			    double dz = msh->z[ip] - spongeZMin;
+		            if(dz < spongeLZ){
+		                double spongeZ = (spongeLZ - dz)/spongeLZ;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ip]);
 			    }
 		        }
 		    }
@@ -470,14 +468,14 @@ class CurvilinearSpongeBC{
   	    }
 	
 	    if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE){
-	        FOR_Z_YPEN{
-		    int kp = GETGLOBALZIND_YPEN;
-		    if(domain->z[kp] > domain->gLz - spongeLZ){
-		        double spongeZ = (domain->z[kp] - (domain->gLz - spongeLZ))/spongeLZ;
-		        FOR_X_YPEN{
-		            FOR_Y_YPEN{
-			        int ii = GETMAJIND_YPEN;
-			        sigma[ii] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ii]);
+	        FOR_X_YPEN{
+	            FOR_Y_YPEN{
+		        FOR_Z_YPEN{
+		    	    int ip = GETMAJIND_YPEN;
+			    double dz = spongeZMax-msh->z[ip];
+		    	    if(dz < spongeLZ){
+		        	double spongeZ = (domain->z[ip] - (domain->gLz - spongeLZ))/spongeLZ;
+			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ip]);
 			    }
 		        }
 		    }
