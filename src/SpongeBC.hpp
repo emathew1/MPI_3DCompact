@@ -321,7 +321,7 @@ class CurvilinearSpongeBC{
 	double *spongeRhoWAvg;
 	double *spongeRhoEAvg;
     
-	CurvilinearSpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int baseDirection, int mpiRank){
+	CurvilinearSpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank){
 
 	    
 	    IF_RANK0 std::cout << endl;
@@ -354,11 +354,12 @@ class CurvilinearSpongeBC{
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;
+
+ 	    //Need to have some way to trigger which one of these is inialized...
 	
 	    //If rectangular sponge BC
 	    initRectSpongeBC();
  
-
 	    //If cylindrical sponge BC
 
 	    //If spherical sponge BC

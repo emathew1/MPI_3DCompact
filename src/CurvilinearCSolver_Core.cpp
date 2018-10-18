@@ -589,9 +589,9 @@ void CurvilinearCSolver::solveContinuity(){
 
     FOR_XYZ_YPEN{
 
-//	if(spongeFlag)
-//	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
-//	else
+	if(spongeFlag)
+	    spgSource = calcSpongeSource(rhoP[ip], spg->spongeRhoAvg[ip], spg->sigma[ip]);
+	else
 	    spgSource = 0.0;
 		
 	rhok2[ip]  = ts->dt*J[ip]*(-cont_1[ip] - cont_2[ip] - cont_3[ip] + spgSource/J[ip]);
@@ -618,9 +618,9 @@ void CurvilinearCSolver::solveXMomentum(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-//	if(spongeFlag)
-//	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
-//	else
+	if(spongeFlag)
+	    spgSource = calcSpongeSource(rhoUP[ip], spg->spongeRhoUAvg[ip], spg->sigma[ip]);
+	else
 	    spgSource = 0.0;
 
 	rhoUk2[ip] += -mom1_1[ip] - mom1_2[ip] -mom1_3[ip] + spgSource/J[ip];
@@ -651,9 +651,9 @@ void CurvilinearCSolver::solveYMomentum(){
 
     FOR_XYZ_YPEN{ 
 
-//        if(spongeFlag)
-//            spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
-//	else
+        if(spongeFlag)
+            spgSource = calcSpongeSource(rhoVP[ip], spg->spongeRhoVAvg[ip], spg->sigma[ip]);
+	else
 	    spgSource = 0.0;
 
 	rhoVk2[ip] += -mom2_1[ip] -mom2_2[ip] -mom2_3[ip] + spgSource/J[ip];
@@ -683,9 +683,9 @@ void CurvilinearCSolver::solveZMomentum(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-//        if(spongeFlag)
-//           spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
-//        else
+        if(spongeFlag)
+           spgSource = calcSpongeSource(rhoWP[ip], spg->spongeRhoWAvg[ip], spg->sigma[ip]);
+        else
 	    spgSource = 0.0;
 
 	rhoWk2[ip] += -mom3_1[ip] -mom3_2[ip] -mom3_3[ip] + spgSource/J[ip];
@@ -716,9 +716,9 @@ void CurvilinearCSolver::solveEnergy(){
     double spgSource;
     FOR_XYZ_YPEN{
 
-//        if(spongeFlag)
-//            spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
-//        else
+        if(spongeFlag)
+            spgSource = calcSpongeSource(rhoEP[ip], spg->spongeRhoEAvg[ip], spg->sigma[ip]);
+        else
             spgSource = 0.0;
 
 	rhoEk2[ip] = -engy_1[ip] - engy_2[ip] - engy_3[ip] + spgSource/J[ip];
@@ -1009,6 +1009,16 @@ void CurvilinearCSolver::checkSolution(){
 	int Ny = pySize[1];
 	int Nz = pySize[2];
 
+	double a = spg->sigma[0];
+	double b = 1 + a;
+	cout << b << endl;
+	//double *sigma;
+	//c2d->allocY(sigma);
+	//FOR_XYZ_YPEN{
+	//    sigma[ip] = spg->sigma[ip];
+	//}
+
+//	getRange(sigma, "SIGMA", Nx, Ny, Nz, mpiRank);
         getRange(rho1, "RHO", Nx, Ny, Nz, mpiRank);
         getRange(U, "U", Nx, Ny, Nz, mpiRank);
         getRange(V, "V", Nx, Ny, Nz, mpiRank);
@@ -1103,9 +1113,13 @@ void CurvilinearCSolver::writeImages(){
 	int zeroPad = 6;
 	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
-	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
-	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
+
+    if(timeStep > 10){
+	writePlaneImageForVariable(spg->sigma, "pXZ", timeStepString, 1, 0.5);
+	writePlaneImageForVariable(spg->sigma, "pXY", timeStepString, 2, 0.5);
+	writePlaneImageForVariable(spg->sigma, "pYZ", timeStepString, 0, 0.5);
+    }
+    
 
     if(useTiming){
 	ft2 = MPI_Wtime();

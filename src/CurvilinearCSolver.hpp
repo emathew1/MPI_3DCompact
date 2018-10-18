@@ -76,7 +76,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
 
 	bool spongeFlag;
-	SpongeBC *spg; 
+	CurvilinearSpongeBC *spg; 
 
 	//See if we have to transpose for Neumann BC calculations
 	bool neumannLocalX, neumannLocalZ;
@@ -137,7 +137,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    //Initialize the sponge boundary conditions if necessary
 	    if(bc->bcX0 == BC::SPONGE || bc->bcX1 == BC::SPONGE || bc->bcY0 == BC::SPONGE || bc->bcY1 == BC::SPONGE || bc->bcZ0 == BC::SPONGE || bc->bcZ1 == BC::SPONGE){
 		spongeFlag = true;
-		spg = new SpongeBC(dom, ig, bc, c2d, baseDirection, mpiRank);
+		spg = new CurvilinearSpongeBC(msh, dom, ig, bc, c2d, mpiRank);
 	    }else{
 		spongeFlag = false;
 		spg = NULL;

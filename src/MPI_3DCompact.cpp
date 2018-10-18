@@ -53,8 +53,8 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.8;
-    int maxTimeStep  = 200;
+    double CFL       = 0.15;
+    int maxTimeStep  = 2000;
     double maxTime   = 300.0;
     int filterStep   = 1;
     int checkStep    = 1;
@@ -76,15 +76,15 @@ int main(int argc, char *argv[]){
     ///////////////////////////
 
     BC::BCType bcXType = BC::PERIODIC_SOLVE;
-    BC::BCType bcYType = BC::PERIODIC_SOLVE;
-    BC::BCType bcZType = BC::PERIODIC_SOLVE;
+    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
     BC::BCKind bcX0 = BC::PERIODIC;
     BC::BCKind bcX1 = BC::PERIODIC;
-    BC::BCKind bcY0 = BC::PERIODIC;
-    BC::BCKind bcY1 = BC::PERIODIC;
-    BC::BCKind bcZ0 = BC::PERIODIC;
-    BC::BCKind bcZ1 = BC::PERIODIC;
+    BC::BCKind bcY0 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcZ0 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcZ1 = BC::RECT_CURVILINEARSPONGE;
 
 /*
     BC::BCType bcXType = BC::DIRICHLET_SOLVE;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.375;
+    double alphaF  = 0.1;
     double mu_ref  = 0.00375;
     bool useTiming = false;
     AbstractCSolver *cs;

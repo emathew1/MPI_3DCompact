@@ -64,10 +64,11 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nXi  = xi/max_xi;
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
+			
+			x[ip] = xi + 0.5*eta;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+			y[ip] = eta;// + fRand(-0.001, 0.001);
+			z[ip] = zta;// + fRand(-0.001, 0.001);  
 
-			x[ip] = xi+1.5*eta;
-			y[ip] = eta;
-			z[ip] = zta;  
 
 			//Since we're already in this loop, calculate the local max and mins
 			x_min_local[0] = fmin(x_min_local[0], x[ip]);
@@ -100,7 +101,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
-		periodicYTranslation[0] = 1.5;
+		periodicYTranslation[0] = 0.5; 
 		periodicYTranslation[1] = 1.0;
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
@@ -603,6 +604,30 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 
 int AlgebraicSingleBlockMesh::findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo){
 
+   /* 
+    int base_index = -1;
+    FOR_XYZ_YPEN{
+	
+	base_index = ip;
+
+	//Back out the ip, jp, kp coordinates based off single major index int
+        int jpp =  base_index%pySize[1];
+        int kpp = (base_index/pySize[1])%pySize[2];
+        int ipp =  base_index/(pySize[2]*pySize[1]);
+
+        double box_p[8][3];
+
+        getOrderedBlockCoordinates(ipp, jpp, kpp, x_halo, y_halo, z_halo, box_p);
+
+	if(isPointInHexa(p, box_p)){
+	    break;
+	}else{
+	    base_index = -1;
+	}
+
+    }
+*/
+//*
     int cvListSize, cvList[8192];
 
     adt->buildListForPoint(cvListSize, cvList, p);
@@ -630,7 +655,7 @@ int AlgebraicSingleBlockMesh::findCVForPoint(double p[3], double *x_halo, double
 	    base_index = -1;
 	}
     }
-
+//*/
     return base_index;    
 
 }
