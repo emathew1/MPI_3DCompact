@@ -135,7 +135,11 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 
 	    //Initialize the sponge boundary conditions if necessary
-	    if(bc->bcX0 == BC::SPONGE || bc->bcX1 == BC::SPONGE || bc->bcY0 == BC::SPONGE || bc->bcY1 == BC::SPONGE || bc->bcZ0 == BC::SPONGE || bc->bcZ1 == BC::SPONGE){
+	
+
+	    //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
+
+	    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || bc->bcX1 == BC::RECT_CURVILINEARSPONGE || bc->bcY0 == BC::RECT_CURVILINEARSPONGE || bc->bcY1 == BC::RECT_CURVILINEARSPONGE || bc->bcZ0 ==  BC::RECT_CURVILINEARSPONGE || bc->bcZ1 == BC::RECT_CURVILINEARSPONGE  ){
 		spongeFlag = true;
 		spg = new CurvilinearSpongeBC(msh, dom, ig, bc, c2d, mpiRank);
 	    }else{
