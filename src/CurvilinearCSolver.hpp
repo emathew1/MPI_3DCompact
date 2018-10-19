@@ -133,20 +133,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    //Allocate our arrays for the solver data
 	    initializeSolverData();		    	    
 
-
-	    //Initialize the sponge boundary conditions if necessary
-	
-
-	    //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
-
-	    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || bc->bcX1 == BC::RECT_CURVILINEARSPONGE || bc->bcY0 == BC::RECT_CURVILINEARSPONGE || bc->bcY1 == BC::RECT_CURVILINEARSPONGE || bc->bcZ0 ==  BC::RECT_CURVILINEARSPONGE || bc->bcZ1 == BC::RECT_CURVILINEARSPONGE  ){
-		spongeFlag = true;
-		spg = new CurvilinearSpongeBC(msh, dom, ig, bc, c2d, mpiRank);
-	    }else{
-		spongeFlag = false;
-		spg = NULL;
-	    }
-
 	    //Initialize our derivative calculations for each direction...
 	    derivX = new Derivatives(dom, bc->bcXType, Derivatives::DIRX);
 	    derivY = new Derivatives(dom, bc->bcYType, Derivatives::DIRY);

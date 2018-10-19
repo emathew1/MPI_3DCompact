@@ -2,12 +2,31 @@
 
 void CurvilinearCSolver::setInitialConditions(){
 
+
+
     if(useTiming) ft1 = MPI_Wtime();
 
     IF_RANK0{
         cout << endl;
         cout << " > Setting initial conditions..." << endl; 
     }
+
+    //Initialize sponge boundary conditions if necessary
+    spg = NULL;
+
+    //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
+    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || \
+        bc->bcX1 == BC::RECT_CURVILINEARSPONGE || \
+        bc->bcY0 == BC::RECT_CURVILINEARSPONGE || \
+        bc->bcY1 == BC::RECT_CURVILINEARSPONGE || \
+        bc->bcZ0 == BC::RECT_CURVILINEARSPONGE || \
+        bc->bcZ1 == BC::RECT_CURVILINEARSPONGE  ){
+        spongeFlag = true;
+        spg = new CurvilinearSpongeBC(msh, dom, ig, bc, c2d, mpiRank);
+    }else{
+        spongeFlag = false;
+    }
+
 
     //just do the simple stuff in a loop...
     FOR_XYZ_YPEN{
@@ -1092,7 +1111,7 @@ void CurvilinearCSolver::postStepBCHandling(){
     //SPONGE BC//
     /////////////
 
-    if(bc->bcX0 == BC::SPONGE){
+    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE){
 	FOR_X0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1102,7 +1121,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX0
     }
 
-    if(bc->bcX1 == BC::SPONGE){
+    if(bc->bcX1 == BC::RECT_CURVILINEARSPONGE){
 	FOR_X1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1112,7 +1131,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX1
     }   
 
-    if(bc->bcY0 == BC::SPONGE){
+    if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE){
 	FOR_Y0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1122,7 +1141,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY0
     }
 
-    if(bc->bcY1 == BC::SPONGE){
+    if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE){
 	FOR_Y1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1132,7 +1151,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY1
     }
 
-    if(bc->bcZ0 == BC::SPONGE){
+    if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE){
 	FOR_Z0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -1142,7 +1161,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORZ0
     }
 
-    if(bc->bcZ1 == BC::SPONGE){
+    if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE){
 	FOR_Z1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;

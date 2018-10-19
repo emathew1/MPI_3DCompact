@@ -1009,16 +1009,9 @@ void CurvilinearCSolver::checkSolution(){
 	int Ny = pySize[1];
 	int Nz = pySize[2];
 
-	double a = spg->sigma[0];
-	double b = 1 + a;
-	cout << b << endl;
-	//double *sigma;
-	//c2d->allocY(sigma);
-	//FOR_XYZ_YPEN{
-	//    sigma[ip] = spg->sigma[ip];
-	//}
+	if(spongeFlag)
+	    getRange(spg->sigma, "SIGMA", Nx, Ny, Nz, mpiRank);
 
-//	getRange(sigma, "SIGMA", Nx, Ny, Nz, mpiRank);
         getRange(rho1, "RHO", Nx, Ny, Nz, mpiRank);
         getRange(U, "U", Nx, Ny, Nz, mpiRank);
         getRange(V, "V", Nx, Ny, Nz, mpiRank);
@@ -1114,11 +1107,9 @@ void CurvilinearCSolver::writeImages(){
 	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
 
-    if(timeStep > 10){
-	writePlaneImageForVariable(spg->sigma, "pXZ", timeStepString, 1, 0.5);
-	writePlaneImageForVariable(spg->sigma, "pXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(spg->sigma, "pYZ", timeStepString, 0, 0.5);
-    }
+	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
+	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);
+	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
     
 
     if(useTiming){

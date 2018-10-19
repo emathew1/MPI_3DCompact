@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o 
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o SpongeBC.o UniformCSolver_BC.o UniformCSolver_Core.o UniformCSolverConservative_Core.o UniformCSolverConservative_BC.o UniformCSolverConservativeYBase_Core.o UniformCSolverConservativeYBase_BC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o 
 
 default: MPI_3DCompact
 
@@ -31,6 +31,9 @@ Utils.o: Utils.cpp Domain.hpp Utils.hpp
 	$(CC) $(CFLAGS) -c $<
 
 Derivatives.o: Derivatives.cpp Derivatives.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
+	$(CC) $(CFLAGS) -c $<
+
+SpongeBC.o: SpongeBC.cpp SpongeBC.hpp Domain.hpp BC.hpp Macros.hpp IdealGas.hpp AbstractSingleBlockMesh.hpp Utils.hpp
 	$(CC) $(CFLAGS) -c $<
 
 Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
