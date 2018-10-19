@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.15;
+    double CFL       = 0.25;
     int maxTimeStep  = 2000;
     double maxTime   = 300.0;
     int filterStep   = 1;
@@ -74,19 +74,19 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-
+/*
     BC::BCType bcXType = BC::PERIODIC_SOLVE;
-    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcYType = BC::PERIODIC_SOLVE;
+    BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
     BC::BCKind bcX0 = BC::PERIODIC;
     BC::BCKind bcX1 = BC::PERIODIC;
-    BC::BCKind bcY0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcZ0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcZ1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcY0 = BC::PERIODIC;
+    BC::BCKind bcY1 = BC::PERIODIC;
+    BC::BCKind bcZ0 = BC::PERIODIC;
+    BC::BCKind bcZ1 = BC::PERIODIC;
+*/
 
-/*
     BC::BCType bcXType = BC::DIRICHLET_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
     BC::BCKind bcY1 = BC::ADIABATIC_WALL;
     BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
     BC::BCKind bcZ1 = BC::ADIABATIC_WALL;
-*/
+
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 50,
-           Ny = 50,
-           Nz = 50;
+    int    Nx = 20,
+           Ny = 20,
+           Nz = 2000;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -123,8 +123,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 0, 
-	pCol = 0;
+    int pRow = 4, 
+	pCol = 1;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.1;
+    double alphaF  = 0.35;
     double mu_ref  = 0.00375;
     bool useTiming = false;
     AbstractCSolver *cs;
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]){
 
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
-                cs->rho0[ip] = 1.0;
+                cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
                 cs->p0[ip]   = (1.0 + 1.0*exp(-r2/0.001))/cs->ig->gamma;
                 cs->U0[ip]   = 0.0;
                 cs->V0[ip]   = 0.0;

@@ -1,7 +1,7 @@
 CC=mpic++
 
 # CFLAGS will be the options passed to the compiler.
-CFLAGS= -Wall -O3
+CFLAGS= -Wall -O0
 
 AR = ar rv
 RANLIB = ar -ts

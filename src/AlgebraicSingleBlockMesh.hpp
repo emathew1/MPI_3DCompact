@@ -65,7 +65,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 			
-			x[ip] = xi + 0.5*eta;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+			x[ip] = xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
 			y[ip] = eta;// + fRand(-0.001, 0.001);
 			z[ip] = zta;// + fRand(-0.001, 0.001);  
 
@@ -101,7 +101,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
 		periodicY = true;
-		periodicYTranslation[0] = 0.5; 
+		periodicYTranslation[0] = 0.0; 
 		periodicYTranslation[1] = 1.0;
 		periodicYTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
@@ -151,11 +151,13 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
             double *z_halo = NULL;
 
 	    generateCoordinateHaloArrays(x_halo, y_halo, z_halo);
-	    
+  
 	    int Nlocal = pySize[0]*pySize[1]*pySize[2];
             double (*boundBoxMin)[3] = new double[Nlocal][3];
             double (*boundBoxMax)[3] = new double[Nlocal][3];
-
+	   
+	    
+ 
             //Cycle through the halo arrays of coordinates
             for(int kp = 0; kp < pySize[2]; kp++){
                 for(int jp = 0; jp < pySize[1]; jp++){
@@ -166,7 +168,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
                         //This is the non-halo array index, y-major
                         int ii_major = ip*pySize[2]*pySize[1] + kp*pySize[1] + jp;
-
 
 			double box_p[8][3];
 			getOrderedBlockCoordinates(ip, jp, kp, x_halo, y_halo, z_halo, box_p);
@@ -235,6 +236,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                     }
                 }
             }
+
+	    cout << "HERE" << endl;
 
 	    FOR_XYZ_YPEN{
 		FOR_I3{
@@ -360,6 +363,8 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//No its fine because C2Decomp will allocate the array with padding even if its not periodic and the *p+1 point should never
 	//be returned since we've zero'd the bounding box from above
 
+	int maxIndex = (pySize[0]+2)*(pySize[1]+2)*(pySize[2]+2);
+
 
         //This is the halo array index for the same point
         iih_0_0_0 = (kp+1)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 1;
@@ -415,6 +420,15 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
         if(pyStart[2] + kp == Nz-1){
             zEndFlag = true;
         }      
+
+	//Tries to access outside the halo index bounds
+	//not sure we can access jp+1 when Ny = last j!! we're in pencil halo and should just return a no box case or something!!!
+	//NEED TO HAVE SOMETHING LIKE THE endYFlag OR SOMETHING LIKE THAT TO MAKE SURE IT DOESN'T TRY TO OVERUN THE ARRAY HERE!!!
+	//THERES ALREADY SOMETHING ABOVE THAT CHECKS TO SEE IF THERE NEEDS TO BE NO BOUNDING BOX AFTER THIS FUNCTION IS CALLED!!
+	if(iih_1_1_1 > 280280){
+	    cout << "OH SNAP SON" << endl;
+	    cout << ip << " " << jp << " " << kp << endl;
+	}
 
 	/////////////////////////////////
 	//Definite local point first...//
@@ -598,7 +612,6 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	        }
 	    }
         }
-
 
 };
 
