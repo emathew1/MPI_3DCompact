@@ -61,7 +61,6 @@ void C2Decomp::updateHalo(double *in, double *&out, int level, int ipencil){
     int outYsize = ye - ys + 1; 
     int outZsize = ze - zs + 1; 
     int outsize = outXsize*outYsize*outZsize;
-    cout << outsize << endl;
     out = new double[outsize];
 
     for(int kp = 0; kp < s3; kp++){

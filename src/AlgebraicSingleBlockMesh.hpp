@@ -65,7 +65,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 			
-			x[ip] = xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+			x[ip] = 8.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
 			y[ip] = eta;// + fRand(-0.001, 0.001);
 			z[ip] = zta;// + fRand(-0.001, 0.001);  
 
@@ -90,7 +90,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
 		periodicX = true;
-		periodicXTranslation[0] = 1.0;
+		periodicXTranslation[0] = 8.0;
 		periodicXTranslation[1] = 0.0;
 		periodicXTranslation[2] = 0.0;
 		IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
@@ -169,16 +169,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                         //This is the non-halo array index, y-major
                         int ii_major = ip*pySize[2]*pySize[1] + kp*pySize[1] + jp;
 
-			double box_p[8][3];
-			getOrderedBlockCoordinates(ip, jp, kp, x_halo, y_halo, z_halo, box_p);
-
-			double x_max = -1.0e100; 
-			double y_max = -1.0e100; 
-			double z_max = -1.0e100; 
-			double x_min =  1.0e100;
-			double y_min =  1.0e100;
-			double z_min =  1.0e100;
-
 
 		        bool xEndFlag = false;
 			if(pyStart[0] + ip == Nx-1){
@@ -201,6 +191,19 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			   (zEndFlag && !periodicZ)){
                             noBBFlag = true;
                         }
+
+
+			double box_p[8][3];
+			if(!noBBFlag){
+			    getOrderedBlockCoordinates(ip, jp, kp, x_halo, y_halo, z_halo, box_p);
+			}
+
+			double x_max = -1.0e100; 
+			double y_max = -1.0e100; 
+			double z_max = -1.0e100; 
+			double x_min =  1.0e100;
+			double y_min =  1.0e100;
+			double z_min =  1.0e100;
 
 			if(!noBBFlag){
 
@@ -236,8 +239,6 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
                     }
                 }
             }
-
-	    cout << "HERE" << endl;
 
 	    FOR_XYZ_YPEN{
 		FOR_I3{
@@ -420,15 +421,6 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
         if(pyStart[2] + kp == Nz-1){
             zEndFlag = true;
         }      
-
-	//Tries to access outside the halo index bounds
-	//not sure we can access jp+1 when Ny = last j!! we're in pencil halo and should just return a no box case or something!!!
-	//NEED TO HAVE SOMETHING LIKE THE endYFlag OR SOMETHING LIKE THAT TO MAKE SURE IT DOESN'T TRY TO OVERUN THE ARRAY HERE!!!
-	//THERES ALREADY SOMETHING ABOVE THAT CHECKS TO SEE IF THERE NEEDS TO BE NO BOUNDING BOX AFTER THIS FUNCTION IS CALLED!!
-	if(iih_1_1_1 > 280280){
-	    cout << "OH SNAP SON" << endl;
-	    cout << ip << " " << jp << " " << kp << endl;
-	}
 
 	/////////////////////////////////
 	//Definite local point first...//
