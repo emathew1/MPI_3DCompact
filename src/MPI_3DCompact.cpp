@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.5;
+    double CFL       = 0.8;
     int maxTimeStep  = 10000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]){
     BC::BCKind bcX1 = BC::RECT_CURVILINEARSPONGE;
     BC::BCKind bcY0 = BC::RECT_CURVILINEARSPONGE;
     BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcZ0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ0 = BC::RECT_CURVILINEARSPONGE;
     BC::BCKind bcZ1 = BC::RECT_CURVILINEARSPONGE;
 
 
@@ -123,8 +123,8 @@ int main(int argc, char *argv[]){
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 4, 
-	pCol = 1;
+    int pRow = 0, 
+	pCol = 0;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
 
     C2Decomp *c2d;
@@ -178,11 +178,11 @@ int main(int argc, char *argv[]){
 		int kk = GETGLOBALZIND_YPEN;
 
 		double x  = cs->msh->x[ip];
-		double x0 = cs->msh->x_max[0]/2; 		
+		double x0 = 3.0*cs->msh->x_max[0]/8.0; 		
 		double y  = cs->msh->y[ip]; 		
-		double y0 = cs->msh->x_max[1]/2; 		
+		double y0 = cs->msh->x_max[1]/2.0; 		
 		double z  = cs->msh->z[ip]; 		
-		double z0 = cs->msh->x_max[2]/2; 		
+		double z0 = cs->msh->x_max[2]/2.0; 		
 
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
