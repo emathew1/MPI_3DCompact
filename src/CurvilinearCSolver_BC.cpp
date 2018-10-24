@@ -15,7 +15,7 @@ void CurvilinearCSolver::setInitialConditions(){
     spg = NULL;
 
     //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
-    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || \
+    if( bc->bcX0 == BC::RECT_CURVILINEARSPONGE || \
         bc->bcX1 == BC::RECT_CURVILINEARSPONGE || \
         bc->bcY0 == BC::RECT_CURVILINEARSPONGE || \
         bc->bcY1 == BC::RECT_CURVILINEARSPONGE || \
@@ -740,7 +740,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	}
 */	
 
-	FOR_Z0_YPEN{
+	FOR_Z0_YPEN_MAJ{
 //	    if(neumannLocalZ){
 	    if(bc->bcZ0 == BC::ADIABATIC_WALL){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zp1],
@@ -792,7 +792,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    c2d->deallocXYZ(T3);
 	}
 */
-	FOR_Z1_YPEN{
+	FOR_Z1_YPEN_MAJ{
 //	    if(neumannLocalZ){
 	    if(bc->bcZ1 == BC::ADIABATIC_WALL){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zm1],
@@ -887,7 +887,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	}
 */	
 	
-        FOR_Y0_YPEN{
+        FOR_Y0_YPEN_MAJ{
 //	    if(neumannLocalY){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Yp1],
                                     T[GETMAJIND_YPEN_Yp2],
@@ -930,7 +930,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    c2d->deallocXYZ(T2);
 	}
 */
-        FOR_Y1_YPEN{
+        FOR_Y1_YPEN_MAJ{
 //	    if(neumannLocalY){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Ym1],
                                     T[GETMAJIND_YPEN_Ym2],
@@ -980,7 +980,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	}
 */
 
-        FOR_Z0_YPEN{
+        FOR_Z0_YPEN_MAJ{
 //	    if(neumannLocalZ){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zp1],
                                     T[GETMAJIND_YPEN_Zp2],
@@ -1029,7 +1029,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    c2d->deallocXYZ(T3);
 	}
 */
-        FOR_Z1_YPEN{
+        FOR_Z1_YPEN_MAJ{
 //	    if(neumannLocalZ){
 	        T[ip] = calcNeumann(T[GETMAJIND_YPEN_Zm1],
                                     T[GETMAJIND_YPEN_Zm2],

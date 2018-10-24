@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.8;
+    double CFL       = 1.2;
     int maxTimeStep  = 10000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
@@ -91,12 +91,12 @@ int main(int argc, char *argv[]){
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::DIRICHLET_SOLVE;
 
-    BC::BCKind bcX0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcX1 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcY0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcZ0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcZ1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcX0 = BC::CONST_T_WALL;
+    BC::BCKind bcX1 = BC::CONST_T_WALL;
+    BC::BCKind bcY0 = BC::CONST_T_WALL;
+    BC::BCKind bcY1 = BC::CONST_T_WALL;
+    BC::BCKind bcZ0 = BC::CONST_T_WALL;
+    BC::BCKind bcZ1 = BC::CONST_T_WALL;
 
 
     bool periodicBC[3];

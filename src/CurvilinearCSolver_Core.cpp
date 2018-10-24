@@ -13,6 +13,8 @@ void CurvilinearCSolver::initializeSolverData(){
         cout << " > Need " << workSize/1024.0/1024.0/1024.0 << " Gb of memory required to allocate solver arrays " << endl;
     }
 
+    c2d->allocY(rankfield);
+
     //3
     c2d->allocY(dU1);
     c2d->allocY(dU2);
@@ -162,6 +164,10 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocZ(tempZ9);
     c2d->allocZ(tempZ10);
 
+
+    FOR_XYZ_YPEN{
+	rankfield[ip] = mpiRank;
+    }
     
     if(useTiming){
 	ft2 = MPI_Wtime();
@@ -1106,6 +1112,11 @@ void CurvilinearCSolver::writeImages(){
 	int zeroPad = 6;
 	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
+	if(timeStep == 0){
+	    writePlaneImageForVariable(rankfield, "rankXZ", timeStepString, 1, 0.5);
+	    writePlaneImageForVariable(rankfield, "rankXY", timeStepString, 2, 0.5);
+	    writePlaneImageForVariable(rankfield, "rankYZ", timeStepString, 0, 0.5);
+	}
 
 	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
 	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);

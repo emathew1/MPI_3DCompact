@@ -75,6 +75,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
 
+	double *rankfield;
+
 	bool spongeFlag;
 	CurvilinearSpongeBC *spg; 
 
