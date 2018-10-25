@@ -65,8 +65,23 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			//double nEta = eta/max_eta;
 			//double nZta = zta/max_zta;
 			
-			x[ip] = 8.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
-			y[ip] = eta;// + fRand(-0.001, 0.001);
+			x[ip] = 4.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+
+			
+
+			if(x[ip] >= 1.5 && x[ip] < 2.5){
+			    double noz_x = x[ip] - 1.5;
+			    double y_upper = 0.9 + 0.1*pow(cos(noz_x*M_PI), 4.0);
+			    double y_lower = 0.1 - 0.1*pow(cos(noz_x*M_PI), 4.0);
+
+			    y[ip] = y_lower + (y_upper-y_lower)*eta;// + fRand(-0.001, 0.001);
+		
+			}else{
+		
+			    y[ip] = eta;// + fRand(-0.001, 0.001);
+		
+			}
+
 			z[ip] = zta;// + fRand(-0.001, 0.001);  
 
 

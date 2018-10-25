@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 1.2;
+    double CFL       = 0.5;
     int maxTimeStep  = 10000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
@@ -89,14 +89,14 @@ int main(int argc, char *argv[]){
 
     BC::BCType bcXType = BC::DIRICHLET_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcZType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::CONST_T_WALL;
-    BC::BCKind bcX1 = BC::CONST_T_WALL;
-    BC::BCKind bcY0 = BC::CONST_T_WALL;
-    BC::BCKind bcY1 = BC::CONST_T_WALL;
-    BC::BCKind bcZ0 = BC::CONST_T_WALL;
-    BC::BCKind bcZ1 = BC::CONST_T_WALL;
+    BC::BCKind bcX0 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcX1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcZ0 = BC::PERIODIC;
+    BC::BCKind bcZ1 = BC::PERIODIC;
 
 
     bool periodicBC[3];
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.3;
-    double mu_ref  = 0.000375;
+    double alphaF  = 0.2;
+    double mu_ref  = 0.01;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]){
 
                 cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
                 cs->p0[ip]   = (1.0 + 1.0*exp(-r2/0.001))/cs->ig->gamma;
-                cs->U0[ip]   = 0.0;
+                cs->U0[ip]   = 0.2;
                 cs->V0[ip]   = 0.0;
                 cs->W0[ip]   = 0.0;
             }
