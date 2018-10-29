@@ -69,10 +69,10 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 			
 
-			if(x[ip] >= 1.5 && x[ip] < 2.5){
-			    double noz_x = x[ip] - 1.5;
-			    double y_upper = 0.9 + 0.1*pow(cos(noz_x*M_PI), 4.0);
-			    double y_lower = 0.1 - 0.1*pow(cos(noz_x*M_PI), 4.0);
+			if(x[ip] >= 1.0 && x[ip] < 2.0){
+			    double noz_x = x[ip] - 1.0;
+			    double y_upper = 0.75 + 0.25*pow(cos(noz_x*M_PI), 4.0);
+			    double y_lower = 0.25 - 0.25*pow(cos(noz_x*M_PI), 4.0);
 
 			    y[ip] = y_lower + (y_upper-y_lower)*eta;// + fRand(-0.001, 0.001);
 		

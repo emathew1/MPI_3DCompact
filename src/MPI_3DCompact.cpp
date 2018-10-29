@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
     double CFL       = 0.5;
-    int maxTimeStep  = 10000;
+    int maxTimeStep  = 20000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 400,
-           Ny = 50,
-           Nz = 50;
+    int    Nx = 300,
+           Ny = 100,
+           Nz = 25;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -143,8 +143,8 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.2;
-    double mu_ref  = 0.01;
+    double alphaF  = 0.4;
+    double mu_ref  = 0.0001;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
@@ -178,17 +178,17 @@ int main(int argc, char *argv[]){
 		int kk = GETGLOBALZIND_YPEN;
 
 		double x  = cs->msh->x[ip];
-		double x0 = 3.0*cs->msh->x_max[0]/8.0; 		
+		double x0 = 2.0*cs->msh->x_max[0]/8.0; 		
 		double y  = cs->msh->y[ip]; 		
-		double y0 = cs->msh->x_max[1]/2.0; 		
+		double y0 = 1.2*cs->msh->x_max[1]/2.0; 		
 		double z  = cs->msh->z[ip]; 		
 		double z0 = cs->msh->x_max[2]/2.0; 		
 
 		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
                 cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
-                cs->p0[ip]   = (1.0 + 1.0*exp(-r2/0.001))/cs->ig->gamma;
-                cs->U0[ip]   = 0.2;
+                cs->p0[ip]   = (1.0 + 2.0*exp(-r2/0.001))/cs->ig->gamma;
+                cs->U0[ip]   = 0.3;
                 cs->V0[ip]   = 0.0;
                 cs->W0[ip]   = 0.0;
             }

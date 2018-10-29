@@ -319,9 +319,9 @@ void CurvilinearSpongeBC::initRectSpongeBC(){
 	    double spongeZMax = msh->x_max[2];
 
 	    //Default to an 1/8th of the domain size in that direction 
-	    spongeLX = 0.25*(spongeXMax-spongeXMin);
-	    spongeLY = 0.25*(spongeYMax-spongeYMin);
-	    spongeLZ = 0.25*(spongeZMax-spongeZMin);
+	    spongeLX = 0.125*(spongeXMax-spongeXMin);
+	    spongeLY = 0.125*(spongeYMax-spongeYMin);
+	    spongeLZ = 0.125*(spongeZMax-spongeZMin);
 
 	    IF_RANK0 cout << " > spongeLX = " << spongeLX << endl;	    
 	    IF_RANK0 cout << " > spongeLY = " << spongeLY << endl;	    
