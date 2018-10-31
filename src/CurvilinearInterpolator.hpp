@@ -266,6 +266,10 @@ class CurvilinearInterpolator{
 	
 	}
 
+	delete[] xHalo;
+	delete[] yHalo;
+	delete[] zHalo;
+
     }
 
     void getDataHalo(double *dataIn, double *&dataHalo);
