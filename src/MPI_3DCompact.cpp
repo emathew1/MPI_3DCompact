@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 300,
-           Ny = 100,
-           Nz = 25;
+    int    Nx = 320,
+           Ny = 120,
+           Nz = 30;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
     //Initialize the Solver//
     /////////////////////////
     double alphaF  = 0.4;
-    double mu_ref  = 0.0001;
+    double mu_ref  = 0.00005;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
