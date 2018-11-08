@@ -1118,13 +1118,12 @@ void CurvilinearCSolver::writeImages(){
 	    writePlaneImageForVariable(rankfield, "rankYZ", timeStepString, 0, 0.5);
 	}
 
-	writePlaneImageForVariable(p, "pXZ", timeStepString, 1, 0.5);
 	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);
 	writePlaneImageForVariable(U, "UXY", timeStepString, 2, 0.5);
 	writePlaneImageForVariable(V, "VXY", timeStepString, 2, 0.5);
 	writePlaneImageForVariable(W, "WXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(p, "pYZ", timeStepString, 0, 0.5);
-	//writePlaneImageForVariable(rho2, "rhoXY", timeStepString, 2, 0.5);
+	writePlaneImageForVariable(rho2, "rhoXY", timeStepString, 2, 0.5);
+	writePlaneImageForVariable(T, "TXY", timeStepString, 2, 0.5);
     
 
     if(useTiming){

@@ -282,10 +282,10 @@ CurvilinearSpongeBC::CurvilinearSpongeBC(AbstractSingleBlockMesh *msh, Domain *d
 	    c2d->allocY(spongeRhoWAvg);
 	    c2d->allocY(spongeRhoEAvg);
 
-	    avgT = 2.0;
+	    avgT = 0.625;
 	    epsP = 0.005;
 	    spongeP = 1.0/idealGas->gamma;
-	    spongeStrength = 1.0;
+	    spongeStrength = 1.0/0.625;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;

@@ -53,8 +53,8 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.5;
-    int maxTimeStep  = 20000;
+    double CFL       = 0.6;
+    int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 320,
-           Ny = 120,
-           Nz = 30;
+    int    Nx = 256,
+           Ny = 100,
+           Nz = 32;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.4;
+    double alphaF  = 0.35;
     double mu_ref  = 0.00005;
     bool useTiming = false;
     AbstractCSolver *cs;
@@ -167,33 +167,67 @@ int main(int argc, char *argv[]){
     ///////////////////////////////
     //Set flow initial conditions//
     ///////////////////////////////
-    FOR_Z_YPEN{
-        FOR_Y_YPEN{
-            FOR_X_YPEN{
 
-                int ip = GETMAJIND_YPEN;
+    bool fromRestart = true;
 
-		int ii = GETGLOBALXIND_YPEN;		
-		int jj = GETGLOBALYIND_YPEN;		
-		int kk = GETGLOBALZIND_YPEN;
+    if(!fromRestart){
+        FOR_Z_YPEN{
+            FOR_Y_YPEN{
+                FOR_X_YPEN{
 
-		double x  = cs->msh->x[ip];
-		double x0 = 2.0*cs->msh->x_max[0]/8.0; 		
-		double y  = cs->msh->y[ip]; 		
-		double y0 = 1.2*cs->msh->x_max[1]/2.0; 		
-		double z  = cs->msh->z[ip]; 		
-		double z0 = cs->msh->x_max[2]/2.0; 		
+                    int ip = GETMAJIND_YPEN;
 
-		double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
+		    int ii = GETGLOBALXIND_YPEN;		
+		    int jj = GETGLOBALYIND_YPEN;		
+		    int kk = GETGLOBALZIND_YPEN;
 
-                cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
-                cs->p0[ip]   = (1.0 + 2.0*exp(-r2/0.001))/cs->ig->gamma;
-                cs->U0[ip]   = 0.3;
-                cs->V0[ip]   = 0.0;
-                cs->W0[ip]   = 0.0;
+		    double x  = cs->msh->x[ip];
+		    double x0 = 2.0*cs->msh->x_max[0]/8.0; 		
+		    double y  = cs->msh->y[ip]; 		
+		    double y0 = 1.2*cs->msh->x_max[1]/2.0; 		
+		    double z  = cs->msh->z[ip]; 		
+		    double z0 = cs->msh->x_max[2]/2.0; 		
+
+		    double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
+
+                    cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
+                    cs->p0[ip]   = (1.0 + 2.0*exp(-r2/0.001))/cs->ig->gamma;
+                    cs->U0[ip]   = 0.2;
+                    cs->V0[ip]   = 0.0;
+                    cs->W0[ip]   = 0.0;
+                }
             }
         }
+    }else{
+
+	string filename = "SolutionDump.15000";
+	int timestep_start = 15000;
+
+	cs->timeStep = timestep_start;
+
+	MPI_File fh;
+	MPI_Offset disp, filesize;
+
+	MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+	disp = 0;
+
+	cs->c2d->readVar(fh, disp, 1, cs->rho0);
+	cs->c2d->readVar(fh, disp, 1, cs->rhoU1);
+	cs->c2d->readVar(fh, disp, 1, cs->rhoV1);
+	cs->c2d->readVar(fh, disp, 1, cs->rhoW1);
+	cs->c2d->readVar(fh, disp, 1, cs->rhoE1);
+
+	MPI_File_close(&fh);
+
+	FOR_XYZ_YPEN{
+	    cs->U0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoU1[ip]);
+	    cs->V0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoV1[ip]);
+	    cs->W0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoW1[ip]);
+	    cs->p0[ip] = cs->ig->solvep(cs->rho0[ip], cs->rhoE1[ip], cs->U0[ip], cs->V0[ip], cs->W0[ip]);
+	}
+
     }
+
 
     rk->executeSolverLoop();  
 

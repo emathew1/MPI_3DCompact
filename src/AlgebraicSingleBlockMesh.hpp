@@ -47,55 +47,93 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    double x_min_local[3] = {1e10, 1e10, 1e10};
 	    double x_max_local[3] = {-1e10, -1e10, -1e10};
 
-	    //Generate the mesh algebraically...
-	    FOR_Z_YPEN{
-		FOR_Y_YPEN{
-		    FOR_X_YPEN{
-			int ip = GETMAJIND_YPEN;
-		
-			int ii = GETGLOBALXIND_YPEN;
-			int jj = GETGLOBALYIND_YPEN;
-			int kk = GETGLOBALZIND_YPEN;
 
-			double xi  = d->x[ii];
-			double eta = d->y[jj];
-			double zta = d->z[kk];
-		
-			//double nXi  = xi/max_xi;
-			//double nEta = eta/max_eta;
-			//double nZta = zta/max_zta;
-			
-			x[ip] = 4.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+	    bool readInGrid = true;
 
-			
+	    if(readInGrid){
+	        MPI_File fh;
+		MPI_Offset disp, filesize;
 
-			if(x[ip] >= 1.0 && x[ip] < 2.0){
-			    double noz_x = x[ip] - 1.0;
-			    double y_upper = 0.75 + 0.25*pow(cos(noz_x*M_PI), 4.0);
-			    double y_lower = 0.25 - 0.25*pow(cos(noz_x*M_PI), 4.0);
+		string filename = "GridDump.XYZ";
+		MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+		disp = 0;
 
-			    y[ip] = y_lower + (y_upper-y_lower)*eta;// + fRand(-0.001, 0.001);
-		
-			}else{
-		
-			    y[ip] = eta;// + fRand(-0.001, 0.001);
-		
-			}
+		c2d->readVar(fh, disp, 1, x);
+		c2d->readVar(fh, disp, 1, y);
+		c2d->readVar(fh, disp, 1, z);
 
-			z[ip] = zta;// + fRand(-0.001, 0.001);  
+		MPI_File_close(&fh);
 
+		FOR_Z_YPEN{
+		    FOR_Y_YPEN{
+			FOR_X_YPEN{
+			    int ip = GETMAJIND_YPEN;
 
-			//Since we're already in this loop, calculate the local max and mins
-			x_min_local[0] = fmin(x_min_local[0], x[ip]);
-			x_min_local[1] = fmin(x_min_local[1], y[ip]);
-			x_min_local[2] = fmin(x_min_local[2], z[ip]);
+			    x_min_local[0] = fmin(x_min_local[0], x[ip]);
+			    x_min_local[1] = fmin(x_min_local[1], y[ip]);
+			    x_min_local[2] = fmin(x_min_local[2], z[ip]);
 	
-			x_max_local[0] = fmax(x_max_local[0], x[ip]);
-			x_max_local[1] = fmax(x_max_local[1], y[ip]);
-			x_max_local[2] = fmax(x_max_local[2], z[ip]);
-
+			    x_max_local[0] = fmax(x_max_local[0], x[ip]);
+			    x_max_local[1] = fmax(x_max_local[1], y[ip]);
+			    x_max_local[2] = fmax(x_max_local[2], z[ip]);
+			}
 		    }
 		}
+
+	    }else{
+	         //Generate the mesh algebraically...
+	         FOR_Z_YPEN{
+		    FOR_Y_YPEN{
+		        FOR_X_YPEN{
+			    int ip = GETMAJIND_YPEN;
+		
+			    int ii = GETGLOBALXIND_YPEN;
+			    int jj = GETGLOBALYIND_YPEN;
+			    int kk = GETGLOBALZIND_YPEN;
+
+			    double xi  = d->x[ii];
+			    double eta = d->y[jj];
+			    double zta = d->z[kk];
+		
+			    //double nXi  = xi/max_xi;
+			    //double nEta = eta/max_eta;
+			    //double nZta = zta/max_zta;
+			
+			    x[ip] = 5.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+
+			
+			    //double sided hyperbolic tangent profile
+			    double delta_s = 2.0;
+			    double eta_stretch = 0.5*(1.0 + tanh(delta_s*(eta - 0.5))/tanh(delta_s*0.5));
+
+			    if(x[ip] >= 1.0 && x[ip] < 2.0){
+			        double noz_x = x[ip] - 1.0;
+			        double y_upper = 0.70 + 0.30*pow(cos(noz_x*M_PI), 4.0);
+			        double y_lower = 0.30 - 0.30*pow(cos(noz_x*M_PI), 4.0);
+
+			        y[ip] = y_lower + (y_upper-y_lower)*eta_stretch;// + fRand(-0.001, 0.001);
+		
+			    }else{
+		
+			        y[ip] = eta_stretch;// + fRand(-0.001, 0.001);
+		
+			    }
+
+			    z[ip] = 0.5*zta;// + fRand(-0.001, 0.001);  
+
+
+			    //Since we're already in this loop, calculate the local max and mins
+			    x_min_local[0] = fmin(x_min_local[0], x[ip]);
+			    x_min_local[1] = fmin(x_min_local[1], y[ip]);
+			    x_min_local[2] = fmin(x_min_local[2], z[ip]);
+	
+			    x_max_local[0] = fmax(x_max_local[0], x[ip]);
+			    x_max_local[1] = fmax(x_max_local[1], y[ip]);
+			    x_max_local[2] = fmax(x_max_local[2], z[ip]);
+ 
+		        }
+		    }
+	        }
 	    }
 
 	    //Reduce to get the global bounding box
@@ -129,7 +167,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		periodicZ = true;
 		periodicZTranslation[0] = 0.0;
 		periodicZTranslation[1] = 0.0;
-		periodicZTranslation[2] = 1.0;
+		periodicZTranslation[2] = 0.5;
 
 		IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 
@@ -270,6 +308,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    IF_RANK0 cout << " > Done!" << endl;
 
 
+	    //Dump the solution grid
+	    dumpGrid();
+
 	    delete[] boundBoxMin;
 	    delete[] boundBoxMax;
 	    delete[] x_halo;
@@ -286,6 +327,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	int findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo);
 
 	void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo);
+
+	void dumpGrid();
 
 };
 
@@ -1820,5 +1863,44 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->deallocXYZ(Jdet3);
 
 }
+
+void AlgebraicSingleBlockMesh::dumpGrid(){
+
+	double time1 = MPI_Wtime();
+
+	IF_RANK0{
+	    cout << endl;
+	    cout << " > Dumping grid " << endl;
+	}
+
+	ofstream outfile;
+	outfile.precision(17);
+	string outputFileName;
+	outputFileName = "GridDump.XYZ";
+
+	MPI_File fh;
+	MPI_Offset disp, filesize;
+
+	MPI_File_open(MPI_COMM_WORLD, outputFileName.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+	filesize = 0;
+	MPI_File_set_size(fh, filesize);
+
+	disp = 0;
+	c2d->writeVar(fh, disp, 1, x); 
+	c2d->writeVar(fh, disp, 1, y); 
+	c2d->writeVar(fh, disp, 1, z); 
+
+	MPI_File_close(&fh);
+
+	double time2 = MPI_Wtime();
+
+	IF_RANK0{
+	    cout << " > Grid dump took " << time2-time1 << " seconds." << endl;   
+	}
+
+}
+
+
 
 #endif

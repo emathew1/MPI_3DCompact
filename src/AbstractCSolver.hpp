@@ -18,6 +18,8 @@ class AbstractCSolver{
 	bool rkLast;
 	bool endFlag;
 
+	int timeStep;
+
 	int baseDirection;
 
 	//Stuff for timing functions
