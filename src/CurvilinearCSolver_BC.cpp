@@ -3,13 +3,13 @@
 void CurvilinearCSolver::setInitialConditions(){
 
 
-
     if(useTiming) ft1 = MPI_Wtime();
 
     IF_RANK0{
         cout << endl;
         cout << " > Setting initial conditions..." << endl; 
     }
+
 
     //Initialize sponge boundary conditions if necessary
     spg = NULL;
@@ -26,7 +26,6 @@ void CurvilinearCSolver::setInitialConditions(){
     }else{
         spongeFlag = false;
     }
-
 
     //just do the simple stuff in a loop...
     FOR_XYZ_YPEN{

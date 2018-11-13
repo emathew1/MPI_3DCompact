@@ -1050,6 +1050,26 @@ void CurvilinearCSolver::dumpSolution(){
 
 	double time1 = MPI_Wtime();
 
+	//Converting over to X-Major Matrices
+	FOR_Z_YPEN{
+	    FOR_Y_YPEN{
+		FOR_X_YPEN{
+		    int ip = GETMAJIND_YPEN;
+		    int jp = GETIND_YPEN;
+
+		    tempY1[jp] = rho1[ip];
+		    tempY2[jp] = rhoU1[ip];
+		    tempY3[jp] = rhoV1[ip];
+		    tempY4[jp] = rhoW1[ip];
+		    tempY5[jp] = rhoE1[ip];
+
+		}
+	    }
+	}
+	
+	
+
+
 	IF_RANK0{
             cout << endl;
             cout << " > ===============" << endl;
@@ -1076,11 +1096,11 @@ void CurvilinearCSolver::dumpSolution(){
 	MPI_File_set_size(fh, filesize);
 
 	disp = 0;
-	c2d->writeVar(fh, disp, baseDirection, rho1);
-	c2d->writeVar(fh, disp, baseDirection, rhoU1);
-	c2d->writeVar(fh, disp, baseDirection, rhoV1);
-	c2d->writeVar(fh, disp, baseDirection, rhoW1);
-	c2d->writeVar(fh, disp, baseDirection, rhoE1);
+	c2d->writeVar(fh, disp, baseDirection, tempY1);
+	c2d->writeVar(fh, disp, baseDirection, tempY2);
+	c2d->writeVar(fh, disp, baseDirection, tempY3);
+	c2d->writeVar(fh, disp, baseDirection, tempY4);
+	c2d->writeVar(fh, disp, baseDirection, tempY5);
 
 	MPI_File_close(&fh);
 

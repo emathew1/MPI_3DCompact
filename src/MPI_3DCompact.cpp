@@ -200,8 +200,8 @@ int main(int argc, char *argv[]){
         }
     }else{
 
-	string filename = "SolutionDump.15000";
-	int timestep_start = 15000;
+	string filename = "SolutionDump.10";
+	int timestep_start = 10;
 
 	cs->timeStep = timestep_start;
 
@@ -211,20 +211,52 @@ int main(int argc, char *argv[]){
 	MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 	disp = 0;
 
-	cs->c2d->readVar(fh, disp, 1, cs->rho0);
-	cs->c2d->readVar(fh, disp, 1, cs->rhoU1);
-	cs->c2d->readVar(fh, disp, 1, cs->rhoV1);
-	cs->c2d->readVar(fh, disp, 1, cs->rhoW1);
-	cs->c2d->readVar(fh, disp, 1, cs->rhoE1);
+	IF_RANK0{
+	    cout << " " << endl;
+	}
+
+	double *rho_in,
+	       *rhoU_in,
+	       *rhoV_in,
+	       *rhoW_in,
+	       *rhoE_in;
+
+	cs->c2d->allocY(rho_in);
+	cs->c2d->allocY(rhoU_in);
+	cs->c2d->allocY(rhoV_in);
+	cs->c2d->allocY(rhoW_in);
+	cs->c2d->allocY(rhoE_in);
+
+	cs->c2d->readVar(fh, disp, 1, rho_in);
+	cs->c2d->readVar(fh, disp, 1, rhoU_in);
+	cs->c2d->readVar(fh, disp, 1, rhoV_in);
+	cs->c2d->readVar(fh, disp, 1, rhoW_in);
+	cs->c2d->readVar(fh, disp, 1, rhoE_in);
 
 	MPI_File_close(&fh);
 
-	FOR_XYZ_YPEN{
-	    cs->U0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoU1[ip]);
-	    cs->V0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoV1[ip]);
-	    cs->W0[ip] = cs->ig->solveU(cs->rho0[ip], cs->rhoW1[ip]);
-	    cs->p0[ip] = cs->ig->solvep(cs->rho0[ip], cs->rhoE1[ip], cs->U0[ip], cs->V0[ip], cs->W0[ip]);
+        FOR_Z_YPEN{
+            FOR_Y_YPEN{
+                FOR_X_YPEN{
+
+                    int ip = GETMAJIND_YPEN;
+		    int jp = GETIND_YPEN;
+
+	            cs->rho0[ip] = rho_in[jp];
+	            cs->U0[ip] = cs->ig->solveU(rho_in[jp], rhoU_in[jp]);
+	            cs->V0[ip] = cs->ig->solveU(rho_in[jp], rhoV_in[jp]);
+	            cs->W0[ip] = cs->ig->solveU(rho_in[jp], rhoW_in[jp]);
+	            cs->p0[ip] = cs->ig->solvep(rho_in[jp], rhoE_in[jp], cs->U0[ip], cs->V0[ip], cs->W0[ip]);
+
+		}
+	    }
 	}
+
+	cs->c2d->deallocXYZ(rho_in);
+	cs->c2d->deallocXYZ(rhoU_in);
+	cs->c2d->deallocXYZ(rhoV_in);
+	cs->c2d->deallocXYZ(rhoW_in);
+	cs->c2d->deallocXYZ(rhoE_in);
 
     }
 

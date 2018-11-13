@@ -58,9 +58,17 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 		disp = 0;
 
-		c2d->readVar(fh, disp, 1, x);
-		c2d->readVar(fh, disp, 1, y);
-		c2d->readVar(fh, disp, 1, z);
+		double *x_temp,
+		       *y_temp,
+		       *z_temp;
+
+		c2d->allocY(x_temp);
+		c2d->allocY(y_temp);
+		c2d->allocY(z_temp);
+
+		c2d->readVar(fh, disp, 1, x_temp);
+		c2d->readVar(fh, disp, 1, y_temp);
+		c2d->readVar(fh, disp, 1, z_temp);
 
 		MPI_File_close(&fh);
 
@@ -68,6 +76,11 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		    FOR_Y_YPEN{
 			FOR_X_YPEN{
 			    int ip = GETMAJIND_YPEN;
+			    int jp = GETIND_YPEN;
+
+			    x[ip] = x_temp[jp];
+			    y[ip] = y_temp[jp];
+			    z[ip] = z_temp[jp];
 
 			    x_min_local[0] = fmin(x_min_local[0], x[ip]);
 			    x_min_local[1] = fmin(x_min_local[1], y[ip]);
@@ -79,6 +92,10 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			}
 		    }
 		}
+
+		c2d->deallocXYZ(x_temp);
+		c2d->deallocXYZ(y_temp);
+		c2d->deallocXYZ(z_temp);
 
 	    }else{
 	         //Generate the mesh algebraically...
@@ -1873,6 +1890,27 @@ void AlgebraicSingleBlockMesh::dumpGrid(){
 	    cout << " > Dumping grid " << endl;
 	}
 
+	double *x_temp,
+	       *y_temp,
+	       *z_temp;
+
+	c2d->allocY(x_temp);
+	c2d->allocY(y_temp);
+	c2d->allocY(z_temp);
+
+	FOR_Z_YPEN{
+	    FOR_Y_YPEN{
+		FOR_X_YPEN{
+		    int ip = GETMAJIND_YPEN;
+		    int jp = GETIND_YPEN;
+
+		    x_temp[jp] = x[ip];
+		    y_temp[jp] = y[ip];
+		    z_temp[jp] = z[ip];
+		}
+	    }
+	}
+
 	ofstream outfile;
 	outfile.precision(17);
 	string outputFileName;
@@ -1887,11 +1925,15 @@ void AlgebraicSingleBlockMesh::dumpGrid(){
 	MPI_File_set_size(fh, filesize);
 
 	disp = 0;
-	c2d->writeVar(fh, disp, 1, x); 
-	c2d->writeVar(fh, disp, 1, y); 
-	c2d->writeVar(fh, disp, 1, z); 
+	c2d->writeVar(fh, disp, 1, x_temp); 
+	c2d->writeVar(fh, disp, 1, y_temp); 
+	c2d->writeVar(fh, disp, 1, z_temp); 
 
 	MPI_File_close(&fh);
+
+	c2d->deallocXYZ(x_temp);
+	c2d->deallocXYZ(y_temp);
+	c2d->deallocXYZ(z_temp);
 
 	double time2 = MPI_Wtime();
 
