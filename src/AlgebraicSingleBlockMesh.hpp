@@ -48,7 +48,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    double x_max_local[3] = {-1e10, -1e10, -1e10};
 
 
-	    bool readInGrid = true;
+	    bool readInGrid = false;
 
 	    if(readInGrid){
 	        MPI_File fh;
@@ -112,32 +112,14 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			    double eta = d->y[jj];
 			    double zta = d->z[kk];
 		
-			    //double nXi  = xi/max_xi;
-			    //double nEta = eta/max_eta;
-			    //double nZta = zta/max_zta;
-			
-			    x[ip] = 5.0*xi;//0.5*(1.0-cos(M_PI*xi)); // + fRand(-0.001, 0.001);
+			    double xi_in[3] = {xi, eta, zta};
+			    double x_out[3];
 
-			
-			    //double sided hyperbolic tangent profile
-			    double delta_s = 2.0;
-			    double eta_stretch = 0.5*(1.0 + tanh(delta_s*(eta - 0.5))/tanh(delta_s*0.5));
+			    generateNozzleGrid(xi_in, x_out);
 
-			    if(x[ip] >= 1.0 && x[ip] < 2.0){
-			        double noz_x = x[ip] - 1.0;
-			        double y_upper = 0.70 + 0.30*pow(cos(noz_x*M_PI), 4.0);
-			        double y_lower = 0.30 - 0.30*pow(cos(noz_x*M_PI), 4.0);
-
-			        y[ip] = y_lower + (y_upper-y_lower)*eta_stretch;// + fRand(-0.001, 0.001);
-		
-			    }else{
-		
-			        y[ip] = eta_stretch;// + fRand(-0.001, 0.001);
-		
-			    }
-
-			    z[ip] = 0.5*zta;// + fRand(-0.001, 0.001);  
-
+			    x[ip] = x_out[0];
+			    y[ip] = x_out[1];
+			    z[ip] = x_out[2];
 
 			    //Since we're already in this loop, calculate the local max and mins
 			    x_min_local[0] = fmin(x_min_local[0], x[ip]);
@@ -346,6 +328,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo);
 
 	void dumpGrid();
+
+	void generateNozzleGrid(double x_in[3], double x_out[3]); 
 
 };
 
@@ -1943,6 +1927,35 @@ void AlgebraicSingleBlockMesh::dumpGrid(){
 
 }
 
+void AlgebraicSingleBlockMesh::generateNozzleGrid(double xi_in[3], double x_out[3]){
 
+	double xi = xi_in[0], eta = xi_in[1], zta = xi_in[2];
+	double x, y, z;
+
+	x = 5.0*xi;
+
+	double delta_s = 2.0;
+	double eta_stretch = 0.5*(1.0 + tanh(delta_s*(eta - 0.5))/tanh(delta_s*0.5));
+
+	if(x >= 1.0 && x < 2.0){
+	   double noz_x = x - 1;
+	   double y_upper = 0.7 + 0.3*pow(cos(noz_x*M_PI), 4.0);
+	   double y_lower = 0.3 - 0.3*pow(cos(noz_x*M_PI), 4.0);
+
+	   y = y_lower + (y_upper - y_lower)*eta_stretch;
+
+	}else{
+
+	   y = eta_stretch;
+
+	}
+
+	z = 0.5*zta;
+
+	x_out[0] = x;
+	x_out[1] = y;
+	x_out[2] = z;
+
+}
 
 #endif

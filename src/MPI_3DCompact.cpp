@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
-    int dumpStep     = 2500;
+    int dumpStep     = 10;
     int imageStep    = 25;
     TimeStepping *ts = new TimeStepping(timeSteppingType, 
 					CFL, 
@@ -255,8 +255,10 @@ int main(int argc, char *argv[]){
 	cs->c2d->deallocXYZ(rho_in);
 	cs->c2d->deallocXYZ(rhoU_in);
 	cs->c2d->deallocXYZ(rhoV_in);
-	cs->c2d->deallocXYZ(rhoW_in);
-	cs->c2d->deallocXYZ(rhoE_in);
+
+	//Segfaults for some reason if I dealloc these?
+	//cs->c2d->deallocXYZ(rhoW_in);
+	//cs->c2d->deallocXYZ(rhoE_in);
 
     }
 
