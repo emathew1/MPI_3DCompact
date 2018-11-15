@@ -29,6 +29,7 @@ class AbstractSingleBlockMesh{
         double periodicZTranslation[3];
 
 	bool transPeriodicX, transPeriodicY, transPeriodicZ;
+	bool interPeriodicX, interPeriodicY, interPeriodicZ;
 
 	Derivatives *derivX, *derivY, *derivZ;
 

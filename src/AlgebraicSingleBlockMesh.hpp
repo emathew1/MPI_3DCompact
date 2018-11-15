@@ -139,39 +139,55 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    MPI_Allreduce(x_min_local, x_min, 3, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
 	    MPI_Allreduce(x_max_local, x_max, 3, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
+	    //Initiallize all of the flags to false
+	    transPeriodicX = false;
+	    transPeriodicY = false;
+	    transPeriodicZ = false;
+
+	    interPeriodicX = false;
+	    interPeriodicY = false;
+	    interPeriodicZ = false;
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
-		transPeriodicX = true;
-		periodicXTranslation[0] = 8.0;
-		periodicXTranslation[1] = 0.0;
-		periodicXTranslation[2] = 0.0;
-		IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
-
-	    }else{
-		transPeriodicX = false;
+		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
+		    transPeriodicX = true;
+		    periodicXTranslation[0] = 8.0;
+		    periodicXTranslation[1] = 0.0;
+		    periodicXTranslation[2] = 0.0;
+		    IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
+		}else if(cs->bc->bcX0 == BC::INTERNALLY_PERIODIC && cs->bc->bcX1 == BC::INTERNALLY_PERIODIC){
+		    interPeriodicX = true;
+		}else{
+		    IF_RANK0 cout << "  Incompatable periodic bc inputs in x-direction! " << endl;
+		}
 	    }
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
-		transPeriodicY = true;
-		periodicYTranslation[0] = 0.0; 
-		periodicYTranslation[1] = 1.0;
-		periodicYTranslation[2] = 0.0;
-		IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
-
-	    }else{
-		transPeriodicY = false; 
+		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
+		    transPeriodicY = true;
+		    periodicYTranslation[0] = 0.0; 
+		    periodicYTranslation[1] = 1.0;
+		    periodicYTranslation[2] = 0.0;
+		    IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
+		}else if(cs->bc->bcY0 == BC::INTERNALLY_PERIODIC && cs->bc->bcY1 == BC::INTERNALLY_PERIODIC){
+		    interPeriodicY = true;			
+		}else{
+		    IF_RANK0 cout << "  Incompatable periodic bc inputs in y-direction! " << endl;
+		} 
 	    }
 
 	    if(cs->bc->bcZType == BC::PERIODIC_SOLVE){
-		transPeriodicZ = true;
-		periodicZTranslation[0] = 0.0;
-		periodicZTranslation[1] = 0.0;
-		periodicZTranslation[2] = 0.5;
-
-		IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
-
-	    }else{
-		transPeriodicZ = false;
+		if(cs->bc->bcZ0 == BC::PERIODIC && cs->bc->bcZ1 == BC::PERIODIC){
+		    transPeriodicZ = true;
+		    periodicZTranslation[0] = 0.0;
+		    periodicZTranslation[1] = 0.0;
+		    periodicZTranslation[2] = 0.5;
+		    IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
+		}else if(cs->bc->bcZ0 == BC::INTERNALLY_PERIODIC && cs->bc->bcZ1 == BC::INTERNALLY_PERIODIC){
+		    interPeriodicZ = true;
+		}else{
+		    IF_RANK0 cout << "  Incompatable periodic bc inputs in z-direction! " << endl;
+		}
 	    }
 
 	    getRange(x, "X", pySize[0], pySize[1], pySize[2], mpiRank);
@@ -999,7 +1015,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(dVc32);
 
 	//Start doing the E2 derivatives of all of this stuff
-	if(tarnsPeriodicY){
+	if(transPeriodicY){
 	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
 	    Nm2a1 = new double[pySize[0]*pySize[2]];
 	    Nm1a1 = new double[pySize[0]*pySize[2]];

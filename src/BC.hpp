@@ -9,7 +9,8 @@ class BC{
     public:
 
 	enum BCType {PERIODIC_SOLVE, DIRICHLET_SOLVE};
-	enum BCKind {PERIODIC, 
+	enum BCKind {PERIODIC,
+		     INTERNALLY_PERIODIC, 
 		     SPONGE,
 		     RECT_CURVILINEARSPONGE,
 		     CYL_CURVILINEARSPONGE,

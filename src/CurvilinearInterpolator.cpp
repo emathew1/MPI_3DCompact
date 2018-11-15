@@ -37,14 +37,14 @@ void CurvilinearInterpolator::getOrderedBlockData(int ip, int jp, int kp, double
      iih_0_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp)*(pySize[0]+2) + ip + 1;
 
      //Halo array index for i, j+1, k
-     if(periodicY && jp == (Ny-1)){
+     if(transPeriodicY && jp == (Ny-1)){
          iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 1;
      }else{
          iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
      }
 
      //Halo array index for i, j+1, k+1
-     if(periodicY && jp == (Ny-1)){
+     if(transPeriodicY && jp == (Ny-1)){
          iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 1;
      }else{
          iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
@@ -57,14 +57,14 @@ void CurvilinearInterpolator::getOrderedBlockData(int ip, int jp, int kp, double
      iih_1_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
 
      //Halo array index for i+1, j+1, k
-     if(periodicY && jp == (Ny-1)){
+     if(transPeriodicY && jp == (Ny-1)){
          iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 2;
      }else{
          iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
      }
 
      //Halo array index for i+1, j+1, k+1
-     if(periodicY && jp == (Ny-1)){
+     if(transPeriodicY && jp == (Ny-1)){
          iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 2;
      }else{
          iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
