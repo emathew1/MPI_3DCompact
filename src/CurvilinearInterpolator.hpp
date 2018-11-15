@@ -18,7 +18,7 @@ class CurvilinearInterpolator{
     int pxStart[3], pyStart[3], pzStart[3];
     int pxEnd[3], pyEnd[3], pzEnd[3];
     int Nx, Ny, Nz;
-    bool periodicX, periodicY, periodicZ;
+    bool transPeriodicX, transPeriodicY, transPeriodicZ;
 
     AbstractCSolver *cs;
     double (*pointList)[3];
@@ -50,9 +50,9 @@ class CurvilinearInterpolator{
 	this->Ny = cs->msh->Ny;
 	this->Nz = cs->msh->Nz;
 
-	this->periodicX = cs->msh->periodicX;
-	this->periodicY = cs->msh->periodicY;
-	this->periodicZ = cs->msh->periodicZ;
+	this->transPeriodicX = cs->msh->transPeriodicX;
+	this->transPeriodicY = cs->msh->transPeriodicY;
+	this->transPeriodicZ = cs->msh->transPeriodicZ;
 
 	cs->dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 	mpiRank = cs->mpiRank;

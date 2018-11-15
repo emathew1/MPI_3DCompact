@@ -3,3 +3,5 @@ Add write/read of Sponge average values for restarting simulations, need those o
 Need to come up with better way to contain restart grids/statistics/instanteous fields in a single file and propagate through to each location it needs to be. current implementation is clunky and has flags in different places and different files.
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
+
+Implement internally periodic boundary conditions
