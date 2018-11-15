@@ -140,15 +140,18 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    MPI_Allreduce(x_max_local, x_max, 3, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
 	    //Initiallize all of the flags to false
+	    periodicBCX = false;	    
+	    periodicBCY = false;	    
+	    periodicBCZ = false;	    
 	    transPeriodicX = false;
 	    transPeriodicY = false;
 	    transPeriodicZ = false;
-
 	    interPeriodicX = false;
 	    interPeriodicY = false;
 	    interPeriodicZ = false;
 
 	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
+		periodicBCX = true;
 		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
 		    transPeriodicX = true;
 		    periodicXTranslation[0] = 8.0;
@@ -157,12 +160,16 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		    IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
 		}else if(cs->bc->bcX0 == BC::INTERNALLY_PERIODIC && cs->bc->bcX1 == BC::INTERNALLY_PERIODIC){
 		    interPeriodicX = true;
+		    periodicXTranslation[0] = 0.0;
+		    periodicXTranslation[1] = 0.0;
+		    periodicXTranslation[2] = 0.0;
 		}else{
 		    IF_RANK0 cout << "  Incompatable periodic bc inputs in x-direction! " << endl;
 		}
 	    }
 
 	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
+		periodicBCY = true;
 		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
 		    transPeriodicY = true;
 		    periodicYTranslation[0] = 0.0; 
@@ -171,12 +178,16 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		    IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
 		}else if(cs->bc->bcY0 == BC::INTERNALLY_PERIODIC && cs->bc->bcY1 == BC::INTERNALLY_PERIODIC){
 		    interPeriodicY = true;			
+		    periodicYTranslation[0] = 0.0; 
+		    periodicYTranslation[1] = 0.0;
+		    periodicYTranslation[2] = 0.0;
 		}else{
 		    IF_RANK0 cout << "  Incompatable periodic bc inputs in y-direction! " << endl;
 		} 
 	    }
 
 	    if(cs->bc->bcZType == BC::PERIODIC_SOLVE){
+		periodicBCZ = true;
 		if(cs->bc->bcZ0 == BC::PERIODIC && cs->bc->bcZ1 == BC::PERIODIC){
 		    transPeriodicZ = true;
 		    periodicZTranslation[0] = 0.0;
@@ -185,6 +196,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		    IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 		}else if(cs->bc->bcZ0 == BC::INTERNALLY_PERIODIC && cs->bc->bcZ1 == BC::INTERNALLY_PERIODIC){
 		    interPeriodicZ = true;
+		    periodicZTranslation[0] = 0.0;
+		    periodicZTranslation[1] = 0.0;
+		    periodicZTranslation[2] = 0.0;
 		}else{
 		    IF_RANK0 cout << "  Incompatable periodic bc inputs in z-direction! " << endl;
 		}
@@ -254,9 +268,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			}      
 
 			bool noBBFlag = false;	
-                        if((xEndFlag && !transPeriodicX) ||
-			   (yEndFlag && !transPeriodicY) ||
-			   (zEndFlag && !transPeriodicZ)){
+                        if((xEndFlag && !periodicBCX) ||
+			   (yEndFlag && !periodicBCY) ||
+			   (zEndFlag && !periodicBCZ)){
                             noBBFlag = true;
                         }
 
@@ -449,14 +463,14 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
         iih_0_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp)*(pySize[0]+2) + ip + 1;
 
         //Halo array index for i, j+1, k
-	if(transPeriodicY && jp == (Ny-1)){
+	if(periodicBCY && jp == (Ny-1)){
             iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 1;
 	}else{
             iih_0_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
 	}
 
         //Halo array index for i, j+1, k+1
-	if(transPeriodicY && jp == (Ny-1)){
+	if(periodicBCY && jp == (Ny-1)){
             iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 1;
 	}else{
             iih_0_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 1;
@@ -469,14 +483,14 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
         iih_1_0_1 = (kp+2)*pySize[1]*(pySize[0]+2) + jp*(pySize[0]+2) + ip + 2;
 
         //Halo array index for i+1, j+1, k
-	if(transPeriodicY && jp == (Ny-1)){
+	if(periodicBCY && jp == (Ny-1)){
             iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 2;
 	}else{
             iih_1_1_0 = (kp+1)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
 	}
 
         //Halo array index for i+1, j+1, k+1
-	if(transPeriodicY && jp == (Ny-1)){
+	if(periodicBCY && jp == (Ny-1)){
 	    iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (0)*(pySize[0]+2) + ip + 2;
 	}else{
 	    iih_1_1_1 = (kp+2)*pySize[1]*(pySize[0]+2) + (jp+1)*(pySize[0]+2) + ip + 2;
@@ -510,7 +524,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 0 0 1// 
 	/////////////////
 
-	if(zEndFlag && transPeriodicZ){
+	if(zEndFlag && periodicBCZ){
 	    box_p[1][0] = x_halo[iih_0_0_1] + periodicZTranslation[0];
 	    box_p[1][1] = y_halo[iih_0_0_1] + periodicZTranslation[1];
 	    box_p[1][2] = z_halo[iih_0_0_1] + periodicZTranslation[2];
@@ -526,7 +540,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 0 1 0//
 	/////////////////
 
-	if(yEndFlag && transPeriodicY){
+	if(yEndFlag && periodicBCY){
 	    box_p[2][0] = x_halo[iih_0_1_0] + periodicYTranslation[0];
 	    box_p[2][1] = y_halo[iih_0_1_0] + periodicYTranslation[1];
 	    box_p[2][2] = z_halo[iih_0_1_0] + periodicYTranslation[2];
@@ -540,8 +554,8 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 0 1 1//
 	/////////////////
 
-	if(zEndFlag && transPeriodicZ){
-	    if(yEndFlag && transPeriodicY){
+	if(zEndFlag && periodicBCZ){
+	    if(yEndFlag && periodicBCY){
 	        box_p[3][0] = x_halo[iih_0_1_1] + periodicZTranslation[0] + periodicYTranslation[0];
 	        box_p[3][1] = y_halo[iih_0_1_1] + periodicZTranslation[1] + periodicYTranslation[1];
 	        box_p[3][2] = z_halo[iih_0_1_1] + periodicZTranslation[2] + periodicYTranslation[2];
@@ -551,7 +565,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 		box_p[3][2] = z_halo[iih_0_1_1] + periodicZTranslation[2];
 	    }
 	}else{ // in interior domain in z-direction
-	    if(yEndFlag && transPeriodicY){
+	    if(yEndFlag && periodicBCY){
 		box_p[3][0] = x_halo[iih_0_1_1] + periodicYTranslation[0];
 		box_p[3][1] = y_halo[iih_0_1_1] + periodicYTranslation[1];
 		box_p[3][2] = z_halo[iih_0_1_1] + periodicYTranslation[2];
@@ -567,7 +581,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 1 0 0//
 	/////////////////
 
-	if(xEndFlag && transPeriodicX){
+	if(xEndFlag && periodicBCX){
 	    box_p[4][0] = x_halo[iih_1_0_0] + periodicXTranslation[0];
 	    box_p[4][1] = y_halo[iih_1_0_0] + periodicXTranslation[1];
 	    box_p[4][2] = z_halo[iih_1_0_0] + periodicXTranslation[2];
@@ -581,8 +595,8 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 1 0 1//
 	/////////////////
 
-	if(xEndFlag && transPeriodicX){
-	    if(zEndFlag && transPeriodicZ){
+	if(xEndFlag && periodicBCX){
+	    if(zEndFlag && periodicBCZ){
 	        box_p[5][0] = x_halo[iih_1_0_1] + periodicXTranslation[0] + periodicZTranslation[0];
 	        box_p[5][1] = y_halo[iih_1_0_1] + periodicXTranslation[1] + periodicZTranslation[1];
 	        box_p[5][2] = z_halo[iih_1_0_1] + periodicXTranslation[2] + periodicZTranslation[2];
@@ -592,7 +606,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 		box_p[5][2] = z_halo[iih_1_0_1] + periodicXTranslation[2];
 	    }
 	}else{
-	    if(zEndFlag && transPeriodicZ){
+	    if(zEndFlag && periodicBCZ){
 		box_p[5][0] = x_halo[iih_1_0_1] + periodicZTranslation[0];
 		box_p[5][1] = y_halo[iih_1_0_1] + periodicZTranslation[1];
 		box_p[5][2] = z_halo[iih_1_0_1] + periodicZTranslation[2];
@@ -607,8 +621,8 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	//Next do 1 1 0// 
 	/////////////////   
 
-	if(xEndFlag && transPeriodicX){
-	    if(yEndFlag && transPeriodicY){
+	if(xEndFlag && periodicBCX){
+	    if(yEndFlag && periodicBCY){
 		box_p[6][0] = x_halo[iih_1_1_0] + periodicXTranslation[0] + periodicYTranslation[0];
 		box_p[6][1] = y_halo[iih_1_1_0] + periodicXTranslation[1] + periodicYTranslation[1];
 		box_p[6][2] = z_halo[iih_1_1_0] + periodicXTranslation[2] + periodicYTranslation[2];
@@ -618,7 +632,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 		box_p[6][2] = z_halo[iih_1_1_0] + periodicXTranslation[2];
 	    }
 	}else{
-	    if(yEndFlag && transPeriodicY){
+	    if(yEndFlag && periodicBCY){
 		box_p[6][0] = x_halo[iih_1_1_0] + periodicYTranslation[0];
 		box_p[6][1] = y_halo[iih_1_1_0] + periodicYTranslation[1];
 		box_p[6][2] = z_halo[iih_1_1_0] + periodicYTranslation[2];
@@ -634,9 +648,9 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
         //Finally do 1 1 1//
         ////////////////////
 
-        if(xEndFlag && transPeriodicX){
-	    if(yEndFlag && transPeriodicY){
-	        if(zEndFlag && transPeriodicZ){
+        if(xEndFlag && periodicBCX){
+	    if(yEndFlag && periodicBCY){
+	        if(zEndFlag && periodicBCZ){
 		    box_p[7][0] = x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicYTranslation[0] + periodicZTranslation[0];
 		    box_p[7][1] = y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicYTranslation[1] + periodicZTranslation[1];
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2] + periodicZTranslation[2];
@@ -646,7 +660,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicYTranslation[2];
 	        }
 	    }else{
-	        if(zEndFlag && transPeriodicZ){
+	        if(zEndFlag && periodicBCZ){
 		    box_p[7][0] = x_halo[iih_1_1_1] + periodicXTranslation[0] + periodicZTranslation[0];
 		    box_p[7][1] = y_halo[iih_1_1_1] + periodicXTranslation[1] + periodicZTranslation[1];
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicXTranslation[2] + periodicZTranslation[2];
@@ -657,8 +671,8 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 	        }
 	    }
         }else{
-	    if(yEndFlag && transPeriodicY){
-	        if(zEndFlag && transPeriodicZ){
+	    if(yEndFlag && periodicBCY){
+	        if(zEndFlag && periodicBCZ){
 		    box_p[7][0] = x_halo[iih_1_1_1] + periodicYTranslation[0] + periodicZTranslation[0];
 		    box_p[7][1] = y_halo[iih_1_1_1] + periodicYTranslation[1] + periodicZTranslation[1];
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicYTranslation[2] + periodicZTranslation[2];
@@ -668,7 +682,7 @@ void AlgebraicSingleBlockMesh::getOrderedBlockCoordinates(int ip, int jp, int kp
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicYTranslation[2];
 	        }
 	    }else{
-	        if(zEndFlag && transPeriodicZ){
+	        if(zEndFlag && periodicBCZ){
 		    box_p[7][0] = x_halo[iih_1_1_1] + periodicZTranslation[0];
 		    box_p[7][1] = y_halo[iih_1_1_1] + periodicZTranslation[1];
 		    box_p[7][2] = z_halo[iih_1_1_1] + periodicZTranslation[2];
@@ -758,7 +772,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(xE23);
 
 	//Do the E2 derivatives first...
-	if(transPeriodicY){
+	if(periodicBCY){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
 	    Nm2x = new double[pySize[0]*pySize[2]];
 	    Nm1x = new double[pySize[0]*pySize[2]];
@@ -823,7 +837,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(y, tempX2);
 
 	//Calculate E1 Derivatives..
-	if(transPeriodicX){
+	if(periodicBCX){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
             Nm2x = new double[pxSize[1]*pxSize[2]];
             Nm1x = new double[pxSize[1]*pxSize[2]];
@@ -892,7 +906,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(y, tempZ2);
 
 	//Calculate E3 Derivatives
-	if(transPeriodicZ){
+	if(periodicBCZ){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
             Nm2x = new double[pzSize[1]*pzSize[0]];
             Nm1x = new double[pzSize[1]*pzSize[0]];
@@ -1015,7 +1029,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(dVc32);
 
 	//Start doing the E2 derivatives of all of this stuff
-	if(transPeriodicY){
+	if(periodicBCY){
 	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
 	    Nm2a1 = new double[pySize[0]*pySize[2]];
 	    Nm1a1 = new double[pySize[0]*pySize[2]];
@@ -1165,7 +1179,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(Vc3, tempX6);
 
 
-	if(transPeriodicX){
+	if(periodicBCX){
 	    
 	    c2d->allocX(y1);
 	    c2d->allocX(z1);
@@ -1340,7 +1354,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(Vc1, tempZ5);
 	c2d->transposeY2Z_MajorIndex(Vc2, tempZ6);
 
-	if(transPeriodicZ){
+	if(periodicBCZ){
 	
  	    c2d->allocZ(y3);
 	    c2d->allocZ(z3);
@@ -1569,7 +1583,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 
 
 	//Compute the E2 component...
-	if(transPeriodicY){
+	if(periodicBCY){
 	    double *Nm2, *Nm1, *Np1, *Np2;
 	    Nm2 = new double[pySize[0]*pySize[2]];
 	    Nm1 = new double[pySize[0]*pySize[2]];
@@ -1618,7 +1632,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
 	//Compute the E1 component....
 	c2d->transposeY2X_MajorIndex(preJdet1, tempX1);
 
-	if(transPeriodicX){
+	if(periodicBCX){
 
 	    c2d->transposeY2X_MajorIndex(x, tempX2);
 	    c2d->transposeY2X_MajorIndex(y, tempX3);
@@ -1679,7 +1693,7 @@ void AlgebraicSingleBlockMesh::solveForJacobians(){
  	//Compute the E3 component....
 	c2d->transposeY2Z_MajorIndex(preJdet3, tempZ1);
 
-	if(transPeriodicZ){
+	if(periodicBCZ){
 
 	    c2d->transposeY2Z_MajorIndex(x, tempZ2);
 	    c2d->transposeY2Z_MajorIndex(y, tempZ3);
