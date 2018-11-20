@@ -115,7 +115,8 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 			    double xi_in[3] = {xi, eta, zta};
 			    double x_out[3];
 
-			    generateNozzleGrid(xi_in, x_out);
+			    generateCylinderGrid(xi_in, jj, Ny, ii, Nx, x_out);
+			    //generateNozzleGrid(xi_in, x_out);
 
 			    x[ip] = x_out[0];
 			    y[ip] = x_out[1];
@@ -192,7 +193,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 		    transPeriodicZ = true;
 		    periodicZTranslation[0] = 0.0;
 		    periodicZTranslation[1] = 0.0;
-		    periodicZTranslation[2] = 0.5;
+		    periodicZTranslation[2] = M_PI;
 		    IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
 		}else if(cs->bc->bcZ0 == BC::INTERNALLY_PERIODIC && cs->bc->bcZ1 == BC::INTERNALLY_PERIODIC){
 		    interPeriodicZ = true;
@@ -361,6 +362,7 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 
 	void generateNozzleGrid(double x_in[3], double x_out[3]); 
 
+	void generateCylinderGrid(double xi_in[3], int cylRIndex, int cylRMax, int cylThetaIndex, int cylThetaMax, double x_out[3]);
 };
 
 
@@ -1987,5 +1989,62 @@ void AlgebraicSingleBlockMesh::generateNozzleGrid(double xi_in[3], double x_out[
 	x_out[2] = z;
 
 }
+
+void AlgebraicSingleBlockMesh::generateCylinderGrid(double xi_in[3], int cylRIndex, int cylRMax, int cylThetaIndex, int cylThetaMax, double x_out[3]){
+
+	double xi = xi_in[0], eta = xi_in[1], zta = xi_in[2];
+	double x, y, z;
+
+
+	//radial distribution
+	double first_off = 0.001;
+	double R = 0.5;
+
+	double inner_growth_rate = 1.055;
+	int Nlayers = 50;
+
+	//sloppy programming 
+	int RMAX = cylRMax;
+	double r[RMAX];
+
+	for(int ip = 0; ip < Nlayers; ip++){
+	    if(ip == 0){
+		r[ip] = R;
+	    }else if(ip == 1){
+		r[ip] = r[ip-1] + first_off;	
+	    }else{
+		r[ip] = r[ip-1] + inner_growth_rate*(r[ip-1] - r[ip-2]);
+	    }
+
+	}
+
+	double outer_growth_rate = 1.025;
+	for(int ip = Nlayers; ip < RMAX; ip++){
+	    r[ip] = r[ip-1] + outer_growth_rate*(r[ip-1] - r[ip-2]);
+	}
+
+	//Theta distribution - just linear here 
+	double local_theta = 2.0*M_PI*((double)cylThetaIndex/(double)cylThetaMax);
+
+	//Get x and y out of the r & theta coordinates
+
+	x = r[cylRIndex]*cos(local_theta);
+	y = r[cylRIndex]*sin(local_theta);
+
+	//IF_RANK0{
+	//    cout << "x, y, theta, r = " << x << " "  << y << " " << local_theta << " " << r[cylRIndex] << endl;
+	//}
+
+	//take z to be uniform distribution of length pi
+	z = zta*M_PI;
+
+	x_out[0] = x;
+	x_out[1] = y;
+	x_out[2] = z;
+
+
+}
+
+
 
 #endif

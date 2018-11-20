@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
-    int dumpStep     = 10;
+    int dumpStep     = 2000;
     int imageStep    = 25;
     TimeStepping *ts = new TimeStepping(timeSteppingType, 
 					CFL, 
@@ -87,14 +87,14 @@ int main(int argc, char *argv[]){
     BC::BCKind bcZ1 = BC::PERIODIC;
 */
 
-    BC::BCType bcXType = BC::DIRICHLET_SOLVE;
+    BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
     BC::BCType bcZType = BC::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::RECT_CURVILINEARSPONGE;
-    BC::BCKind bcX1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcX0 = BC::INTERNALLY_PERIODIC;
+    BC::BCKind bcX1 = BC::INTERNALLY_PERIODIC;
     BC::BCKind bcY0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY1 = BC::ADIABATIC_WALL;
+    BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
     BC::BCKind bcZ0 = BC::PERIODIC;
     BC::BCKind bcZ1 = BC::PERIODIC;
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 256,
-           Ny = 100,
-           Nz = 32;
+    int    Nx = 180,
+           Ny = 160,
+           Nz = 64;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
     //Initialize the Solver//
     /////////////////////////
     double alphaF  = 0.35;
-    double mu_ref  = 0.00005;
+    double mu_ref  = 0.005;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]){
     //Set flow initial conditions//
     ///////////////////////////////
 
-    bool fromRestart = true;
+    bool fromRestart = false;
 
     if(!fromRestart){
         FOR_Z_YPEN{
