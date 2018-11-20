@@ -1136,6 +1136,8 @@ void CurvilinearCSolver::writeImages(){
 	    writePlaneImageForVariable(rankfield, "rankXZ", timeStepString, 1, 0.5);
 	    writePlaneImageForVariable(rankfield, "rankXY", timeStepString, 2, 0.5);
 	    writePlaneImageForVariable(rankfield, "rankYZ", timeStepString, 0, 0.5);
+	    if(spongeFlag)
+	        writePlaneImageForVariable(spg->sigma, "sigmaXY", timeStepString, 2, 0.5);
 	}
 
 	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);

@@ -159,9 +159,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	    //only rank 0 write images for now...
 	    //Resolution of all images...
-	    png_res[0] = 512;
-	    png_res[1] = 512;
-	    png_res[2] = 512;
+	    png_res[0] = 1028;
+	    png_res[1] = 1028;
+	    png_res[2] = 1028;
             IF_RANK0{
                 pngXY = new PngWriter(png_res[0], png_res[1]);
                 pngYZ = new PngWriter(png_res[1], png_res[2]);

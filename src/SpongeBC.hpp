@@ -76,6 +76,7 @@ class CurvilinearSpongeBC{
     
 	CurvilinearSpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank);
 	void initRectSpongeBC();
+	void initCylSpongeBC();
 
 };
 

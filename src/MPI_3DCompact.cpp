@@ -53,7 +53,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.6;
+    double CFL       = 0.15;
     int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]){
     BC::BCKind bcX0 = BC::INTERNALLY_PERIODIC;
     BC::BCKind bcX1 = BC::INTERNALLY_PERIODIC;
     BC::BCKind bcY0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY1 = BC::RECT_CURVILINEARSPONGE;
+    BC::BCKind bcY1 = BC::CYL_CURVILINEARSPONGE;
     BC::BCKind bcZ0 = BC::PERIODIC;
     BC::BCKind bcZ1 = BC::PERIODIC;
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 180,
-           Ny = 160,
-           Nz = 64;
+    int    Nx = 150,
+           Ny = 165,
+           Nz = 48;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0,
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
     //Initialize the Solver//
     /////////////////////////
     double alphaF  = 0.35;
-    double mu_ref  = 0.005;
+    double mu_ref  = 0.001;
     bool useTiming = false;
     AbstractCSolver *cs;
     cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
