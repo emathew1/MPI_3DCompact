@@ -1997,11 +1997,11 @@ void AlgebraicSingleBlockMesh::generateCylinderGrid(double xi_in[3], int cylRInd
 
 
 	//radial distribution
-	double first_off = 0.001;
+	double first_off = 0.005;
 	double R = 0.5;
 
-	double inner_growth_rate = 1.055;
-	int Nlayers = 50;
+	double inner_growth_rate = 1.045;
+	int Nlayers = 40;
 
 	//sloppy programming 
 	int RMAX = cylRMax;
@@ -2018,7 +2018,7 @@ void AlgebraicSingleBlockMesh::generateCylinderGrid(double xi_in[3], int cylRInd
 
 	}
 
-	double outer_growth_rate = 1.025;
+	double outer_growth_rate = 1.035;
 	for(int ip = Nlayers; ip < RMAX; ip++){
 	    r[ip] = r[ip-1] + outer_growth_rate*(r[ip-1] - r[ip-2]);
 	}

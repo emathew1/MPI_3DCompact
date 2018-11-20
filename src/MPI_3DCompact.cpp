@@ -53,13 +53,13 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.15;
+    double CFL       = 0.8;
     int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
     int checkStep    = 1;
     int dumpStep     = 2000;
-    int imageStep    = 25;
+    int imageStep    = 50;
     TimeStepping *ts = new TimeStepping(timeSteppingType, 
 					CFL, 
 					maxTimeStep, 
@@ -108,8 +108,8 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 150,
-           Ny = 165,
+    int    Nx = 165,
+           Ny = 110,
            Nz = 48;
 
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.35;
+    double alphaF  = 0.3;
     double mu_ref  = 0.001;
     bool useTiming = false;
     AbstractCSolver *cs;
@@ -191,8 +191,8 @@ int main(int argc, char *argv[]){
 		    double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
                     cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
-                    cs->p0[ip]   = (1.0 + 2.0*exp(-r2/0.001))/cs->ig->gamma;
-                    cs->U0[ip]   = 0.2;
+                    cs->p0[ip]   = 1.0/cs->ig->gamma;
+                    cs->U0[ip]   = 0.3;
                     cs->V0[ip]   = 0.0;
                     cs->W0[ip]   = 0.0;
                 }
@@ -200,8 +200,8 @@ int main(int argc, char *argv[]){
         }
     }else{
 
-	string filename = "SolutionDump.10";
-	int timestep_start = 10;
+	string filename = "SolutionDump.2000";
+	int timestep_start = 2000;
 
 	cs->timeStep = timestep_start;
 
