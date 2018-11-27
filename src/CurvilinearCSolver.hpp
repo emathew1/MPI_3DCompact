@@ -89,6 +89,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double Z0WallU, Z0WallV, Z1WallU, Z1WallV;
 
 	//For drawing images
+	list<PngWriter*> imageList;
 	PngWriter *pngXY;
 	PngWriter *pngXZ;
 	PngWriter *pngYZ;

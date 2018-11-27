@@ -44,6 +44,7 @@
 // ======================================================================
 
 #include <png.h>
+#include "CurvilinearInterpolator.hpp"
 
 class PngWriter {
   
@@ -51,7 +52,15 @@ private:
   
   unsigned char (*buffer)[3]; // 0 <= r,g,b < 255 
   int nx,ny;
-  
+
+  double *fieldPtr;
+  string varName;
+  int planeInd;
+  double fraction;
+
+  bool interpolatorFlag;
+  CurvilinearInterpolator *ci;  
+
  public:
   
   PngWriter(const int width,const int height) {
@@ -66,6 +75,35 @@ private:
       buffer[i][1] = 175;
       buffer[i][2] = 205;
     }
+
+    fieldPtr = NULL;
+    varName = "";
+    planeInd = -1;
+    fraction = -1.0;
+    interpolatorFlag = false;
+    ci = NULL;
+
+  }
+
+  PngWriter(const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction){
+    nx = width;
+    ny = height;
+    buffer = new unsigned char[nx*ny][3];
+
+    // fill buffer with a "nice" cyan [73,175,205] -- eventually a designer should choose this ;)
+    for (int i = 0; i < nx*ny; ++i) {
+      buffer[i][0] = 73;
+      buffer[i][1] = 175;
+      buffer[i][2] = 205;
+    }
+
+    this->fieldPtr = fieldPtr;
+    this->varName  = varName;
+    this->planeInd = planeInd;
+    this->fraction = fraction;
+
+    interpolatorFlag = false;
+    ci = NULL;
 
   }
 

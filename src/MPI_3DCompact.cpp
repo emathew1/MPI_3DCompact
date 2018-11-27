@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <assert.h>
+#include <list>
 
 using namespace std;
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]){
     //Time Stepping info intialization//
     ////////////////////////////////////
     TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
-    double CFL       = 0.8;
+    double CFL       = 0.5;
     int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
     int filterStep   = 1;
@@ -143,7 +144,7 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.3;
+    double alphaF  = 0.45;
     double mu_ref  = 0.001;
     bool useTiming = false;
     AbstractCSolver *cs;
@@ -168,7 +169,7 @@ int main(int argc, char *argv[]){
     //Set flow initial conditions//
     ///////////////////////////////
 
-    bool fromRestart = false;
+    bool fromRestart = true;
 
     if(!fromRestart){
         FOR_Z_YPEN{
