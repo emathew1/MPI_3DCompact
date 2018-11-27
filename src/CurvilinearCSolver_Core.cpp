@@ -1121,16 +1121,50 @@ void CurvilinearCSolver::dumpSolution(){
 
 }
 
+void CurvilinearCSolver::addImageOutput(PngWriter *png){
+    imageList.push_back(png);
+}
+
 void CurvilinearCSolver::writeImages(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
-	IF_RANK0 cout << " > Dumping images..." << endl;
+    //Get the timestep string just in case...
+    ostringstream timeStepStringT;
+    timeStepStringT << timeStep;
+    int zeroPad = 6;
+    string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
 
-	ostringstream timeStepStringT;
-	timeStepStringT << timeStep;
-	int zeroPad = 6;
-	string timeStepString = string(zeroPad - (timeStepStringT.str()).length(), '0') + timeStepStringT.str();
+    //iterating through the image list
+    for(list<PngWriter*>::iterator iter=imageList.begin(); iter != imageList.end(); ++iter){
+	if(timeStep == 0 && (*iter)->dumpInterval == 0){
+
+	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
+	    if((*iter)->interpolatorFlag == false){
+		//Call the function to generate it...
+
+		(*iter)->interpolatorFlag = true;
+	    }
+
+	    //Do the write...
+	    
+	}
+
+	if(timeStep%(*iter)->dumpInterval==0 && (*iter)->dumpInterval > 0){
+
+	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
+	    if((*iter)->interpolatorFlag == false){
+		//Call the function to generate it...
+
+		(*iter)->interpolatorFlag = true;
+	    }
+
+   
+
+	    //Do the write
+
+	}
+    }
 
 	if(timeStep == 0){
 	    writePlaneImageForVariable(rankfield, "rankXZ", timeStepString, 1, 0.5);
@@ -1460,4 +1494,5 @@ void CurvilinearCSolver::reportAll(){
    IF_RANK0 cout << " " << endl;
 
 }
+
 

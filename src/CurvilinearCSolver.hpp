@@ -205,6 +205,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    t1 = MPI_Wtime();
 	}
 
+	//Pre solver utility functions
+	void addImageOutput(PngWriter *png);
+
 	//Pre Step Functions...
 	void calcDtFromCFL();
 
