@@ -206,7 +206,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	}
 
 	//Pre solver utility functions
-	void addImageOutput(PngWriter *png);
+	void addImageOutput(PngWriter *pw);
+	void generateImagePlane(PngWriter *pw);
 
 	//Pre Step Functions...
 	void calcDtFromCFL();
@@ -230,7 +231,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//Post Step Functions
 	void updateSponge();
 	void writeImages();
-	void writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction);
+	void writePlaneImageForVariable(PngWriter *pw);
 	void checkSolution();
 	void dumpSolution();
 	void checkEnd();

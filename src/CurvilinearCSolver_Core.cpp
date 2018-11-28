@@ -1137,17 +1137,20 @@ void CurvilinearCSolver::writeImages(){
 
     //iterating through the image list
     for(list<PngWriter*>::iterator iter=imageList.begin(); iter != imageList.end(); ++iter){
+
+	(*iter)->timeStepString = timeStepString;
+
 	if(timeStep == 0 && (*iter)->dumpInterval == 0){
 
 	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
 	    if((*iter)->interpolatorFlag == false){
 		//Call the function to generate it...
-
+		generateImagePlane(*iter); 	
 		(*iter)->interpolatorFlag = true;
 	    }
 
 	    //Do the write...
-	    
+	    writePlaneImageForVariable(*iter);	    
 	}
 
 	if(timeStep%(*iter)->dumpInterval==0 && (*iter)->dumpInterval > 0){
@@ -1155,32 +1158,14 @@ void CurvilinearCSolver::writeImages(){
 	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
 	    if((*iter)->interpolatorFlag == false){
 		//Call the function to generate it...
-
+		generateImagePlane(*iter); 	
 		(*iter)->interpolatorFlag = true;
 	    }
 
-   
-
 	    //Do the write
-
+	    writePlaneImageForVariable(*iter);	    
 	}
     }
-
-	if(timeStep == 0){
-	    writePlaneImageForVariable(rankfield, "rankXZ", timeStepString, 1, 0.5);
-	    writePlaneImageForVariable(rankfield, "rankXY", timeStepString, 2, 0.5);
-	    writePlaneImageForVariable(rankfield, "rankYZ", timeStepString, 0, 0.5);
-	    if(spongeFlag)
-	        writePlaneImageForVariable(spg->sigma, "sigmaXY", timeStepString, 2, 0.5);
-	}
-
-	writePlaneImageForVariable(p, "pXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(U, "UXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(V, "VXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(W, "WXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(rho2, "rhoXY", timeStepString, 2, 0.5);
-	writePlaneImageForVariable(T, "TXY", timeStepString, 2, 0.5);
-    
 
     if(useTiming){
 	ft2 = MPI_Wtime();
@@ -1191,23 +1176,17 @@ void CurvilinearCSolver::writeImages(){
 
 }
 
-void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName, string timeStepString, int plane, double fraction){
+void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 
-    //plane == 0, YZ (X-normal Plane)
-    //plane == 1, XZ (Y-normal Plane)
-    //plane == 2, XY (Z-normal Plane)
-
-    int N1 = 0, N2 = 0; 
-    PngWriter *png = NULL;
+    int N1 = pw->nx, N2 = pw->ny; 
+    int plane    = pw->planeInd;
+    int fraction = pw->fraction;
 
     double (*pointList)[3] = NULL;
 
     if(plane == 0){
-	N1 = png_res[1];
-	N2 = png_res[2];
-	pointList = new double[N1*N2][3];
 
-	IF_RANK0 png = pngYZ;
+	pointList = new double[N1*N2][3];
 
 	//Get the plane location coordinate
 	double x_plane = fraction*(msh->x_max[0]-msh->x_min[0]) + msh->x_min[0];
@@ -1238,8 +1217,6 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 
     }else if(plane == 1){
 
-	N1 = png_res[2];
-	N2 = png_res[0];
 	pointList = new double[N1*N2][3];
 
 	//Get the plane location coordinate
@@ -1266,12 +1243,8 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	    }
 	}
 
-	IF_RANK0 png = pngXZ;
-
     }else if(plane == 2){
  
-	N1 = png_res[0];
-	N2 = png_res[1];
 	pointList = new double[N1*N2][3];
 
 	//Get the plane location coordinate
@@ -1297,17 +1270,24 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	    }
 	}
 
-	IF_RANK0 png = pngXY;
    }else{
 	cout << "Shouldn't be here in image writer?" << endl;
    }
     
+    pw->ci = new CurvilinearInterpolator(this, pointList, N1*N2);
 
-    //TODO RESTRUCTURE IMAGE GENERATION SO THAT THIS IS ONLY DONE ONCE INSTEAD OF EACH TIME...
-    CurvilinearInterpolator *ci = new CurvilinearInterpolator(this, pointList, N1*N2);
+    delete[] pointList;
+
+}
+
+void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
+
+    int N1 = pw->nx;
+    int N2 = pw->ny;
+    double *var = pw->fieldPtr;
 
     double *ff_ci = new double[N1*N2];
-    ci->interpolateData(var, ff_ci);
+    pw->ci->interpolateData(var, ff_ci);
   
     double *ff_local = new double[N1*N2];
     double *ff       = new double[N1*N2];
@@ -1315,12 +1295,11 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 	ff_local[ip] = -1000000.0;
     }
     
-    for(int ip = 0; ip < ci->localPointFoundCount; ip++){
-	ff_local[ci->pointIndex[ip]] = ff_ci[ip];
+    for(int ip = 0; ip < pw->ci->localPointFoundCount; ip++){
+	ff_local[pw->ci->pointIndex[ip]] = ff_ci[ip];
     }
 
     delete[] ff_ci;
-    delete ci;
 
 
     MPI_Reduce(ff_local, ff, N1*N2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -1329,13 +1308,20 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 
     IF_RANK0{
 
-	//get the max/min value in the plane...
 	double dataMin =  100000000.0;
 	double dataMax = -100000000.0;
-	for(int ip = 0; ip < N1*N2; ip++){
-	    if(ff[ip] > -100000.0){
-	        dataMin = fmin(dataMin, ff[ip]);
-	        dataMax = fmax(dataMax, ff[ip]);
+
+
+	if(pw->valFlag == true){
+	    dataMin = pw->valMin;
+	    dataMax = pw->valMax;
+	}else{
+	    //get the max/min value in the plane...
+	    for(int ip = 0; ip < N1*N2; ip++){
+	        if(ff[ip] > -100000.0){
+	            dataMin = fmin(dataMin, ff[ip]);
+	            dataMax = fmax(dataMax, ff[ip]);
+	        }
 	    }
 	}
 
@@ -1351,24 +1337,23 @@ void CurvilinearCSolver::writePlaneImageForVariable(double *var, string varName,
 		int ii = jp*N1 + ip;
 		//Grayscale image...
 		if(ff[ii] > -100000.0){
-		    png->set(ip, jp, g[ii], g[ii], g[ii]);
+		    pw->set(ip, jp, g[ii], g[ii], g[ii]);
 		}else{
-		    png->set(ip, jp, 73, 175, 205);
+		    pw->set(ip, jp, 73, 175, 205);
 		}
 	    }
 	}
 
-	string imageName = varName;
+	string imageName = pw->varName;
 	imageName.append(".");
-	imageName.append(timeStepString);
+	imageName.append(pw->timeStepString);
 	imageName.append(".png");
-	png->write(imageName.c_str());
+	pw->write(imageName.c_str());
 
 	delete[] g;
     }
 
     delete[] ff;
-    delete[] pointList;
 
 }
 

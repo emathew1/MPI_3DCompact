@@ -68,6 +68,7 @@ class PngWriter {
     bool valFlag;
     double valMax, valMin;
 
+    string timeStepString;
 
   //Generic old constructor -- should go the way of the dinosaur soon... 
   PngWriter(const int width,const int height) {
