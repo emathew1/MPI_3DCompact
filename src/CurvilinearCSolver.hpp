@@ -199,6 +199,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 		neumannLocalZ = false;
 	    }
 
+    	    //Adding image dumps to the solver list
+	    addImageOutput(new PngWriter(10, 1028, 1028, p, "P", 2, 0.5, 0.65, 0.75));
 
 	    //adt = new Adt<double>(Nboxes, bbmin, bbmax);	
 
@@ -301,8 +303,7 @@ class CurvilinearCSolver: public AbstractCSolver{
     	    if(timeStep%ts->dumpStep == 0)
         	dumpSolution();
 
-    	    if(timeStep%ts->imageStep == 0)
-        	writeImages();
+       	    writeImages();
 
 	    temporalCalculations();
 

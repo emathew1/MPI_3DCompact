@@ -159,17 +159,11 @@ int main(int argc, char *argv[]){
     AbstractRK *rk;
     rk = new TVDRK3(cs);
 
-    IF_RANK0{
-	cout << cs->msh->x_max[0] << endl;
-	cout << cs->msh->x_max[1] << endl;
-	cout << cs->msh->x_max[2] << endl;
-    }
-
     ///////////////////////////////
     //Set flow initial conditions//
     ///////////////////////////////
 
-    bool fromRestart = true;
+    bool fromRestart = false;
 
     if(!fromRestart){
         FOR_Z_YPEN{

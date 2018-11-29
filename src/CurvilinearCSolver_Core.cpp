@@ -1153,6 +1153,7 @@ void CurvilinearCSolver::writeImages(){
 	    writePlaneImageForVariable(*iter);	    
 	}
 
+
 	if(timeStep%(*iter)->dumpInterval==0 && (*iter)->dumpInterval > 0){
 
 	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
@@ -1328,7 +1329,17 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	//Scale pixel value to local min and max
 	int *g = new int[N1*N2];
 	for(int ip = 0; ip < N1*N2; ip++){
+
 	   double gtemp = (ff[ip] - dataMin)/(dataMax - dataMin); 
+
+	   if(gtemp > 1.0){
+	       gtemp = 1.0;
+	   }
+
+	   if(gtemp < 0.0){
+	       gtemp = 0.0;
+	   }
+
 	   g[ip] = (int)(gtemp*255.0);
 	}
 
