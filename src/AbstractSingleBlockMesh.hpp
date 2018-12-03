@@ -1,12 +1,25 @@
 #ifndef _CABSTRACTSINGLEBLOCKMESHH_
 #define _CABSTRACTSINGLEBLOCKMESHH_
 
+#include <iostream>
+#include <fstream>
+
+#include "AbstractCSolver.hpp"
+#include "C2Decomp.hpp"
+#include "Domain.hpp"
 #include "Derivatives.hpp"
 #include "Adt.hpp"
+
+//There's some cyclic dependency going on here...
+class AbstractCSolver;
 
 class AbstractSingleBlockMesh{
 
     public:
+
+	C2Decomp *c2d;
+	AbstractCSolver *cs;
+	Domain *d;
 
 	int mpiRank;
 	double *x, *y, *z;
@@ -36,16 +49,21 @@ class AbstractSingleBlockMesh{
 
 	Adt<double> *adt;
 
-	//Each RK Class needs to have these functions to overwrite the pure virtual ones
-	virtual void solveForJacobians() = 0;
-
-	virtual void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo) = 0;
+	void allocateForMesh();
+	void solveForJacobians();
+	void dumpGrid();
+	void getOrderedBlockCoordinates(int ip, int jp, int kp, double *x_halo, double *y_halo, double *z_halo, double box_p[8][3]);
+	void getOrderedBlockXiCoordinates(int ip, int jp, int kp, double box_pxi[8][3]);
+	void generateCoordinateHaloArrays(double *&x_halo, double *&y_halo, double *&z_halo);
+	int findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo);
+	void initMeshADT();
+	void handlePeriodicStuff();
 	
-	virtual void getOrderedBlockCoordinates(int ip, int jp, int kp, double *x_halo, double *y_halo, double *z_halo, double box_p[8][3]) = 0;
-	virtual void getOrderedBlockXiCoordinates(int ip, int jp, int kp, double box_pxi[8][3]) = 0;
 
-	virtual int findCVForPoint(double p[3], double *x_halo, double *y_halo, double *z_halo) = 0;
+	//This is the function that makes this class abstract, mesh is never read or generated within this class...
+	virtual void getMesh() = 0;
 
 };
+
 
 #endif

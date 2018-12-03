@@ -1,8 +1,12 @@
 Add write/read of Sponge average values for restarting simulations, need those or will start from initial conditions as average and may be wrong.
 
-Move jacobian matrix calculations to the abstract mesh class, won't be purely abstract anymore but the jacobian component calcylations and adt functions would be used whether the mesh is read in or algebraicly generated 
-
 Need to come up with better way to contain restart grids/statistics/instanteous fields in a single file and propagate through to each location it needs to be. current implementation is clunky and has flags in different places and different files.
+
+Come up with way to enter sponge parameters on the MPI_Compact.cpp file
+
+Add temporal and boundary condition hook functions that can do calculations after every timestep for field variable calculations or boundary conditions
+
+Add an LES model/field source to the RHS of the governing equations, maybe included in its own hook for the source field
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 

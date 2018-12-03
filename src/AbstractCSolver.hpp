@@ -8,6 +8,9 @@
 #include "TimeStepping.hpp"
 #include "AbstractSingleBlockMesh.hpp"
 
+//cyclic dependency here...
+class AbstractSingleBlockMesh;
+
 class AbstractCSolver{
 
     public:

@@ -75,18 +75,6 @@ int main(int argc, char *argv[]){
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
-/*
-    BC::BCType bcXType = BC::PERIODIC_SOLVE;
-    BC::BCType bcYType = BC::PERIODIC_SOLVE;
-    BC::BCType bcZType = BC::PERIODIC_SOLVE;
-
-    BC::BCKind bcX0 = BC::PERIODIC;
-    BC::BCKind bcX1 = BC::PERIODIC;
-    BC::BCKind bcY0 = BC::PERIODIC;
-    BC::BCKind bcY1 = BC::PERIODIC;
-    BC::BCKind bcZ0 = BC::PERIODIC;
-    BC::BCKind bcZ1 = BC::PERIODIC;
-*/
 
     BC::BCType bcXType = BC::PERIODIC_SOLVE;
     BC::BCType bcYType = BC::DIRICHLET_SOLVE;
@@ -99,12 +87,28 @@ int main(int argc, char *argv[]){
     BC::BCKind bcZ0 = BC::PERIODIC;
     BC::BCKind bcZ1 = BC::PERIODIC;
 
+    double periodicDisp[3][3];
+    //x-direction periodic displacement
+    periodicDisp[0][0] = 0.0; // in x
+    periodicDisp[0][1] = 0.0; // in y
+    periodicDisp[0][2] = 0.0; // in z
+
+    //y-direction periodic displacement
+    periodicDisp[1][0] = 0.0; // in x
+    periodicDisp[1][1] = 0.0; // in y
+    periodicDisp[1][2] = 0.0; // in z
+
+    //z-direction periodic displacement
+    periodicDisp[2][0] = 0.0; // in x
+    periodicDisp[2][1] = 0.0; // in y
+    periodicDisp[2][2] = M_PI; // in z
+
 
     bool periodicBC[3];
     BC *bc = new BC(bcXType, bcX0, bcX1,
                     bcYType, bcY0, bcY1,
                     bcZType, bcZ0, bcZ1,
-		    periodicBC, mpiRank);
+		    periodicBC, mpiRank, periodicDisp);
 
     /////////////////////////
     //Initialize the Domain//
@@ -147,17 +151,15 @@ int main(int argc, char *argv[]){
     double alphaF  = 0.45;
     double mu_ref  = 0.001;
     bool useTiming = false;
-    AbstractCSolver *cs;
-    cs = new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
-    
+    AbstractCSolver *cs= new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
+
+    //Attach the mesh object to the solver...
     cs->msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
-    cs->msh->solveForJacobians();
 
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
     ///////////////////////////////////////////
-    AbstractRK *rk;
-    rk = new TVDRK3(cs);
+    AbstractRK *rk = new TVDRK3(cs);
 
     ///////////////////////////////
     //Set flow initial conditions//
@@ -257,12 +259,26 @@ int main(int argc, char *argv[]){
 
     }
 
+
+
+    ///////////////////////////
+    //Add images to be output//
+    ///////////////////////////
+
+
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
     cs_downcast->addImageOutput(new PngWriter(10, 1028, 1028, cs_downcast->p, "P", 2, 0.5, 0.65, 0.75));
     cs_downcast->addImageOutput(new PngWriter(9, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4));
     cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65));
+
+
+
+    ////////////////////////////////////////
+    //Execute the solver timestepping loop//
+    ////////////////////////////////////////
+
 
     rk->executeSolverLoop();  
 
