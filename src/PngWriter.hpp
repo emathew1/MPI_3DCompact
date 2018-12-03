@@ -70,37 +70,6 @@ class PngWriter {
 
     string timeStepString;
 
-  //Generic old constructor -- should go the way of the dinosaur soon... 
-  PngWriter(const int width,const int height) {
-    
-    nx = width;
-    ny = height;
-    buffer = new unsigned char[nx*ny][3];
-
-    // fill buffer with a "nice" cyan [73,175,205] -- eventually a designer should choose this ;)
-    for (int i = 0; i < nx*ny; ++i) {
-      buffer[i][0] = 73;
-      buffer[i][1] = 175;
-      buffer[i][2] = 205;
-    }
-
-    fieldPtr = NULL;
-    varName = "";
-    planeInd = -1;
-    fraction = -1.0;
-
-    interpolatorFlag = false;
-    ci = NULL;
-
-    valFlag = false;   
-    valMax = 0.0;
-    valMin = 0.0;
-
-    dumpInterval = -1;
-
-    mpiRank = -1;
-
-  }
 
   //General constructor w/ floating value bounds
   PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction){
@@ -161,6 +130,7 @@ class PngWriter {
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
   }
+
 
   ~PngWriter() {
 

@@ -90,10 +90,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	//For drawing images
 	list<PngWriter*> imageList;
-	PngWriter *pngXY;
-	PngWriter *pngXZ;
-	PngWriter *pngYZ;
-	int png_res[3];
 
 	//Alias'd derivative objects
 	Derivatives *derivXi1, *derivXi2, *derivXi3;
@@ -158,21 +154,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
 
-	    //only rank 0 write images for now...
-	    //Resolution of all images...
-	    png_res[0] = 1028;
-	    png_res[1] = 1028;
-	    png_res[2] = 1028;
-            IF_RANK0{
-                pngXY = new PngWriter(png_res[0], png_res[1]);
-                pngYZ = new PngWriter(png_res[1], png_res[2]);
-                pngXZ = new PngWriter(png_res[1], png_res[2]);
-            }else{
-                pngXY = NULL;
-                pngYZ = NULL;
-                pngXZ = NULL;
-            }
-
 	    int minYPenXSize;
 	    int minYPenZSize;
 
@@ -198,11 +179,6 @@ class CurvilinearCSolver: public AbstractCSolver{
  		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
 		neumannLocalZ = false;
 	    }
-
-    	    //Adding image dumps to the solver list
-	    addImageOutput(new PngWriter(10, 1028, 1028, p, "P", 2, 0.5, 0.65, 0.75));
-
-	    //adt = new Adt<double>(Nboxes, bbmin, bbmax);	
 
 	    t1 = MPI_Wtime();
 	}

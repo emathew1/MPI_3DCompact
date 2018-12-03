@@ -3,8 +3,8 @@ CC=mpic++
 # CFLAGS will be the options passed to the compiler.
 CFLAGS= -Wall -O3
 
-AR = ar rv
-RANLIB = ar -ts
+AR = /usr/bin/ar rv 
+RANLIB = /usr/bin/ar -ts
 
 LIB = /usr/lib 
 LIBF = -lpng -lstdc++
