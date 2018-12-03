@@ -1,8 +1,5 @@
 Add write/read of Sponge average values for restarting simulations, need those or will start from initial conditions as average and may be wrong.
 
-Need to implement stl object list for images, image objects should be able to be added on the inputs file so we don't have to dig deep into the solver everytime we want to add images
-	-Additionally should be able to specify upper and lower values for the colormap in a given image object
-
 Move jacobian matrix calculations to the abstract mesh class, won't be purely abstract anymore but the jacobian component calcylations and adt functions would be used whether the mesh is read in or algebraicly generated 
 
 Need to come up with better way to contain restart grids/statistics/instanteous fields in a single file and propagate through to each location it needs to be. current implementation is clunky and has flags in different places and different files.
@@ -10,3 +7,5 @@ Need to come up with better way to contain restart grids/statistics/instanteous 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 
 Implement different computation/communication (overlapping) methods for primary solve portions of code and have flags that allow for choosing which one
+
+Add different colormaps to images, add ability to specify the bounding box of the images being printed out
