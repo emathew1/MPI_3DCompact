@@ -207,6 +207,22 @@ class PngWriter {
 
   }
   
+  void getRainbowColormap(double f, int &r, int &g, int &b){
+
+	int r_map[5] = {0,   0,   0,   255, 255};
+	int g_map[5] = {0,   255, 255, 255, 0};
+	int b_map[5] = {255, 255, 0,   0,   0};
+
+	int chunk = (int) floor(f/0.2500001);
+
+	double interp = (f-0.2500001*(double)chunk)/0.2500001;
+
+	r = (int) ( (1.0-interp)*r_map[chunk] + interp*r_map[chunk+1]);
+	g = (int) ( (1.0-interp)*g_map[chunk] + interp*g_map[chunk+1]);
+	b = (int) ( (1.0-interp)*b_map[chunk] + interp*b_map[chunk+1]);
+	
+  }
+
 };
 
 #endif

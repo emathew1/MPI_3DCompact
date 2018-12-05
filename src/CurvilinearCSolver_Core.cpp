@@ -1327,20 +1327,30 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	}
 
 	//Scale pixel value to local min and max
+	int *r = new int[N1*N2];
 	int *g = new int[N1*N2];
+	int *b = new int[N1*N2];
 	for(int ip = 0; ip < N1*N2; ip++){
 
-	   double gtemp = (ff[ip] - dataMin)/(dataMax - dataMin); 
+	   double phitemp = (ff[ip] - dataMin)/(dataMax - dataMin); 
 
-	   if(gtemp > 1.0){
-	       gtemp = 1.0;
+	   if(phitemp > 1.0){
+	       phitemp = 1.0;
 	   }
 
-	   if(gtemp < 0.0){
-	       gtemp = 0.0;
+	   if(phitemp < 0.0){
+	       phitemp = 0.0;
 	   }
 
-	   g[ip] = (int)(gtemp*255.0);
+
+	   //RAINBOW COLORMAP
+	   pw->getRainbowColormap(phitemp, r[ip], g[ip], b[ip]);
+
+	   //GREYSCALE COLORMAP
+	   //r[ip] = (int)(gtemp*255.0);
+	   //g[ip] = (int)(gtemp*255.0);
+	   //b[ip] = (int)(gtemp*255.0);
+	  
 	}
 
 	for(int jp = 0; jp < N2; jp++){
@@ -1348,7 +1358,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 		int ii = jp*N1 + ip;
 		//Grayscale image...
 		if(ff[ii] > -100000.0){
-		    pw->set(ip, jp, g[ii], g[ii], g[ii]);
+		    pw->set(ip, jp, r[ii], g[ii], b[ii]);
 		}else{
 		    pw->set(ip, jp, 73, 175, 205);
 		}
@@ -1361,7 +1371,9 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	imageName.append(".png");
 	pw->write(imageName.c_str());
 
+	delete[] r;
 	delete[] g;
+	delete[] b;
     }
 
     delete[] ff;
