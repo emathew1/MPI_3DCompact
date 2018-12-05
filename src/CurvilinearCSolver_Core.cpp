@@ -1344,7 +1344,7 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 
 
 	   //RAINBOW COLORMAP
-	   pw->getRainbowColormap(phitemp, r[ip], g[ip], b[ip]);
+	   pw->getPARAVIEW_BWR(phitemp, r[ip], g[ip], b[ip]);
 
 	   //GREYSCALE COLORMAP
 	   //r[ip] = (int)(gtemp*255.0);

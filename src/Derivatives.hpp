@@ -137,7 +137,7 @@ class Derivatives{
 
 	//Left off here!     
   
-	for(int ip = 0; ip < N; ip++){ //Not correct...
+	for(int ip = 0; ip < N; ip++){ 
 	    diag_1D[ip] = 1.0;
 	    offlower_1D[ip]  = alpha_1D;
 	    offupper_1D[ip]  = alpha_1D;
