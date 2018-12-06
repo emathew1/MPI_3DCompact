@@ -1343,14 +1343,16 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	   }
 
 
-	   //RAINBOW COLORMAP
-	   pw->getPARAVIEW_BWR(phitemp, r[ip], g[ip], b[ip]);
+	   if(pw->cm == PngWriter::BWR){
+	       pw->getPARAVIEW_BWR(phitemp, r[ip], g[ip], b[ip]);
+	   }else if(pw->cm == PngWriter::RAINBOW){
+	       pw->getRainbowColormap(phitemp, r[ip], g[ip], b[ip]);
+	   }else if(pw->cm == PngWriter::GREYSCALE){ 
+	       r[ip] = (int)(phitemp*255.0);
+	       g[ip] = (int)(phitemp*255.0);
+	       b[ip] = (int)(phitemp*255.0);
+	   }	  
 
-	   //GREYSCALE COLORMAP
-	   //r[ip] = (int)(gtemp*255.0);
-	   //g[ip] = (int)(gtemp*255.0);
-	   //b[ip] = (int)(gtemp*255.0);
-	  
 	}
 
 	for(int jp = 0; jp < N2; jp++){

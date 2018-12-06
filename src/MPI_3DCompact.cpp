@@ -269,9 +269,9 @@ int main(int argc, char *argv[]){
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(10, 1028, 1028, cs_downcast->p, "P", 2, 0.5, 0.65, 0.75));
-    cs_downcast->addImageOutput(new PngWriter(9, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4));
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65));
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->p, "P", 2, 0.5, 0.664, 0.764, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
 
 
 

@@ -70,9 +70,14 @@ class PngWriter {
 
     string timeStepString;
 
+    enum Colormap {GREYSCALE,
+		   RAINBOW, 
+		   BWR};
+
+    Colormap cm;
 
   //General constructor w/ floating value bounds
-  PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction){
+  PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction, Colormap cm){
     nx = width;
     ny = height;
     buffer = new unsigned char[nx*ny][3];
@@ -83,6 +88,8 @@ class PngWriter {
       buffer[i][1] = 175;
       buffer[i][2] = 205;
     }
+
+    this->cm = cm;
 
     this->fieldPtr = fieldPtr;
     this->varName  = varName;
@@ -102,7 +109,7 @@ class PngWriter {
   }
 
   //Constructor for fixed value bounds
-  PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction, double valMin, double valMax){
+  PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction, double valMin, double valMax, Colormap cm){
     nx = width;
     ny = height;
     buffer = new unsigned char[nx*ny][3];
@@ -118,6 +125,8 @@ class PngWriter {
     this->varName  = varName;
     this->planeInd = planeInd;
     this->fraction = fraction;
+
+    this->cm = cm;
 
     interpolatorFlag = false;
     ci = NULL;

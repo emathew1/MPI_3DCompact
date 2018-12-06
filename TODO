@@ -12,4 +12,4 @@ Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 
 Implement different computation/communication (overlapping) methods for primary solve portions of code and have flags that allow for choosing which one
 
-Add different colormaps to images, add ability to specify the bounding box of the images being printed out
+Add ability to specify the bounding box of the images being printed out
