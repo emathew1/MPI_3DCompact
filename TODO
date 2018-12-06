@@ -4,9 +4,9 @@ Need to come up with better way to contain restart grids/statistics/instanteous 
 
 Come up with way to enter sponge parameters on the MPI_Compact.cpp file
 
-Add temporal and boundary condition hook functions that can do calculations after every timestep for field variable calculations or boundary conditions
+Add list or extenable variable containers for memory that might be allocated in hooks that needs to be reaccessed
 
-Add an LES model/field source to the RHS of the governing equations, maybe included in its own hook for the source field
+Add an LES model
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 
