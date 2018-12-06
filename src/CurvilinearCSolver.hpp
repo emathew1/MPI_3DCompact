@@ -215,7 +215,10 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void checkEnd();
 	void reportAll();
 
-	virtual void temporalCalculations(){};
+	void temporalHook();
+	void preStepBoundaryHook(){};
+	void postStepBoundaryHook(){};
+
 
 	//Inline, Or general solver functions
 	inline double calcSpongeSource(double phi, double phiSpongeAvg, double sigma){
@@ -242,6 +245,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void preSubStep(){
 
     	    preStepBCHandling();
+	    preStepBoundaryHook();
+
     	    preStepDerivatives();
 
 	}
@@ -259,6 +264,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void postSubStep(){
 
     	    postStepBCHandling();
+	    postStepBoundaryHook();
 
 	}
 
@@ -281,7 +287,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
        	    writeImages();
 
-	    temporalCalculations();
+	    temporalHook();
 
     	    checkEnd();
 

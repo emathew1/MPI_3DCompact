@@ -62,6 +62,20 @@ class AbstractCSolver{
 	virtual void postStep() = 0;
 	virtual void reportAll() = 0;
 
+	//Hook functions
+	virtual void temporalHook(){
+	    //This needs to be written for the specific solver if needed
+	};
+
+	virtual void preStepBoundaryHook(){
+	    //Also something needs to be done to actually eventually make this work
+
+	};
+
+	virtual void postStepBoundaryHook(){
+	    //Also something needs to be done to actually eventually make this work
+
+	};
 };
 
 #endif
