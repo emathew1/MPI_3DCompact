@@ -63,19 +63,17 @@ class AbstractCSolver{
 	virtual void reportAll() = 0;
 
 	//Hook functions
-	virtual void temporalHook(){
-	    //This needs to be written for the specific solver if needed
-	};
+	virtual void subStepTemporalHook(){};
+	virtual void fullStepTemporalHook(){};
+	virtual void preStepBoundaryHook(){};
+	virtual void postStepBoundaryHook(){};
 
-	virtual void preStepBoundaryHook(){
-	    //Also something needs to be done to actually eventually make this work
-
-	};
-
-	virtual void postStepBoundaryHook(){
-	    //Also something needs to be done to actually eventually make this work
-
-	};
+	//RHS source terms
+	virtual double contRHSSource(int ip) = 0;
+	virtual double xmomRHSSource(int ip) = 0;
+	virtual double ymomRHSSource(int ip) = 0;
+	virtual double zmomRHSSource(int ip) = 0;
+	virtual double engyRHSSource(int ip) = 0;
 };
 
 #endif

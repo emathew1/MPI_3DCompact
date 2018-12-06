@@ -288,13 +288,18 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void CurvilinearCSolver::temporalHook(){
+void CurvilinearCSolver::fullStepTemporalHook(){};
+void CurvilinearCSolver::subStepTemporalHook(){};
+void CurvilinearCSolver::preStepBoundaryHook(){};
+void CurvilinearCSolver::postStepBoundaryHook(){};
 
-    //TEST
-    double a = 1;
-  
+double CurvilinearCSolver::contRHSSource(int ip){return 0.0;};
+double CurvilinearCSolver::xmomRHSSource(int ip){return 0.0;};
+double CurvilinearCSolver::ymomRHSSource(int ip){return 0.0;};
+double CurvilinearCSolver::zmomRHSSource(int ip){return 0.0;};
+double CurvilinearCSolver::engyRHSSource(int ip){return 0.0;};
 
-}
+
 
 
 

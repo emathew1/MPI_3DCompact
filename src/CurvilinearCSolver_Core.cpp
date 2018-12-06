@@ -590,9 +590,9 @@ void CurvilinearCSolver::solveContinuity(){
     }else{
         rhoP = rhok;
     }
-	
-    double spgSource; 
 
+    double spgSource;
+	
     FOR_XYZ_YPEN{
 
 	if(spongeFlag)
@@ -600,7 +600,7 @@ void CurvilinearCSolver::solveContinuity(){
 	else
 	    spgSource = 0.0;
 		
-	rhok2[ip]  = ts->dt*J[ip]*(-cont_1[ip] - cont_2[ip] - cont_3[ip] + spgSource/J[ip]);
+	rhok2[ip]  = ts->dt*J[ip]*(-cont_1[ip] - cont_2[ip] - cont_3[ip] + (spgSource+contRHSSource(ip))/J[ip]);
     }
 
     if(useTiming){
@@ -629,7 +629,7 @@ void CurvilinearCSolver::solveXMomentum(){
 	else
 	    spgSource = 0.0;
 
-	rhoUk2[ip] += -mom1_1[ip] - mom1_2[ip] -mom1_3[ip] + spgSource/J[ip];
+	rhoUk2[ip] += -mom1_1[ip] - mom1_2[ip] -mom1_3[ip] + (spgSource+xmomRHSSource(ip))/J[ip];
 	rhoUk2[ip] *= ts->dt*J[ip];
     }
 
@@ -662,7 +662,7 @@ void CurvilinearCSolver::solveYMomentum(){
 	else
 	    spgSource = 0.0;
 
-	rhoVk2[ip] += -mom2_1[ip] -mom2_2[ip] -mom2_3[ip] + spgSource/J[ip];
+	rhoVk2[ip] += -mom2_1[ip] -mom2_2[ip] -mom2_3[ip] + (spgSource+ymomRHSSource(ip))/J[ip];
         rhoVk2[ip] *= ts->dt*J[ip];
    }
 
@@ -694,7 +694,7 @@ void CurvilinearCSolver::solveZMomentum(){
         else
 	    spgSource = 0.0;
 
-	rhoWk2[ip] += -mom3_1[ip] -mom3_2[ip] -mom3_3[ip] + spgSource/J[ip];
+	rhoWk2[ip] += -mom3_1[ip] -mom3_2[ip] -mom3_3[ip] + (spgSource+zmomRHSSource(ip))/J[ip];
         rhoWk2[ip] *= ts->dt*J[ip];
     }
 
@@ -727,7 +727,7 @@ void CurvilinearCSolver::solveEnergy(){
         else
             spgSource = 0.0;
 
-	rhoEk2[ip] = -engy_1[ip] - engy_2[ip] - engy_3[ip] + spgSource/J[ip];
+	rhoEk2[ip] = -engy_1[ip] - engy_2[ip] - engy_3[ip] + (spgSource+engyRHSSource(ip))/J[ip];
 	rhoEk2[ip] *= ts->dt*J[ip];
     }
 
