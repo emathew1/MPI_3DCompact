@@ -216,6 +216,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	void reportAll();
 
 	//Hook functions
+	void initialHook();
 	void fullStepTemporalHook();
 	void subStepTemporalHook();
 	void preStepBoundaryHook();

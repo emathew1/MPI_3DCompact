@@ -537,6 +537,9 @@ void CurvilinearCSolver::setInitialConditions(){
     getRange(T, "T0", pySize[0], pySize[1], pySize[2], mpiRank);
     getRange(p, "p0", pySize[0], pySize[1], pySize[2], mpiRank);
 
+    //Run the initial hook
+    initialHook();
+
     if(useTiming){
 	ft2 = MPI_Wtime();
 	IF_RANK0 cout << " > setInitCond Timing: " << setw(6)  << (int)((ft2-ft1)*1000) << "ms" << endl;

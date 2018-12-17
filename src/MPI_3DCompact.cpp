@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <assert.h>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -288,7 +288,128 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void CurvilinearCSolver::fullStepTemporalHook(){};
+void CurvilinearCSolver::initialHook(){
+
+    //Lets do dilatation and vorticity as a test...
+    double (*vort)[3], *vort_mag, *dil;
+
+    //Add to the variable data list, this is clunky?
+    FOR_I3{
+        varData.push_back(vort[i]);
+    }
+    varData.push_back(vort_mag);
+    varData.push_back(dil);
+
+    //Now lets run through the list and allocate the data
+    for(vector<double*>::iterator itr = varData.begin(); itr != varData.end(); ++itr){
+	c2d->allocY(*itr);
+    }
+
+};
+
+
+void CurvilinearCSolver::fullStepTemporalHook(){
+
+    //Work with these pointers since its easier....
+    double (*vort)[3], *vort_mag, *dil;
+   
+    vort[0]  = varData[0];
+    vort[1]  = varData[1];
+    vort[2]  = varData[2];
+    vort_mag = varData[3];
+    dil      = varData[4];
+
+    /////////////////////////////
+    //Xi2-Direction Derivatives//
+    /////////////////////////////
+
+    //First we'll do all of the ~Y-Direction derivatives to calc tau
+    derivXi2->calc1stDerivField(U, dU2);
+    derivXi2->calc1stDerivField(V, dV2);
+    derivXi2->calc1stDerivField(W, dW2);
+
+    /////////////////////////////
+    //Xi1-Direction Derivatives//
+    /////////////////////////////
+
+    double *dU1_xp, *dV1_xp, *dW1_xp;
+
+    //Point to the needed X memory
+    U_xp = tempX1; dU1_xp = tempX5;
+    V_xp = tempX2; dV1_xp = tempX6;
+    W_xp = tempX3; dW1_xp = tempX7;
+
+    c2d->transposeY2X_MajorIndex(U, U_xp);
+    c2d->transposeY2X_MajorIndex(V, V_xp);
+    c2d->transposeY2X_MajorIndex(W, W_xp);
+
+    derivXi1->calc1stDerivField(U_xp, dU1_xp);
+    derivXi1->calc1stDerivField(V_xp, dV1_xp);
+    derivXi1->calc1stDerivField(W_xp, dW1_xp);
+
+    c2d->transposeX2Y_MajorIndex(dU1_xp, dU1);
+    c2d->transposeX2Y_MajorIndex(dV1_xp, dV1);
+    c2d->transposeX2Y_MajorIndex(dW1_xp, dW1);
+
+    /////////////////////////////
+    //Xi3-Direction Derivatives//
+    /////////////////////////////
+
+    double *dU3_zp, *dV3_zp, *dW3_zp;
+
+    //Point to the needed Z memory
+    U_zp = tempZ1; dU3_zp = tempZ5;
+    V_zp = tempZ2; dV3_zp = tempZ6;
+    W_zp = tempZ3; dW3_zp = tempZ7;
+
+    c2d->transposeY2Z_MajorIndex(U, U_zp);
+    c2d->transposeY2Z_MajorIndex(V, V_zp);
+    c2d->transposeY2Z_MajorIndex(W, W_zp);
+
+    derivXi3->calc1stDerivField(U_zp, dU3_zp);
+    derivXi3->calc1stDerivField(V_zp, dV3_zp);
+    derivXi3->calc1stDerivField(W_zp, dW3_zp);
+
+    c2d->transposeZ2Y_MajorIndex(dU3_zp, dU3);
+    c2d->transposeZ2Y_MajorIndex(dV3_zp, dV3);
+    c2d->transposeZ2Y_MajorIndex(dW3_zp, dW3);
+
+
+    //Get each of the cartesian velocity derivative components
+    double *dUdx, *dUdy, *dUdz;
+    double *dVdx, *dVdy, *dVdz;
+    double *dWdx, *dWdy, *dWdz;
+
+    dUdx = tempY1; dUdy = tempY2; dUdz = tempY3;
+    dVdx = tempY4; dVdy = tempY5; dVdz = tempY6;
+    dWdx = tempY7; dWdy = tempY8; dWdz = tempY9;
+
+    FOR_XYZ_YPEN{
+
+	dUdx[ip] = J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip];
+	dUdy[ip] = J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip];
+	dUdz[ip] = J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip];
+
+	dVdx[ip] = J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
+	dVdy[ip] = J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip];
+	dVdz[ip] = J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip];
+
+	dWdx[ip] = J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
+	dWdy[ip] = J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
+	dWdz[ip] = J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip];
+
+	dil[ip] = dUdx[ip] + dVdy[ip] + dWdz[ip];
+
+	vort[0][ip] = dWdy[ip] - dVdz[ip]; 
+	vort[1][ip] = dUdz[ip] - dWdx[ip]; 
+	vort[2][ip] = dVdx[ip] - dUdy[ip]; 
+
+	vort_mag[ip] = sqrt(vort[0][ip]*vort[0][ip] + vort[1][ip]*vort[1][ip] + vort[2][ip]*vort[2][ip]);
+    }
+
+};
+
+
 void CurvilinearCSolver::subStepTemporalHook(){};
 void CurvilinearCSolver::preStepBoundaryHook(){};
 void CurvilinearCSolver::postStepBoundaryHook(){};

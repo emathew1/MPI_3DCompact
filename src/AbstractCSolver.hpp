@@ -7,6 +7,7 @@
 #include "IdealGas.hpp"
 #include "TimeStepping.hpp"
 #include "AbstractSingleBlockMesh.hpp"
+#include <vector>
 
 //cyclic dependency here...
 class AbstractSingleBlockMesh;
@@ -51,6 +52,9 @@ class AbstractCSolver{
 	AbstractSingleBlockMesh *msh;
 	double *J, *J11, *J12, *J13, *J21, *J22, *J23, *J31, *J32, *J33;
 
+	//double pointer list that we can attach things to
+	vector<double*> varData;
+
 	//Each Solver Class needs to have these functions to overwrite the pure virtual ones
 	virtual void initializeSolverData() = 0;
 	virtual void setInitialConditions() = 0;
@@ -63,6 +67,7 @@ class AbstractCSolver{
 	virtual void reportAll() = 0;
 
 	//Hook functions
+	virtual void initialHook(){};
 	virtual void subStepTemporalHook(){};
 	virtual void fullStepTemporalHook(){};
 	virtual void preStepBoundaryHook(){};
