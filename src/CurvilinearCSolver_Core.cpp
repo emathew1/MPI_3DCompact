@@ -1342,7 +1342,6 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	       phitemp = 0.0;
 	   }
 
-
 	   if(pw->cm == PngWriter::BWR){
 	       pw->getPARAVIEW_BWR(phitemp, r[ip], g[ip], b[ip]);
 	   }else if(pw->cm == PngWriter::RAINBOW){

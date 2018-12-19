@@ -275,7 +275,7 @@ int main(int argc, char *argv[]){
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->p, "P", 2, 0.5, 0.664, 0.764, PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[2], "VORTZ", 2, 0.5, -10.0, 10.0, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[3], "VORTMAG", 2, 0.5, 0.0, 25.0, PngWriter::RAINBOW));
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[4], "DIL", 2, 0.5, -2.0,2.0, PngWriter::BWR));
 
 
@@ -413,7 +413,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
 	vortY[ip] = dUdz[ip] - dWdx[ip]; 
 	vortZ[ip] = dVdx[ip] - dUdy[ip]; 
 
-	vort_mag[ip] = sqrt(pow(vortX[ip],2.0) + pow(vortY[ip],2.0) + pow(vortZ[ip],2.0));
+	vort_mag[ip] = sqrt(vortX[ip]*vortX[ip] + vortY[ip]*vortY[ip] + vortZ[ip]*vortZ[ip]);
 
    }
 
@@ -426,6 +426,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     getRange(vortZ, "VORTZ", Nx, Ny, Nz, mpiRank);
     getRange(vort_mag, "VORT_MAG", Nx, Ny, Nz, mpiRank);
     getRange(dil, "DIL", Nx, Ny, Nz, mpiRank);
+
 
 
 };

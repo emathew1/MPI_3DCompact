@@ -132,8 +132,8 @@ class PngWriter {
     ci = NULL;
 
     valFlag = true;
-    this->valMax  = valMin;
-    this->valMin  = valMax;
+    this->valMax  = valMax;
+    this->valMin  = valMin;
 
     this->dumpInterval = dumpInterval;
 
