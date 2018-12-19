@@ -1302,7 +1302,6 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 
     delete[] ff_ci;
 
-
     MPI_Reduce(ff_local, ff, N1*N2, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     delete[] ff_local;
@@ -1333,6 +1332,10 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 	for(int ip = 0; ip < N1*N2; ip++){
 
 	   double phitemp = (ff[ip] - dataMin)/(dataMax - dataMin); 
+
+	   if((dataMax - dataMin) < 1E-6){
+		phitemp = 0.0;
+	   }
 
 	   if(phitemp > 1.0){
 	       phitemp = 1.0;
