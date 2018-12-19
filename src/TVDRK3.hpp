@@ -134,8 +134,6 @@ void TVDRK3::updateConservedData(){
 
 void TVDRK3::executeSolverLoop(){
 
-    cs->setInitialConditions();
-
     while(cs->endFlag == false){
 
 	cs->rkLast = false;

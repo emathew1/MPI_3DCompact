@@ -260,6 +260,9 @@ int main(int argc, char *argv[]){
     }
 
 
+    cs->setInitialConditions();
+
+
 
     ///////////////////////////
     //Add images to be output//
@@ -272,7 +275,8 @@ int main(int argc, char *argv[]){
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->p, "P", 2, 0.5, 0.664, 0.764, PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[2], "VORTZ", 2, 0.5, -10.0, 10.0, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[4], "DIL", 2, 0.5, -2.0,2.0, PngWriter::BWR));
 
 
     ////////////////////////////////////////
@@ -291,19 +295,23 @@ int main(int argc, char *argv[]){
 void CurvilinearCSolver::initialHook(){
 
     //Lets do dilatation and vorticity as a test...
-    double (*vort)[3], *vort_mag, *dil;
+    double *vortX, *vortY, *vortZ, *vort_mag, *dil;
 
     //Add to the variable data list, this is clunky?
-    FOR_I3{
-        varData.push_back(vort[i]);
-    }
+    varData.push_back(vortX);
+    varData.push_back(vortY);
+    varData.push_back(vortZ);
     varData.push_back(vort_mag);
     varData.push_back(dil);
 
     //Now lets run through the list and allocate the data
     for(vector<double*>::iterator itr = varData.begin(); itr != varData.end(); ++itr){
 	c2d->allocY(*itr);
+	FOR_XYZ_YPEN{
+	    (*itr)[ip] = 0.0;
+	}
     }
+
 
 };
 
@@ -311,13 +319,14 @@ void CurvilinearCSolver::initialHook(){
 void CurvilinearCSolver::fullStepTemporalHook(){
 
     //Work with these pointers since its easier....
-    double (*vort)[3], *vort_mag, *dil;
+    double *vortX, *vortY, *vortZ, *vort_mag, *dil;
    
-    vort[0]  = varData[0];
-    vort[1]  = varData[1];
-    vort[2]  = varData[2];
+    vortX    = varData[0];
+    vortY    = varData[1];
+    vortZ    = varData[2];
     vort_mag = varData[3];
     dil      = varData[4];
+
 
     /////////////////////////////
     //Xi2-Direction Derivatives//
@@ -400,12 +409,24 @@ void CurvilinearCSolver::fullStepTemporalHook(){
 
 	dil[ip] = dUdx[ip] + dVdy[ip] + dWdz[ip];
 
-	vort[0][ip] = dWdy[ip] - dVdz[ip]; 
-	vort[1][ip] = dUdz[ip] - dWdx[ip]; 
-	vort[2][ip] = dVdx[ip] - dUdy[ip]; 
+	vortX[ip] = dWdy[ip] - dVdz[ip]; 
+	vortY[ip] = dUdz[ip] - dWdx[ip]; 
+	vortZ[ip] = dVdx[ip] - dUdy[ip]; 
 
-	vort_mag[ip] = sqrt(vort[0][ip]*vort[0][ip] + vort[1][ip]*vort[1][ip] + vort[2][ip]*vort[2][ip]);
-    }
+	vort_mag[ip] = sqrt(pow(vortX[ip],2.0) + pow(vortY[ip],2.0) + pow(vortZ[ip],2.0));
+
+   }
+
+    int Nx = pySize[0];
+    int Ny = pySize[1];
+    int Nz = pySize[2];   
+ 
+    getRange(vortX, "VORTX", Nx, Ny, Nz, mpiRank);
+    getRange(vortY, "VORTY", Nx, Ny, Nz, mpiRank);
+    getRange(vortZ, "VORTZ", Nx, Ny, Nz, mpiRank);
+    getRange(vort_mag, "VORT_MAG", Nx, Ny, Nz, mpiRank);
+    getRange(dil, "DIL", Nx, Ny, Nz, mpiRank);
+
 
 };
 
