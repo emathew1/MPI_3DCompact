@@ -11,3 +11,11 @@ Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 Implement different computation/communication (overlapping) methods for primary solve portions of code and have flags that allow for choosing which one
 
 Add ability to specify the bounding box of the images being printed out
+
+Add ability to calculate statistics of a simulation
+
+Add true interpolation methods to the Curvilinear interpolant object
+
+Add ability to write out to pvtk file formats
+
+Add ability to read in from some standard grid formats

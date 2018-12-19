@@ -327,7 +327,8 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     vort_mag = varData[3];
     dil      = varData[4];
 
-
+    if(timeStep%25 == 0){
+    
     /////////////////////////////
     //Xi2-Direction Derivatives//
     /////////////////////////////
@@ -427,7 +428,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     getRange(vort_mag, "VORT_MAG", Nx, Ny, Nz, mpiRank);
     getRange(dil, "DIL", Nx, Ny, Nz, mpiRank);
 
-
+    }
 
 };
 

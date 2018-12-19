@@ -287,6 +287,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	void postStep(){
 
+	    fullStepTemporalHook();
+
     	    //updateSponge();
     	    checkSolution();
 
@@ -294,8 +296,6 @@ class CurvilinearCSolver: public AbstractCSolver{
         	dumpSolution();
 
        	    writeImages();
-
-	    fullStepTemporalHook();
 
     	    checkEnd();
 
