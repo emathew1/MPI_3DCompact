@@ -124,45 +124,45 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocY(sos);
 
     //84
-    c2d->allocX(tempX1);
-    c2d->allocX(tempX2);
-    c2d->allocX(tempX3);
-    c2d->allocX(tempX4);
-    c2d->allocX(tempX5);
-    c2d->allocX(tempX6);
-    c2d->allocX(tempX7);
-    c2d->allocX(tempX8);
-    c2d->allocX(tempX9);
-    c2d->allocX(tempX10);
+    c2d->allocX(tempX1); tempXVec.push_back(tempX1);
+    c2d->allocX(tempX2); tempXVec.push_back(tempX2);
+    c2d->allocX(tempX3); tempXVec.push_back(tempX3);
+    c2d->allocX(tempX4); tempXVec.push_back(tempX4);
+    c2d->allocX(tempX5); tempXVec.push_back(tempX5);
+    c2d->allocX(tempX6); tempXVec.push_back(tempX6);
+    c2d->allocX(tempX7); tempXVec.push_back(tempX7);
+    c2d->allocX(tempX8); tempXVec.push_back(tempX8);
+    c2d->allocX(tempX9); tempXVec.push_back(tempX9);
+    c2d->allocX(tempX10); tempXVec.push_back(tempX10);
 
     //94
-    c2d->allocY(tempY1);
-    c2d->allocY(tempY2);
-    c2d->allocY(tempY3);
-    c2d->allocY(tempY4);
-    c2d->allocY(tempY5);
-    c2d->allocY(tempY6);
-    c2d->allocY(tempY7);
-    c2d->allocY(tempY8);
-    c2d->allocY(tempY9);
-    c2d->allocY(tempY10);
-    c2d->allocY(tempY11);
-    c2d->allocY(tempY12);
-    c2d->allocY(tempY13);
-    c2d->allocY(tempY14);
-    c2d->allocY(tempY15);
+    c2d->allocY(tempY1); tempYVec.push_back(tempY1);
+    c2d->allocY(tempY2); tempYVec.push_back(tempY2);
+    c2d->allocY(tempY3); tempYVec.push_back(tempY3);
+    c2d->allocY(tempY4); tempYVec.push_back(tempY4);
+    c2d->allocY(tempY5); tempYVec.push_back(tempY5);
+    c2d->allocY(tempY6); tempYVec.push_back(tempY6);
+    c2d->allocY(tempY7); tempYVec.push_back(tempY7);
+    c2d->allocY(tempY8); tempYVec.push_back(tempY8);
+    c2d->allocY(tempY9); tempYVec.push_back(tempY9);
+    c2d->allocY(tempY10); tempYVec.push_back(tempY10);
+    c2d->allocY(tempY11); tempYVec.push_back(tempY11);
+    c2d->allocY(tempY12); tempYVec.push_back(tempY12);
+    c2d->allocY(tempY13); tempYVec.push_back(tempY13);
+    c2d->allocY(tempY14); tempYVec.push_back(tempY14);
+    c2d->allocY(tempY15); tempYVec.push_back(tempY15);
 
     //104
-    c2d->allocZ(tempZ1);
-    c2d->allocZ(tempZ2);
-    c2d->allocZ(tempZ3);
-    c2d->allocZ(tempZ4);
-    c2d->allocZ(tempZ5);
-    c2d->allocZ(tempZ6);
-    c2d->allocZ(tempZ7);
-    c2d->allocZ(tempZ8);
-    c2d->allocZ(tempZ9);
-    c2d->allocZ(tempZ10);
+    c2d->allocZ(tempZ1); tempZVec.push_back(tempZ1);
+    c2d->allocZ(tempZ2); tempZVec.push_back(tempZ2);
+    c2d->allocZ(tempZ3); tempZVec.push_back(tempZ3);
+    c2d->allocZ(tempZ4); tempZVec.push_back(tempZ4);
+    c2d->allocZ(tempZ5); tempZVec.push_back(tempZ5);
+    c2d->allocZ(tempZ6); tempZVec.push_back(tempZ6);
+    c2d->allocZ(tempZ7); tempZVec.push_back(tempZ7);
+    c2d->allocZ(tempZ8); tempZVec.push_back(tempZ8);
+    c2d->allocZ(tempZ9); tempZVec.push_back(tempZ9);
+    c2d->allocZ(tempZ10); tempZVec.push_back(tempZ10);
 
 
     FOR_XYZ_YPEN{
@@ -226,6 +226,52 @@ void CurvilinearCSolver::calcDtFromCFL(){
 
 }
 
+void CurvilinearCSolver::computeGradient(vector<double*> vecIn, vector<double*>vecOut){
+
+    if(vecIn.size() > 5){
+	cout << "ERROR:computeGradient: NEED MORE TEMPORARY MEMORY, COMPUTING GRADIENT ON LIST LARGER THAN 5" << endl;
+    }else{
+
+	int vecInSize = vecIn.size();
+
+	if(vecOut.size() != vecInSize*3){
+	    cout << "ERROR:computeGradient: vecOut size should be 3x the vecIn size!" << endl;
+	}
+
+	//Xi2 Derivatives First
+	for(int ip = 0; ip < vecInSize; ip++){
+	    derivXi2->calc1stDerivField(vecIn[ip], vecOut[vecInSize*ip+1]); 
+       	}
+
+	//Xi1 Derivatives Next
+	for(int ip = 0; ip < vecInSize; ip++){
+	    c2d->transposeY2X_MajorIndex(vecIn[ip], tempXVec[ip]);
+	}
+
+	for(int ip = 0; ip < vecInSize; ip++){
+	    derivXi1->calc1stDerivField(tempXVec[ip], tempXVec[ip+vecInSize]);
+	}
+
+	for(int ip = 0; ip < vecInSize; ip++){
+	    c2d->transposeX2Y_MajorIndex(tempXVec[ip+vecInSize], vecOut[vecInSize*ip]);
+	}
+
+	//Xi3 Derivatives Finally
+	for(int ip = 0; ip < vecInSize; ip++){
+	    c2d->transposeY2Z_MajorIndex(vecIn[ip], tempZVec[ip]);
+	}
+
+	for(int ip = 0; ip < vecInSize; ip++){
+	    derivXi3->calc1stDerivField(tempZVec[ip], tempZVec[ip+vecInSize]);
+	}
+
+	for(int ip = 0; ip < vecInSize; ip++){
+	    c2d->transposeZ2Y_MajorIndex(tempZVec[ip+vecInSize], vecOut[vecInSize*ip+2]);
+	}
+
+    }
+
+};
 
 void CurvilinearCSolver::preStepDerivatives(){
 

@@ -67,13 +67,16 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
 	double *tempX6,  *tempX7,  *tempX8,  *tempX9, *tempX10;
+	vector<double*> tempXVec;
 
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
 	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
+	vector<double*> tempYVec;
 
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
+	vector<double*> tempZVec;
 
 	double *rankfield;
 
@@ -232,6 +235,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	inline double calcSpongeSource(double phi, double phiSpongeAvg, double sigma){
         	return sigma*(phiSpongeAvg - phi);
 	};
+
+	//Derivative calculation functions
+	void computeGradient(vector<double*> vecIn, vector<double*>vecOut);
 
 	/////////////////////////////////////
 	//Our Generalized Solver Functions //

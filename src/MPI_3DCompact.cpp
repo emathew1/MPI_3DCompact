@@ -328,7 +328,25 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     dil      = varData[4];
 
     if(timeStep%25 == 0){
-    
+
+    vector<double*> vecIn;
+    vecIn.push_back(U);
+    vecIn.push_back(V);
+    vecIn.push_back(W);
+    vector<double*> vecOut;
+    vecOut.push_back(dU1);
+    vecOut.push_back(dU2);
+    vecOut.push_back(dU3);
+    vecOut.push_back(dV1);
+    vecOut.push_back(dV2);
+    vecOut.push_back(dV3);
+    vecOut.push_back(dW1);
+    vecOut.push_back(dW2);
+    vecOut.push_back(dW3);
+
+    computeGradient(vecIn, vecOut);
+
+/*    
     /////////////////////////////
     //Xi2-Direction Derivatives//
     /////////////////////////////
@@ -383,7 +401,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     c2d->transposeZ2Y_MajorIndex(dU3_zp, dU3);
     c2d->transposeZ2Y_MajorIndex(dV3_zp, dV3);
     c2d->transposeZ2Y_MajorIndex(dW3_zp, dW3);
-
+*/
 
     //Get each of the cartesian velocity derivative components
     double *dUdx, *dUdy, *dUdz;
