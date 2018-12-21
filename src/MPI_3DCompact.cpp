@@ -329,79 +329,14 @@ void CurvilinearCSolver::fullStepTemporalHook(){
 
     if(timeStep%25 == 0){
 
-    vector<double*> vecIn;
-    vecIn.push_back(U);
-    vecIn.push_back(V);
-    vecIn.push_back(W);
-    vector<double*> vecOut;
-    vecOut.push_back(dU1);
-    vecOut.push_back(dU2);
-    vecOut.push_back(dU3);
-    vecOut.push_back(dV1);
-    vecOut.push_back(dV2);
-    vecOut.push_back(dV3);
-    vecOut.push_back(dW1);
-    vecOut.push_back(dW2);
-    vecOut.push_back(dW3);
+    //Specifiy our input and output vectors for the computeGradient call
+    double *vi[] = {U, V, W};
+    vector<double*> vecIn(vi, vi+sizeof(vi)/sizeof(vi[0]));
+
+    double *vo[] = {dU1, dU2, dU3, dV1, dV2, dV3, dW1, dW2, dW3};
+    vector<double*> vecOut(vo, vo+sizeof(vo)/sizeof(vo[0]));
 
     computeGradient(vecIn, vecOut);
-
-/*    
-    /////////////////////////////
-    //Xi2-Direction Derivatives//
-    /////////////////////////////
-
-    //First we'll do all of the ~Y-Direction derivatives to calc tau
-    derivXi2->calc1stDerivField(U, dU2);
-    derivXi2->calc1stDerivField(V, dV2);
-    derivXi2->calc1stDerivField(W, dW2);
-
-    /////////////////////////////
-    //Xi1-Direction Derivatives//
-    /////////////////////////////
-
-    double *dU1_xp, *dV1_xp, *dW1_xp;
-
-    //Point to the needed X memory
-    U_xp = tempX1; dU1_xp = tempX5;
-    V_xp = tempX2; dV1_xp = tempX6;
-    W_xp = tempX3; dW1_xp = tempX7;
-
-    c2d->transposeY2X_MajorIndex(U, U_xp);
-    c2d->transposeY2X_MajorIndex(V, V_xp);
-    c2d->transposeY2X_MajorIndex(W, W_xp);
-
-    derivXi1->calc1stDerivField(U_xp, dU1_xp);
-    derivXi1->calc1stDerivField(V_xp, dV1_xp);
-    derivXi1->calc1stDerivField(W_xp, dW1_xp);
-
-    c2d->transposeX2Y_MajorIndex(dU1_xp, dU1);
-    c2d->transposeX2Y_MajorIndex(dV1_xp, dV1);
-    c2d->transposeX2Y_MajorIndex(dW1_xp, dW1);
-
-    /////////////////////////////
-    //Xi3-Direction Derivatives//
-    /////////////////////////////
-
-    double *dU3_zp, *dV3_zp, *dW3_zp;
-
-    //Point to the needed Z memory
-    U_zp = tempZ1; dU3_zp = tempZ5;
-    V_zp = tempZ2; dV3_zp = tempZ6;
-    W_zp = tempZ3; dW3_zp = tempZ7;
-
-    c2d->transposeY2Z_MajorIndex(U, U_zp);
-    c2d->transposeY2Z_MajorIndex(V, V_zp);
-    c2d->transposeY2Z_MajorIndex(W, W_zp);
-
-    derivXi3->calc1stDerivField(U_zp, dU3_zp);
-    derivXi3->calc1stDerivField(V_zp, dV3_zp);
-    derivXi3->calc1stDerivField(W_zp, dW3_zp);
-
-    c2d->transposeZ2Y_MajorIndex(dU3_zp, dU3);
-    c2d->transposeZ2Y_MajorIndex(dV3_zp, dV3);
-    c2d->transposeZ2Y_MajorIndex(dW3_zp, dW3);
-*/
 
     //Get each of the cartesian velocity derivative components
     double *dUdx, *dUdy, *dUdz;
