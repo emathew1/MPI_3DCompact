@@ -238,6 +238,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	//Derivative calculation functions
 	void computeGradient(vector<double*> vecIn, vector<double*>vecOut);
+	void computeGradDotComponents(vector<double*> vecIn, vector<double*>vecOut);
 
 	/////////////////////////////////////
 	//Our Generalized Solver Functions //

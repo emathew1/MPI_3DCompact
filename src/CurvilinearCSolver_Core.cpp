@@ -274,6 +274,59 @@ void CurvilinearCSolver::computeGradient(vector<double*> vecIn, vector<double*>v
 
 };
 
+void CurvilinearCSolver::computeGradDotComponents(vector<double*> vecIn, vector<double*>vecOut){
+
+    if(vecIn.size()/3 > 5){
+	cout << "ERROR:computeGradDotComponents: NEED MORE TEMPORARY MEMORY, COMPUTING GRADIENT ON LIST LARGER THAN 5" << endl;
+    }else{
+
+	int vecInSize = vecIn.size();
+	int N = vecIn.size()/3;
+
+	if(vecOut.size() != vecInSize){
+	    cout << "ERROR:computeGradDotComponents: vecOut size should be the same as the vecIn size!" << endl;
+	}
+
+	if(N*3 != vecInSize){
+	    cout << "ERROR::computeGradDotComponents: missing an awkward number of inputs/outputs" << endl;
+	}
+
+	//Xi2 Derivatives First
+	for(int ip = 0; ip < N; ip++){
+	    derivXi2->calc1stDerivField(vecIn[ip+N], vecOut[ip+N]);
+       	}
+
+	//Xi1 Derivatives Next
+	for(int ip = 0; ip < N; ip++){
+	    c2d->transposeY2X_MajorIndex(vecIn[ip], tempXVec[ip]);
+	}
+
+	for(int ip = 0; ip < N; ip++){
+	    derivXi1->calc1stDerivField(tempXVec[ip], tempXVec[ip+N]);
+	}
+
+	for(int ip = 0; ip < N; ip++){
+	    c2d->transposeX2Y_MajorIndex(tempXVec[ip+N], vecOut[ip]);
+	}
+
+
+	//Xi3 Derivatives Finally
+	for(int ip = 0; ip < N; ip++){
+	    c2d->transposeY2Z_MajorIndex(vecIn[2*N+ip], tempZVec[ip]);
+	}
+
+	for(int ip = 0; ip < N; ip++){
+	    derivXi3->calc1stDerivField(tempZVec[ip], tempZVec[ip+N]);
+	}
+
+	for(int ip = 0; ip < N; ip++){
+	    c2d->transposeZ2Y_MajorIndex(tempZVec[ip+N], vecOut[2*N+ip]);
+	}
+
+    }
+
+};
+
 void CurvilinearCSolver::preStepDerivatives(){
 
     if(useTiming) ft1 = MPI_Wtime();
@@ -455,100 +508,27 @@ void CurvilinearCSolver::preStepDerivatives(){
 	IF_RANK0 cout << " > Tau&Components Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
 
-    /////////////////////
-    // Xi2-DERIVATIVES //
-    /////////////////////
-   
-    derivXi2->calc1stDerivField(preCont_2, cont_2);
-    derivXi2->calc1stDerivField(preMom1_2, mom1_2);
-    derivXi2->calc1stDerivField(preMom2_2, mom2_2);
-    derivXi2->calc1stDerivField(preMom3_2, mom3_2);
-    derivXi2->calc1stDerivField(preEngy_2, engy_2);
+    ///////////////////////////////////////
+    // COMPUTE DERIVATIVES OF COMPONENTS //
+    ///////////////////////////////////////
+
+    double *vi2[] = {preCont_1, preMom1_1, preMom2_1, preMom3_1, preEngy_1, \
+		     preCont_2, preMom1_2, preMom2_2, preMom3_2, preEngy_2, \
+		     preCont_3, preMom1_3, preMom2_3, preMom3_3, preEngy_3};
+    vector<double*> vecIn2(vi2, vi2+sizeof(vi2)/sizeof(vi2[0]));
+    
+    double *vo2[] = {cont_1, mom1_1, mom2_1, mom3_1, engy_1, \
+		     cont_2, mom1_2, mom2_2, mom3_2, engy_2, \
+		     cont_3, mom1_3, mom2_3, mom3_3, engy_3};
+    vector<double*> vecOut2(vo2, vo2+sizeof(vo2)/sizeof(vo2[0]));
+
+    computeGradDotComponents(vecIn2, vecOut2);
+
 
     if(useTiming){
 	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > 2derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
+	IF_RANK0 cout << " >  derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
     }
-
-    /////////////////////
-    // Xi1-DERIVATIVES //
-    /////////////////////
-
-    double *preCont_1_xp, *preMom1_1_xp, *preMom2_1_xp, *preMom3_1_xp, *preEngy_1_xp;
-    preCont_1_xp = tempX1; 
-    preMom1_1_xp = tempX2; 
-    preMom2_1_xp = tempX3; 
-    preMom3_1_xp = tempX4; 
-    preEngy_1_xp = tempX5; 
-
-    double *cont_1_xp, *mom1_1_xp, *mom2_1_xp, *mom3_1_xp, *engy_1_xp;
-    cont_1_xp = tempX6; 
-    mom1_1_xp = tempX7; 
-    mom2_1_xp = tempX8; 
-    mom3_1_xp = tempX9; 
-    engy_1_xp = tempX10; 
-
-    c2d->transposeY2X_MajorIndex(preCont_1, preCont_1_xp);
-    c2d->transposeY2X_MajorIndex(preMom1_1, preMom1_1_xp);
-    c2d->transposeY2X_MajorIndex(preMom2_1, preMom2_1_xp);
-    c2d->transposeY2X_MajorIndex(preMom3_1, preMom3_1_xp);
-    c2d->transposeY2X_MajorIndex(preEngy_1, preEngy_1_xp);
-
-    derivX->calc1stDerivField(preCont_1_xp, cont_1_xp); 
-    derivX->calc1stDerivField(preMom1_1_xp, mom1_1_xp); 
-    derivX->calc1stDerivField(preMom2_1_xp, mom2_1_xp); 
-    derivX->calc1stDerivField(preMom3_1_xp, mom3_1_xp); 
-    derivX->calc1stDerivField(preEngy_1_xp, engy_1_xp); 
-
-    c2d->transposeX2Y_MajorIndex(cont_1_xp, cont_1);
-    c2d->transposeX2Y_MajorIndex(mom1_1_xp, mom1_1);
-    c2d->transposeX2Y_MajorIndex(mom2_1_xp, mom2_1);
-    c2d->transposeX2Y_MajorIndex(mom3_1_xp, mom3_1);
-    c2d->transposeX2Y_MajorIndex(engy_1_xp, engy_1);
-
-    if(useTiming){
-	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > 1derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
-    }
-
-    ///////////////////
-    // Xi3-DERIVATIVES //
-    ///////////////////
-
-    double *preCont_3_zp, *preMom1_3_zp, *preMom2_3_zp, *preMom3_3_zp, *preEngy_3_zp;
-    double *cont_3_zp, *mom1_3_zp, *mom2_3_zp, *mom3_3_zp, *engy_3_zp;
-
-    preCont_3_zp = tempZ1; cont_3_zp = tempZ6;
-    preMom1_3_zp = tempZ2; mom1_3_zp = tempZ7;
-    preMom2_3_zp = tempZ3; mom2_3_zp = tempZ8;
-    preMom3_3_zp = tempZ4; mom3_3_zp = tempZ9;
-    preEngy_3_zp = tempZ5; engy_3_zp = tempZ10;
-
-    c2d->transposeY2Z_MajorIndex(preCont_3, preCont_3_zp);
-    c2d->transposeY2Z_MajorIndex(preMom1_3, preMom1_3_zp);
-    c2d->transposeY2Z_MajorIndex(preMom2_3, preMom2_3_zp);
-    c2d->transposeY2Z_MajorIndex(preMom3_3, preMom3_3_zp);
-    c2d->transposeY2Z_MajorIndex(preEngy_3, preEngy_3_zp);
-
-    derivXi3->calc1stDerivField(preCont_3_zp, cont_3_zp);
-    derivXi3->calc1stDerivField(preMom1_3_zp, mom1_3_zp);
-    derivXi3->calc1stDerivField(preMom2_3_zp, mom2_3_zp);
-    derivXi3->calc1stDerivField(preMom3_3_zp, mom3_3_zp);
-    derivXi3->calc1stDerivField(preEngy_3_zp, engy_3_zp);
-
-    c2d->transposeZ2Y_MajorIndex(cont_3_zp, cont_3);
-    c2d->transposeZ2Y_MajorIndex(mom1_3_zp, mom1_3);
-    c2d->transposeZ2Y_MajorIndex(mom2_3_zp, mom2_3);
-    c2d->transposeZ2Y_MajorIndex(mom3_3_zp, mom3_3);
-    c2d->transposeZ2Y_MajorIndex(engy_3_zp, engy_3);
-
-    if(useTiming){
-	ftt2 = MPI_Wtime();
-	IF_RANK0 cout << " > 3derivtrans Timing: " << setw(6)  << (int)((ftt2-ftt1)*1000) << "ms" << endl;
-    }
-
-
-   
 
     if(useTiming){
 	ft2 = MPI_Wtime();
