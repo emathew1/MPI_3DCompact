@@ -78,6 +78,15 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
 	vector<double*> tempZVec;
 
+	//Stuff for different styles of interprocessor computation...
+	enum CompStyle {VANILLA, OCC, VANILLA_CHUNKED, OCC_CHUNKED};
+        CompStyle compStyle;
+
+	//Vector containers for send and receive buffers for OCC style
+	vector<double*> sbufVec;
+	vector<double*> rbufVec;
+	
+	//Field for visualizing the processor decomposition of the field
 	double *rankfield;
 
 	bool spongeFlag;
@@ -132,6 +141,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    done = false;
 	    rkLast = false;
 
+	    //Computational style, should be in inputs
+	    compStyle = OCC;
+	
 	    //Allocate our arrays for the solver data
 	    initializeSolverData();		    	    
 
