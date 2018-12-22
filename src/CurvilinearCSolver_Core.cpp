@@ -273,17 +273,17 @@ void CurvilinearCSolver::computeGradient(vector<double*> vecIn, vector<double*>v
 	    }
 	}else if(compStyle == OCC){
 
-	    if(sbufVec.empty()){
+	    if(sbufVec.size() < 2*vecInSize){
 		//Need to allocate memory in send buffer arrays...
-		for(int ip = 0; ip < 2*vecInSize; ip++){
+		for(int ip = sbufVec.size(); ip < 2*vecInSize; ip++){
 		    double *tmp_ptr = new double[c2d->decompBufSize];
 		    sbufVec.push_back(tmp_ptr);
 		}
 	    }
 
-	    if(rbufVec.empty()){
+	    if(rbufVec.size() < 2*vecInSize){
 		//Need to allocate memory in recv buffer arrays...
-		for(int ip = 0; ip < 2*vecInSize; ip++){
+		for(int ip = rbufVec.size(); ip < 2*vecInSize; ip++){
 		    double *tmp_ptr = new double[c2d->decompBufSize];
 		    rbufVec.push_back(tmp_ptr);
 		}
@@ -354,36 +354,101 @@ void CurvilinearCSolver::computeGradDotComponents(vector<double*> vecIn, vector<
 	    cout << "ERROR::computeGradDotComponents: missing an awkward number of inputs/outputs" << endl;
 	}
 
-	//Xi2 Derivatives First
-	for(int ip = 0; ip < N; ip++){
-	    derivXi2->calc1stDerivField(vecIn[ip+N], vecOut[ip+N]);
-       	}
+        if(compStyle == VANILLA){
 
-	//Xi1 Derivatives Next
-	for(int ip = 0; ip < N; ip++){
-	    c2d->transposeY2X_MajorIndex(vecIn[ip], tempXVec[ip]);
-	}
+	    //Xi2 Derivatives First
+	    for(int ip = 0; ip < N; ip++){
+	        derivXi2->calc1stDerivField(vecIn[ip+N], vecOut[ip+N]);
+       	    }
 
-	for(int ip = 0; ip < N; ip++){
-	    derivXi1->calc1stDerivField(tempXVec[ip], tempXVec[ip+N]);
-	}
+	    //Xi1 Derivatives Next
+	    for(int ip = 0; ip < N; ip++){
+	        c2d->transposeY2X_MajorIndex(vecIn[ip], tempXVec[ip]);
+	    }
 
-	for(int ip = 0; ip < N; ip++){
-	    c2d->transposeX2Y_MajorIndex(tempXVec[ip+N], vecOut[ip]);
-	}
+	    for(int ip = 0; ip < N; ip++){
+	        derivXi1->calc1stDerivField(tempXVec[ip], tempXVec[ip+N]);
+	    }
+
+	    for(int ip = 0; ip < N; ip++){
+	        c2d->transposeX2Y_MajorIndex(tempXVec[ip+N], vecOut[ip]);
+	    }
 
 
-	//Xi3 Derivatives Finally
-	for(int ip = 0; ip < N; ip++){
-	    c2d->transposeY2Z_MajorIndex(vecIn[2*N+ip], tempZVec[ip]);
-	}
+	    //Xi3 Derivatives Finally
+	    for(int ip = 0; ip < N; ip++){
+	        c2d->transposeY2Z_MajorIndex(vecIn[2*N+ip], tempZVec[ip]);
+	    }
 
-	for(int ip = 0; ip < N; ip++){
-	    derivXi3->calc1stDerivField(tempZVec[ip], tempZVec[ip+N]);
-	}
+	    for(int ip = 0; ip < N; ip++){
+	        derivXi3->calc1stDerivField(tempZVec[ip], tempZVec[ip+N]);
+	    }
 
-	for(int ip = 0; ip < N; ip++){
-	    c2d->transposeZ2Y_MajorIndex(tempZVec[ip+N], vecOut[2*N+ip]);
+	    for(int ip = 0; ip < N; ip++){
+	        c2d->transposeZ2Y_MajorIndex(tempZVec[ip+N], vecOut[2*N+ip]);
+	    }
+	}else if(compStyle == OCC){
+
+	
+	    if(sbufVec.size() < 2*N){
+		//Need to allocate memory in send buffer arrays...
+		for(int ip = sbufVec.size(); ip < 2*N; ip++){
+		    double *tmp_ptr = new double[c2d->decompBufSize];
+		    sbufVec.push_back(tmp_ptr);
+		}
+	    }
+
+	    if(rbufVec.size() < 2*N){
+		//Need to allocate memory in recv buffer arrays...
+		for(int ip = rbufVec.size(); ip < 2*N; ip++){
+		    double *tmp_ptr = new double[c2d->decompBufSize];
+		    rbufVec.push_back(tmp_ptr);
+		}
+	    }
+	
+	    //Going to need some handles for each of the communications
+	    vector<MPI_Request> y2xHandles(vecInSize);
+	    vector<MPI_Request> y2zHandles(vecInSize);
+
+	    //Do our sends to x and z first
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeY2X_MajorIndex_Start(y2xHandles[ip], vecIn[ip], tempXVec[ip], sbufVec[ip], rbufVec[ip]);
+	    }
+
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeY2Z_MajorIndex_Start(y2zHandles[ip], vecIn[2*N+ip], tempZVec[ip], sbufVec[ip+N], rbufVec[ip+N]);
+	    }	
+
+	   //Do our Xi2 Derivative Calculations
+	   for(int ip = 0; ip < N; ip++){
+	       derivXi2->calc1stDerivField(vecIn[ip+N], vecOut[ip+N]);
+	   }
+
+	   //Now we'll collect our transpose to x and do the calcs and send it back out
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeY2X_MajorIndex_Wait(y2xHandles[ip], vecIn[ip], tempXVec[ip], sbufVec[ip], rbufVec[ip]);
+		derivXi1->calc1stDerivField(tempXVec[ip], tempXVec[ip+N]);
+		c2d->transposeX2Y_MajorIndex_Start(y2xHandles[ip], tempXVec[ip+N], vecOut[ip], sbufVec[ip], rbufVec[ip]);
+	    }
+	
+	    //Do the same with out transposes to the Z
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeY2Z_MajorIndex_Wait(y2zHandles[ip], vecIn[2*N+ip], tempZVec[ip], sbufVec[ip+N], rbufVec[ip+N]);
+	        derivXi3->calc1stDerivField(tempZVec[ip], tempZVec[ip+N]);
+		c2d->transposeZ2Y_MajorIndex_Start(y2zHandles[ip], tempZVec[ip+N], vecOut[2*N+ip], sbufVec[ip+N], rbufVec[ip+N]);
+
+	    }
+
+	    //Collect the final x->y transposes...
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeX2Y_MajorIndex_Wait(y2xHandles[ip], tempXVec[ip+N], vecOut[ip], sbufVec[ip], rbufVec[ip]);
+	    }
+
+	    //Collect the final z->y transposes...
+	    for(int ip = 0; ip < N; ip++){
+		c2d->transposeZ2Y_MajorIndex_Wait(y2zHandles[ip], tempZVec[ip+N], vecOut[2*N+ip], sbufVec[ip+N], rbufVec[ip+N]);
+	    }
+
 	}
 
     }
