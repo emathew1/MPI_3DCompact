@@ -129,7 +129,7 @@ void Filter::compactFilter(double *phi, double *phiF){
 void Filter::filterField(double *dataIn, double *dataOut){
 
 
-    if(currentDir == Derivatives::DIRX){
+    if(currentDir == AbstractDerivatives::DIRX){
 	FOR_Z_XPEN{
 	    FOR_Y_XPEN{
                 double *dataInLocal, *dataOutLocal;
@@ -140,7 +140,7 @@ void Filter::filterField(double *dataIn, double *dataOut){
 	    }
 	}
 
-    }else if(currentDir == Derivatives::DIRY){
+    }else if(currentDir == AbstractDerivatives::DIRY){
         FOR_X_YPEN{
             FOR_Z_YPEN{
                 double *dataInLocal, *dataOutLocal;
@@ -151,7 +151,7 @@ void Filter::filterField(double *dataIn, double *dataOut){
             }
         }
 
-    }else if(currentDir == Derivatives::DIRZ){
+    }else if(currentDir == AbstractDerivatives::DIRZ){
         FOR_Y_ZPEN{
             FOR_X_ZPEN{
                 double *dataInLocal, *dataOutLocal;

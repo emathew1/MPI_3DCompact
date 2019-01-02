@@ -1,6 +1,6 @@
-#include "Derivatives.hpp"
+#include "Pade6.hpp"
 
-void Derivatives::calc1stDerivField(double *dataIn, double *dataOut){
+void Pade6::calc1stDerivField(double *dataIn, double *dataOut){
 
 
     if(currentDir == DIRX){
@@ -45,7 +45,7 @@ void Derivatives::calc1stDerivField(double *dataIn, double *dataOut){
 }
 
 //TPB: Transform Periodic Boundaries
-void Derivatives::calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2){
+void Pade6::calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2){
 
     if(currentDir == DIRX){
 
@@ -111,7 +111,7 @@ void Derivatives::calc1stDerivField_TPB(double *dataIn, double *dataOut, double 
 
 
 
-void Derivatives::calc2ndDerivField(double *dataIn, double *dataOut){
+void Pade6::calc2ndDerivField(double *dataIn, double *dataOut){
 
 
     if(currentDir == DIRX){
@@ -154,7 +154,7 @@ void Derivatives::calc2ndDerivField(double *dataIn, double *dataOut){
 
 }
 
-void Derivatives::calc1stDeriv(double *phi, double *dphi){
+void Pade6::calc1stDeriv(double *phi, double *dphi){
 
     if(bcType == BC::PERIODIC_SOLVE){
 	Compact1stPeriodic(phi, dphi);	
@@ -164,7 +164,7 @@ void Derivatives::calc1stDeriv(double *phi, double *dphi){
 
 }
 
-void Derivatives::calc1stDeriv_TPB(double *phi, double *dphi){
+void Pade6::calc1stDeriv_TPB(double *phi, double *dphi){
     if(bcType == BC::PERIODIC_SOLVE){
 	Compact1stPeriodic_TPB(phi, dphi);	
     }else if(bcType == BC::DIRICHLET_SOLVE){
@@ -174,7 +174,7 @@ void Derivatives::calc1stDeriv_TPB(double *phi, double *dphi){
 
 
 
-void Derivatives::calc2ndDeriv(double *phi, double *dphi){
+void Pade6::calc2ndDeriv(double *phi, double *dphi){
 
     if(bcType == BC::PERIODIC_SOLVE){
 	Compact2ndPeriodic(phi, dphi);	
@@ -184,7 +184,7 @@ void Derivatives::calc2ndDeriv(double *phi, double *dphi){
 
 }
 
-void Derivatives::multRHS1stDerivPeriodic(double dh, double *phi, int N, double *RHSvec){
+void Pade6::multRHS1stDerivPeriodic(double dh, double *phi, int N, double *RHSvec){
 
     double cc2 = -b_1D/4.0;
     double cc3 = -a_1D/2.0;
@@ -217,7 +217,7 @@ void Derivatives::multRHS1stDerivPeriodic(double dh, double *phi, int N, double 
 
 }
 
-void Derivatives::multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, double *RHSvec){
+void Pade6::multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, double *RHSvec){
 
     double cc2 = -b_1D/4.0;
     double cc3 = -a_1D/2.0;
@@ -251,7 +251,7 @@ void Derivatives::multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, dou
 }
 
 
-void Derivatives::multRHS2ndDerivPeriodic(double dh, double *phi, int N, double *RHSvec){
+void Pade6::multRHS2ndDerivPeriodic(double dh, double *phi, int N, double *RHSvec){
 
     double cc1 =  b_2D/4.0;
     double cc2 =  a_2D;
@@ -281,7 +281,7 @@ void Derivatives::multRHS2ndDerivPeriodic(double dh, double *phi, int N, double 
 
 }
 
-void Derivatives::multRHS1stDerivDirichlet(double dh, double *phi, int N, double *RHSvec){
+void Pade6::multRHS1stDerivDirichlet(double dh, double *phi, int N, double *RHSvec){
 
 
     double cc2 = -b_1D/4.0;
@@ -312,7 +312,7 @@ void Derivatives::multRHS1stDerivDirichlet(double dh, double *phi, int N, double
 
 }
 
-void Derivatives::multRHS2ndDerivDirichlet(double dh, double *phi, int N, double *RHSvec){
+void Pade6::multRHS2ndDerivDirichlet(double dh, double *phi, int N, double *RHSvec){
 
 
     double cc1 =  b_2D/4.0;
@@ -348,7 +348,7 @@ void Derivatives::multRHS2ndDerivDirichlet(double dh, double *phi, int N, double
 }
 
 
-void Derivatives::Compact1stPeriodic(double *phi, double *dphidy){
+void Pade6::Compact1stPeriodic(double *phi, double *dphidy){
 
     double RHSvec[N];
     multRHS1stDerivPeriodic(dd, phi, N, RHSvec);
@@ -356,7 +356,7 @@ void Derivatives::Compact1stPeriodic(double *phi, double *dphidy){
 
 }
 
-void Derivatives::Compact1stPeriodic_TPB(double *phi, double *dphidy){
+void Pade6::Compact1stPeriodic_TPB(double *phi, double *dphidy){
 
     double RHSvec[N];
     multRHS1stDerivPeriodic_TPB(dd, phi, N, RHSvec);
@@ -364,7 +364,7 @@ void Derivatives::Compact1stPeriodic_TPB(double *phi, double *dphidy){
 
 }
 
-void Derivatives::Compact2ndPeriodic(double *phi, double *dphidy){
+void Pade6::Compact2ndPeriodic(double *phi, double *dphidy){
 
     double RHSvec[N];
     multRHS2ndDerivPeriodic(dd, phi, N, RHSvec);
@@ -373,7 +373,7 @@ void Derivatives::Compact2ndPeriodic(double *phi, double *dphidy){
 }
 
 
-void Derivatives::Compact1stDirichlet(double *phi, double *dphidy){
+void Pade6::Compact1stDirichlet(double *phi, double *dphidy){
 
     double RHSvec[N];
     double work[N];
@@ -383,7 +383,7 @@ void Derivatives::Compact1stDirichlet(double *phi, double *dphidy){
 }
 
 
-void Derivatives::Compact2ndDirichlet(double *phi, double *dphidy){
+void Pade6::Compact2ndDirichlet(double *phi, double *dphidy){
 
     double RHSvec[N];
     double work[N];

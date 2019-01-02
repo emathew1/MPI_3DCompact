@@ -37,7 +37,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(xE23);
 
 	//Do the E2 derivatives first...
-	if(periodicBCY){
+	if(periodicBCY && derivY->rhsBandwidth == AbstractDerivatives::BW5){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
 	    Nm2x = new double[pySize[0]*pySize[2]];
 	    Nm1x = new double[pySize[0]*pySize[2]];
@@ -102,7 +102,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(y, tempX2);
 
 	//Calculate E1 Derivatives..
-	if(periodicBCX){
+	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
             Nm2x = new double[pxSize[1]*pxSize[2]];
             Nm1x = new double[pxSize[1]*pxSize[2]];
@@ -171,7 +171,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(y, tempZ2);
 
 	//Calculate E3 Derivatives
-	if(periodicBCZ){
+	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
 	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
             Nm2x = new double[pzSize[1]*pzSize[0]];
             Nm1x = new double[pzSize[1]*pzSize[0]];
@@ -294,7 +294,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(dVc32);
 
 	//Start doing the E2 derivatives of all of this stuff
-	if(periodicBCY){
+	if(periodicBCY && derivY->rhsBandwidth == AbstractDerivatives::BW5){
 	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
 	    Nm2a1 = new double[pySize[0]*pySize[2]];
 	    Nm1a1 = new double[pySize[0]*pySize[2]];
@@ -444,7 +444,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(Vc3, tempX6);
 
 
-	if(periodicBCX){
+	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
 	    
 	    c2d->allocX(y1);
 	    c2d->allocX(z1);
@@ -619,7 +619,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(Vc1, tempZ5);
 	c2d->transposeY2Z_MajorIndex(Vc2, tempZ6);
 
-	if(periodicBCZ){
+	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
 	
  	    c2d->allocZ(y3);
 	    c2d->allocZ(z3);
@@ -848,7 +848,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 
 
 	//Compute the E2 component...
-	if(periodicBCY){
+	if(periodicBCY && derivY->rhsBandwidth == AbstractDerivatives::BW5){
 	    double *Nm2, *Nm1, *Np1, *Np2;
 	    Nm2 = new double[pySize[0]*pySize[2]];
 	    Nm1 = new double[pySize[0]*pySize[2]];
@@ -897,7 +897,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	//Compute the E1 component....
 	c2d->transposeY2X_MajorIndex(preJdet1, tempX1);
 
-	if(periodicBCX){
+	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
 
 	    c2d->transposeY2X_MajorIndex(x, tempX2);
 	    c2d->transposeY2X_MajorIndex(y, tempX3);
@@ -958,7 +958,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
  	//Compute the E3 component....
 	c2d->transposeY2Z_MajorIndex(preJdet3, tempZ1);
 
-	if(periodicBCZ){
+	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
 
 	    c2d->transposeY2Z_MajorIndex(x, tempZ2);
 	    c2d->transposeY2Z_MajorIndex(y, tempZ3);

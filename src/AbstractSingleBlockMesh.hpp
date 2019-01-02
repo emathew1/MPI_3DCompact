@@ -7,7 +7,7 @@
 #include "AbstractCSolver.hpp"
 #include "C2Decomp.hpp"
 #include "Domain.hpp"
-#include "Derivatives.hpp"
+#include "AbstractDerivatives.hpp"
 #include "Adt.hpp"
 
 //There's some cyclic dependency going on here...
@@ -45,7 +45,7 @@ class AbstractSingleBlockMesh{
 	bool transPeriodicX, transPeriodicY, transPeriodicZ;
 	bool interPeriodicX, interPeriodicY, interPeriodicZ;
 
-	Derivatives *derivX, *derivY, *derivZ;
+	AbstractDerivatives *derivX, *derivY, *derivZ;
 
 	Adt<double> *adt;
 

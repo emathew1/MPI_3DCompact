@@ -4,7 +4,7 @@
 #include <math.h>
 #include <cstring>
 #include <iostream>
-#include "Derivatives.hpp"
+#include "AbstractDerivatives.hpp"
 #include "Domain.hpp"
 #include "BC.hpp"
 #include "Utils.hpp"
@@ -30,11 +30,11 @@ class Filter{
 
 	double *diagF, *offlowerF, *offupperF;
 	
-	Derivatives::Direct currentDir;
+	AbstractDerivatives::Direct currentDir;
 	BC::BCType bcType;
 
 
-    Filter(double alphaF, Domain *dom, BC::BCType bcType, Derivatives::Direct currentDir){
+    Filter(double alphaF, Domain *dom, BC::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
 	this->Nx = dom->gNx;
@@ -47,11 +47,11 @@ class Filter{
 
 	this->bcType = bcType;
 
-	if(currentDir == Derivatives::DIRX){
+	if(currentDir == AbstractDerivatives::DIRX){
 	    N = Nx;
-	}else if(currentDir == Derivatives::DIRY){
+	}else if(currentDir == AbstractDerivatives::DIRY){
 	    N = Ny;
-	}else if(currentDir == Derivatives::DIRZ){
+	}else if(currentDir == AbstractDerivatives::DIRZ){
 	    N = Nz;
 	}
 

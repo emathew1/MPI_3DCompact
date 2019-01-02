@@ -10,6 +10,7 @@
 #include "AbstractCSolver.hpp"
 #include "PngWriter.hpp"
 #include "CurvilinearInterpolator.hpp"
+#include "Pade6.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -104,7 +105,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	list<PngWriter*> imageList;
 
 	//Alias'd derivative objects
-	Derivatives *derivXi1, *derivXi2, *derivXi3;
+	AbstractDerivatives *derivXi1, *derivXi2, *derivXi3;
 	Filter *filtXi1, *filtXi2, *filtXi3;
 
 	//Constructor to use for this class...
@@ -148,18 +149,18 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    initializeSolverData();		    	    
 
 	    //Initialize our derivative calculations for each direction...
-	    derivX = new Derivatives(dom, bc->bcXType, Derivatives::DIRX);
-	    derivY = new Derivatives(dom, bc->bcYType, Derivatives::DIRY);
-	    derivZ = new Derivatives(dom, bc->bcZType, Derivatives::DIRZ);
+	    derivX = new Pade6(dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    derivY = new Pade6(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    derivZ = new Pade6(dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    derivXi1 = derivX;
 	    derivXi2 = derivY;
 	    derivXi3 = derivZ;
 
 	    //Initialize the filters we're going to use for each direction
-	    filtX  = new Filter(alphaF, dom, bc->bcXType, Derivatives::DIRX);
-	    filtY  = new Filter(alphaF, dom, bc->bcYType, Derivatives::DIRY);
-	    filtZ  = new Filter(alphaF, dom, bc->bcZType, Derivatives::DIRZ);
+	    filtX  = new Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    filtY  = new Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    filtZ  = new Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    filtXi1 = filtX;
 	    filtXi2 = filtY;

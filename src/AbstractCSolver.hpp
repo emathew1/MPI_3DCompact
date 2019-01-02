@@ -2,7 +2,7 @@
 #define _CABSTRACTSOLVERH_
 
 #include "C2Decomp.hpp"
-#include "Derivatives.hpp"
+#include "AbstractDerivatives.hpp"
 #include "Filter.hpp"
 #include "IdealGas.hpp"
 #include "TimeStepping.hpp"
@@ -45,7 +45,7 @@ class AbstractCSolver{
 	BC *bc;
 	TimeStepping *ts;
 	IdealGas *ig;
-        Derivatives *derivX, *derivY, *derivZ;
+        AbstractDerivatives *derivX, *derivY, *derivZ;
         Filter *filtX, *filtY, *filtZ;
 
 	//Common Msh Stuff if needed

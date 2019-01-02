@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Derivatives.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o
+OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o
 
 default: MPI_3DCompact
 
@@ -30,13 +30,13 @@ MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeSt
 Utils.o: Utils.cpp Domain.hpp Utils.hpp
 	$(CC) $(CFLAGS) -c $<
 
-Derivatives.o: Derivatives.cpp Derivatives.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
+Pade6.o: Pade6.cpp Pade6.hpp AbstractDerivatives.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 SpongeBC.o: SpongeBC.cpp SpongeBC.hpp Domain.hpp BC.hpp Macros.hpp IdealGas.hpp AbstractSingleBlockMesh.hpp Utils.hpp
 	$(CC) $(CFLAGS) -c $<
 
-AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.hpp AbstractCSolver.hpp Domain.hpp Derivatives.hpp Adt.hpp
+AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.hpp AbstractCSolver.hpp Domain.hpp Pade6.hpp Adt.hpp
 	$(CC) $(CFLAGS) -c $<
 
 Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 

@@ -4,23 +4,12 @@
 #include <math.h>
 #include <cstring>
 #include <iostream>
-#include "Macros.hpp"
-#include "Domain.hpp"
-#include "BC.hpp"
-#include "Utils.hpp"
+#include "AbstractDerivatives.hpp"
 
-class Derivatives{
+class Pade6: public AbstractDerivatives{
 
 
     public:
-
-	int Nx, Ny, Nz, N;
-	int i, j, k;
-	double dx, dy, dz, dd;
-
-	int pxSize[3], pySize[3], pzSize[3];
-	int pxStart[3], pyStart[3], pzStart[3];
-	int pxEnd[3], pyEnd[3], pzEnd[3];
 
         //First Derivative
 
@@ -33,11 +22,6 @@ class Derivatives{
 	double a1_1D, b1_1D, c1_1D, d1_1D, e1_1D, f1_1D;
 	double a2_1D, b2_1D, c2_1D, d2_1D, e2_1D; 
 
-	double *diag_1D, *offlower_1D, *offupper_1D;
-
-	//for Transforming Periodic Boundary Condition stuff
-	double Nm2val, Nm1val, Np1val, Np2val;
-
         //Second Derivative
 
         // Interior Coefficients	
@@ -49,14 +33,12 @@ class Derivatives{
 	double a1_2D, b1_2D, c1_2D, d1_2D, e1_2D;
 	double a2_2D, b2_2D, c2_2D, d2_2D, e2_2D, f2_2D; 
 
-	double *diag_2D, *offlower_2D, *offupper_2D;
-	enum Direct {DIRX, DIRY, DIRZ};
-	Direct currentDir;
-
-	BC::BCType bcType;
-
 	//Constructor
-        Derivatives(Domain *dom, BC::BCType bcType, Direct currentDir){
+        Pade6(Domain *dom, BC::BCType bcType, Direct currentDir){
+
+	    //For this method
+	    rhsBandwidth = BW5;
+	    lhsBandwidth = BW3;
 
    	    this->Nx = dom->gNx;
 	    this->Ny = dom->gNy;
@@ -173,6 +155,7 @@ class Derivatives{
     //Function's to call...
     void calc1stDerivField(double *dataIn, double *dataOut);
     void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2);
+    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm3, double *Nm2, double *Nm1, double *Np1, double *Np2, double *Np3){};//empty call here since our bandwidth is 5
     void calc2ndDerivField(double *dataIn, double *dataOut);
 
     void calc1stDeriv(double *phi, double *dphi);
