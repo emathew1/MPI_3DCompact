@@ -47,6 +47,8 @@ class AbstractDerivatives{
 	//Not necessary with the current solver that just does two 1st derivs
 	//virtual void calc2ndDerivField(double *dataIn, double *dataOut) = 0;
 	
+	//Going to move the calc Neumann function here to force it to be defined for each kind of derivative
+	virtual double calcNeumann(double *f, int dir);
 
 };
 

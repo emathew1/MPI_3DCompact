@@ -41,12 +41,21 @@
 #define GETMAJIND_XPEN_Xp4 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+4
 #define GETMAJIND_XPEN_Xp5 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+5
 #define GETMAJIND_XPEN_Xp6 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+6
+#define GETMAJIND_XPEN_Xp7 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+7
+#define GETMAJIND_XPEN_Xp8 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+8
+#define GETMAJIND_XPEN_Xp9 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+9
+#define GETMAJIND_XPEN_Xp10 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i+10
+
 #define GETMAJIND_XPEN_Xm1 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-1
 #define GETMAJIND_XPEN_Xm2 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-2
 #define GETMAJIND_XPEN_Xm3 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-3
 #define GETMAJIND_XPEN_Xm4 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-4
 #define GETMAJIND_XPEN_Xm5 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-5
 #define GETMAJIND_XPEN_Xm6 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-6
+#define GETMAJIND_XPEN_Xm7 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-7
+#define GETMAJIND_XPEN_Xm8 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-8
+#define GETMAJIND_XPEN_Xm9 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-9
+#define GETMAJIND_XPEN_Xm10 k*pxSize[0]*pxSize[1] + j*pxSize[0] + i-10
 
 #define GETMAJIND_YPEN_Yp1 i*pySize[2]*pySize[1] + k*pySize[1] + j+1
 #define GETMAJIND_YPEN_Yp2 i*pySize[2]*pySize[1] + k*pySize[1] + j+2
@@ -54,12 +63,21 @@
 #define GETMAJIND_YPEN_Yp4 i*pySize[2]*pySize[1] + k*pySize[1] + j+4
 #define GETMAJIND_YPEN_Yp5 i*pySize[2]*pySize[1] + k*pySize[1] + j+5
 #define GETMAJIND_YPEN_Yp6 i*pySize[2]*pySize[1] + k*pySize[1] + j+6
+#define GETMAJIND_YPEN_Yp7 i*pySize[2]*pySize[1] + k*pySize[1] + j+7
+#define GETMAJIND_YPEN_Yp8 i*pySize[2]*pySize[1] + k*pySize[1] + j+8
+#define GETMAJIND_YPEN_Yp9 i*pySize[2]*pySize[1] + k*pySize[1] + j+9
+#define GETMAJIND_YPEN_Yp10 i*pySize[2]*pySize[1] + k*pySize[1] + j+10
+
 #define GETMAJIND_YPEN_Ym1 i*pySize[2]*pySize[1] + k*pySize[1] + j-1
 #define GETMAJIND_YPEN_Ym2 i*pySize[2]*pySize[1] + k*pySize[1] + j-2
 #define GETMAJIND_YPEN_Ym3 i*pySize[2]*pySize[1] + k*pySize[1] + j-3
 #define GETMAJIND_YPEN_Ym4 i*pySize[2]*pySize[1] + k*pySize[1] + j-4
 #define GETMAJIND_YPEN_Ym5 i*pySize[2]*pySize[1] + k*pySize[1] + j-5
 #define GETMAJIND_YPEN_Ym6 i*pySize[2]*pySize[1] + k*pySize[1] + j-6
+#define GETMAJIND_YPEN_Ym7 i*pySize[2]*pySize[1] + k*pySize[1] + j-7
+#define GETMAJIND_YPEN_Ym8 i*pySize[2]*pySize[1] + k*pySize[1] + j-8
+#define GETMAJIND_YPEN_Ym9 i*pySize[2]*pySize[1] + k*pySize[1] + j-9
+#define GETMAJIND_YPEN_Ym10 i*pySize[2]*pySize[1] + k*pySize[1] + j-10
 
 #define GETMAJIND_ZPEN_Zp1 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+1
 #define GETMAJIND_ZPEN_Zp2 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+2
@@ -67,12 +85,21 @@
 #define GETMAJIND_ZPEN_Zp4 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+4
 #define GETMAJIND_ZPEN_Zp5 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+5
 #define GETMAJIND_ZPEN_Zp6 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+6
+#define GETMAJIND_ZPEN_Zp7 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+7
+#define GETMAJIND_ZPEN_Zp8 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+8
+#define GETMAJIND_ZPEN_Zp9 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+9
+#define GETMAJIND_ZPEN_Zp10 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k+10
+
 #define GETMAJIND_ZPEN_Zm1 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-1
 #define GETMAJIND_ZPEN_Zm2 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-2
 #define GETMAJIND_ZPEN_Zm3 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-3
 #define GETMAJIND_ZPEN_Zm4 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-4
 #define GETMAJIND_ZPEN_Zm5 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-5
 #define GETMAJIND_ZPEN_Zm6 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-6
+#define GETMAJIND_ZPEN_Zm7 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-7
+#define GETMAJIND_ZPEN_Zm8 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-8
+#define GETMAJIND_ZPEN_Zm9 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-9
+#define GETMAJIND_ZPEN_Zm10 j*pzSize[2]*pzSize[0] + i*pzSize[2] + k-10
 
 #define GETYPIND_XPEN_Yp1 k*pxSize[0]*pxSize[1] + (j+1)*pxSize[0] + i
 #define GETYPIND_XPEN_Yp2 k*pxSize[0]*pxSize[1] + (j+2)*pxSize[0] + i
@@ -106,12 +133,21 @@
 #define GETMAJIND_YPEN_Xp4 (i+4)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xp5 (i+5)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xp6 (i+6)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp7 (i+7)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp8 (i+8)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp9 (i+9)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xp10 (i+10)*pySize[2]*pySize[1] + k*pySize[1] + j
+
 #define GETMAJIND_YPEN_Xm1 (i-1)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xm2 (i-2)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xm3 (i-3)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xm4 (i-4)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xm5 (i-5)*pySize[2]*pySize[1] + k*pySize[1] + j
 #define GETMAJIND_YPEN_Xm6 (i-6)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm7 (i-7)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm8 (i-8)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm9 (i-9)*pySize[2]*pySize[1] + k*pySize[1] + j
+#define GETMAJIND_YPEN_Xm10 (i-10)*pySize[2]*pySize[1] + k*pySize[1] + j
 
 #define GETMAJIND_YPEN_Zp1 i*pySize[2]*pySize[1] + (k+1)*pySize[1] + j
 #define GETMAJIND_YPEN_Zp2 i*pySize[2]*pySize[1] + (k+2)*pySize[1] + j
@@ -119,14 +155,31 @@
 #define GETMAJIND_YPEN_Zp4 i*pySize[2]*pySize[1] + (k+4)*pySize[1] + j
 #define GETMAJIND_YPEN_Zp5 i*pySize[2]*pySize[1] + (k+5)*pySize[1] + j
 #define GETMAJIND_YPEN_Zp6 i*pySize[2]*pySize[1] + (k+6)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp7 i*pySize[2]*pySize[1] + (k+7)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp8 i*pySize[2]*pySize[1] + (k+8)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp9 i*pySize[2]*pySize[1] + (k+9)*pySize[1] + j
+#define GETMAJIND_YPEN_Zp10 i*pySize[2]*pySize[1] + (k+10)*pySize[1] + j
+
 #define GETMAJIND_YPEN_Zm1 i*pySize[2]*pySize[1] + (k-1)*pySize[1] + j
 #define GETMAJIND_YPEN_Zm2 i*pySize[2]*pySize[1] + (k-2)*pySize[1] + j
 #define GETMAJIND_YPEN_Zm3 i*pySize[2]*pySize[1] + (k-3)*pySize[1] + j
 #define GETMAJIND_YPEN_Zm4 i*pySize[2]*pySize[1] + (k-4)*pySize[1] + j
 #define GETMAJIND_YPEN_Zm5 i*pySize[2]*pySize[1] + (k-5)*pySize[1] + j
 #define GETMAJIND_YPEN_Zm6 i*pySize[2]*pySize[1] + (k-6)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm7 i*pySize[2]*pySize[1] + (k-7)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm8 i*pySize[2]*pySize[1] + (k-8)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm9 i*pySize[2]*pySize[1] + (k-9)*pySize[1] + j
+#define GETMAJIND_YPEN_Zm10 i*pySize[2]*pySize[1] + (k-10)*pySize[1] + j
 
 
+#define FILL_GETMAJIND_YPEN_Xp {GETMAJIND_YPEN_Xp1, GETMAJIND_YPEN_Xp2, GETMAJIND_YPEN_Xp3, GETMAJIND_YPEN_Xp4, GETMAJIND_YPEN_Xp5, GETMAJIND_YPEN_Xp6, GETMAJIND_YPEN_Xp7, GETMAJIND_YPEN_Xp8, GETMAJIND_YPEN_Xp9, GETMAJIND_YPEN_Xp10}
+#define FILL_GETMAJIND_YPEN_Xm {GETMAJIND_YPEN_Xm1, GETMAJIND_YPEN_Xm2, GETMAJIND_YPEN_Xm3, GETMAJIND_YPEN_Xm4, GETMAJIND_YPEN_Xm5, GETMAJIND_YPEN_Xm6, GETMAJIND_YPEN_Xm7, GETMAJIND_YPEN_Xm8, GETMAJIND_YPEN_Xm9, GETMAJIND_YPEN_Xm10}
+
+#define FILL_GETMAJIND_YPEN_Yp {GETMAJIND_YPEN_Yp1, GETMAJIND_YPEN_Yp2, GETMAJIND_YPEN_Yp3, GETMAJIND_YPEN_Yp4, GETMAJIND_YPEN_Yp5, GETMAJIND_YPEN_Yp6, GETMAJIND_YPEN_Yp7, GETMAJIND_YPEN_Yp8, GETMAJIND_YPEN_Yp9, GETMAJIND_YPEN_Yp10}
+#define FILL_GETMAJIND_YPEN_Ym {GETMAJIND_YPEN_Ym1, GETMAJIND_YPEN_Ym2, GETMAJIND_YPEN_Ym3, GETMAJIND_YPEN_Ym4, GETMAJIND_YPEN_Ym5, GETMAJIND_YPEN_Ym6, GETMAJIND_YPEN_Ym7, GETMAJIND_YPEN_Ym8, GETMAJIND_YPEN_Ym9, GETMAJIND_YPEN_Ym10}
+
+#define FILL_GETMAJIND_YPEN_Zp {GETMAJIND_YPEN_Zp1, GETMAJIND_YPEN_Zp2, GETMAJIND_YPEN_Zp3, GETMAJIND_YPEN_Zp4, GETMAJIND_YPEN_Zp5, GETMAJIND_YPEN_Zp6, GETMAJIND_YPEN_Zp7, GETMAJIND_YPEN_Zp8, GETMAJIND_YPEN_Zp9, GETMAJIND_YPEN_Zp10}
+#define FILL_GETMAJIND_YPEN_Zm {GETMAJIND_YPEN_Zm1, GETMAJIND_YPEN_Zm2, GETMAJIND_YPEN_Zm3, GETMAJIND_YPEN_Zm4, GETMAJIND_YPEN_Zm5, GETMAJIND_YPEN_Zm6, GETMAJIND_YPEN_Zm7, GETMAJIND_YPEN_Zm8, GETMAJIND_YPEN_Zm9, GETMAJIND_YPEN_Zm10}
 
 
 //Loops

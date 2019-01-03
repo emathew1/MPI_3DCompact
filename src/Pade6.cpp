@@ -392,3 +392,6 @@ void Pade6::Compact2ndDirichlet(double *phi, double *dphidy){
     solveTri(offlower_2D, diag_2D, offupper_2D, RHSvec, dphidy, work, N);
 }
 
+double Pade6::calcNeumann(double *f){
+    return (f[1]*360.0 - f[2]*450.0 + f[3]*400.0 - f[4]*225.0 + f[5]*72.0 - f[6]*10.0)/147.0;   
+}

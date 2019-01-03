@@ -162,6 +162,8 @@ class Pade6: public AbstractDerivatives{
     void calc1stDeriv_TPB(double *phi, double *dphi);
     void calc2ndDeriv(double *phi, double *dphi);
 
+    double calcNeumann(double *f);
+
     //Need a cleaner way of passing these things...
     void multRHS1stDerivPeriodic(double dh, double *phi, int N, double *RHSvec);
     void multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, double *RHSvec);
