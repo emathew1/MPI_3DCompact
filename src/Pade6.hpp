@@ -1,5 +1,5 @@
-#ifndef _DERIVATIVESH_
-#define _DERIVATIVESH_
+#ifndef _PADE6H_
+#define _PADE6H_
 
 #include <math.h>
 #include <cstring>

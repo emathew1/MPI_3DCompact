@@ -1,23 +1,14 @@
-#ifndef _FILTERH_
-#define _FILTERH_
+#ifndef _COMPACT8FILTERH_
+#define _COMPACT8FILTERH_
 
 #include <math.h>
 #include <cstring>
 #include <iostream>
-#include "AbstractDerivatives.hpp"
-#include "Domain.hpp"
-#include "BC.hpp"
-#include "Utils.hpp"
-#include "Macros.hpp"
+#include "AbstractFilter.hpp"
 
-class Filter{
+class Compact8Filter: public AbstractFilter{
 
     public:
-	int Nx, Ny, Nz, N;
-
-        int pxSize[3], pySize[3], pzSize[3];
-        int pxStart[3], pyStart[3], pzStart[3];
-        int pxEnd[3], pyEnd[3], pzEnd[3];
 
  	double alphaF;	
 	double a0_8, a1_8, a2_8, a3_8, a4_8;
@@ -28,13 +19,8 @@ class Filter{
 	double b00, b01, b02, b03, b04;
 	double c00, c01, c02, c03, c04;
 
-	double *diagF, *offlowerF, *offupperF;
-	
-	AbstractDerivatives::Direct currentDir;
-	BC::BCType bcType;
 
-
-    Filter(double alphaF, Domain *dom, BC::BCType bcType, AbstractDerivatives::Direct currentDir){
+    Compact8Filter(double alphaF, Domain *dom, BC::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
 	this->Nx = dom->gNx;

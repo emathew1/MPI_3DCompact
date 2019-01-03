@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o
+OBJECTS  = Compact8Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o
 
 default: MPI_3DCompact
 
@@ -39,13 +39,13 @@ SpongeBC.o: SpongeBC.cpp SpongeBC.hpp Domain.hpp BC.hpp Macros.hpp IdealGas.hpp 
 AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.hpp AbstractCSolver.hpp Domain.hpp Pade6.hpp Adt.hpp
 	$(CC) $(CFLAGS) -c $<
 
-Filter.o: Filter.cpp Filter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
+Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp
+CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Pade6.cpp Compact8Filter.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp

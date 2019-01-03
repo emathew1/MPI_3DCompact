@@ -1,8 +1,8 @@
-#include "Filter.hpp"
+#include "Compact8Filter.hpp"
 
 using namespace std;
 
-void Filter::multRHSPeriodicFilter(double *phi, double *RHSvec){
+void Compact8Filter::multRHSPeriodicFilter(double *phi, double *RHSvec){
 
     double cc0 = a0_8;
     double cc1 = a1_8/2.0;
@@ -61,7 +61,7 @@ void Filter::multRHSPeriodicFilter(double *phi, double *RHSvec){
     }
 }
 
-void Filter::multRHSDirichletFilter(double *phi, double *RHSvec){
+void Compact8Filter::multRHSDirichletFilter(double *phi, double *RHSvec){
 
     double aa0 = a0_6;
     double aa1 = a1_6/2.0;
@@ -95,7 +95,7 @@ void Filter::multRHSDirichletFilter(double *phi, double *RHSvec){
     }
 }
 
-void Filter::FilterPeriodic(double *phi, double *phiF){
+void Compact8Filter::FilterPeriodic(double *phi, double *phiF){
 
     double RHSvec[N];
     multRHSPeriodicFilter(phi, RHSvec);
@@ -103,7 +103,7 @@ void Filter::FilterPeriodic(double *phi, double *phiF){
 
 }
 
-void Filter::FilterDirichlet(double *phi, double *phiF){
+void Compact8Filter::FilterDirichlet(double *phi, double *phiF){
     
 
     double RHSvec[N];
@@ -116,7 +116,7 @@ void Filter::FilterDirichlet(double *phi, double *phiF){
 
 }
 
-void Filter::compactFilter(double *phi, double *phiF){
+void Compact8Filter::compactFilter(double *phi, double *phiF){
 
     if(bcType == BC::PERIODIC_SOLVE){
 	FilterPeriodic(phi, phiF);
@@ -126,7 +126,7 @@ void Filter::compactFilter(double *phi, double *phiF){
 
 }
 
-void Filter::filterField(double *dataIn, double *dataOut){
+void Compact8Filter::filterField(double *dataIn, double *dataOut){
 
 
     if(currentDir == AbstractDerivatives::DIRX){

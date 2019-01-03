@@ -11,6 +11,7 @@
 #include "PngWriter.hpp"
 #include "CurvilinearInterpolator.hpp"
 #include "Pade6.hpp"
+#include "Compact8Filter.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -106,7 +107,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	//Alias'd derivative objects
 	AbstractDerivatives *derivXi1, *derivXi2, *derivXi3;
-	Filter *filtXi1, *filtXi2, *filtXi3;
+	AbstractFilter *filtXi1, *filtXi2, *filtXi3;
 
 	//Constructor to use for this class...
 	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
@@ -158,9 +159,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    derivXi3 = derivZ;
 
 	    //Initialize the filters we're going to use for each direction
-	    filtX  = new Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
-	    filtY  = new Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
-	    filtZ  = new Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    filtX  = new Compact8Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    filtY  = new Compact8Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    filtZ  = new Compact8Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    filtXi1 = filtX;
 	    filtXi2 = filtY;

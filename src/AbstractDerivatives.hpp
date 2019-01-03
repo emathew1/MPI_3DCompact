@@ -44,7 +44,8 @@ class AbstractDerivatives{
 	//transformed periodic boundaries for rhsBandwidth of 7
 	virtual void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm3, double *Nm2, double *Nm1, double *Np1, double *Np2, double *Np3) = 0;
 
-	virtual void calc2ndDerivField(double *dataIn, double *dataOut) = 0;
+	//Not necessary with the current solver that just does two 1st derivs
+	//virtual void calc2ndDerivField(double *dataIn, double *dataOut) = 0;
 	
 
 };

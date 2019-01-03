@@ -3,7 +3,7 @@
 
 #include "C2Decomp.hpp"
 #include "AbstractDerivatives.hpp"
-#include "Filter.hpp"
+#include "AbstractFilter.hpp"
 #include "IdealGas.hpp"
 #include "TimeStepping.hpp"
 #include "AbstractSingleBlockMesh.hpp"
@@ -46,7 +46,7 @@ class AbstractCSolver{
 	TimeStepping *ts;
 	IdealGas *ig;
         AbstractDerivatives *derivX, *derivY, *derivZ;
-        Filter *filtX, *filtY, *filtZ;
+        AbstractFilter *filtX, *filtY, *filtZ;
 
 	//Common Msh Stuff if needed
 	AbstractSingleBlockMesh *msh;
