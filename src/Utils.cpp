@@ -387,3 +387,12 @@ double getHexaVolumeWithPoint(double vertex[8][3], double P[3]){
 
     return volume_hexa;
 };
+
+
+void getDataFromIndex(double *f_in, int *index, int N, double *f_out){
+
+    for(int ip = 0; ip < N; ip++){
+	f_out[ip] = f_in[index[ip]];
+    }
+
+};

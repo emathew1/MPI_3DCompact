@@ -393,5 +393,5 @@ void Pade6::Compact2ndDirichlet(double *phi, double *dphidy){
 }
 
 double Pade6::calcNeumann(double *f){
-    return (f[1]*360.0 - f[2]*450.0 + f[3]*400.0 - f[4]*225.0 + f[5]*72.0 - f[6]*10.0)/147.0;   
+    return (f[0]*360.0 - f[1]*450.0 + f[2]*400.0 - f[3]*225.0 + f[4]*72.0 - f[5]*10.0)/147.0;   
 }

@@ -43,5 +43,6 @@ bool isPointInHexa(double p[3], double vertex[8][3]);
 double getHexaVolume(double vertex[8][3]);
 double getHexaVolumeWithPoint(double vertex[8][3], double P[3]);
 
+void getDataFromIndex(double *f_in, int *index, int N, double *f_out);
 
 #endif
