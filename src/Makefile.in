@@ -7,7 +7,7 @@ AR = /usr/bin/ar rv
 RANLIB = /usr/bin/ar -ts
 
 LIB = /usr/lib 
-LIBF = -lpng -lstdc++
+LIBF = -lpng -lstdc++ -lboost_program_options
 INC = /usr/include
 
 DECOMP_DIR = ./C2Decomp
