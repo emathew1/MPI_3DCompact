@@ -15,6 +15,7 @@ using namespace std;
 #include "TimeStepping.hpp"
 #include "Domain.hpp"
 #include "BC.hpp" 
+#include "Options.hpp"
 
 #include "AbstractCSolver.hpp"
 #include "CurvilinearCSolver.hpp"
@@ -49,7 +50,11 @@ int main(int argc, char *argv[]){
 	cout << endl;
     }
  
+    //Have the root rank parse the input file and broadcast it out...
+    Options *opt = new Options(mpiRank);
 
+
+/*
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
@@ -285,6 +290,8 @@ int main(int argc, char *argv[]){
 
 
     rk->executeSolverLoop();  
+*/
+
 
     //Now lets kill MPI
     MPI_Finalize();

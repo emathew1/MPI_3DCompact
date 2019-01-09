@@ -1,0 +1,48 @@
+#Inputs for MPI_3DCompact...
+
+#Information about stepping...
+[TIMESTEPPING]
+CFL 	    = 0.5
+MAXTIME     = 3000.0
+MAXTIMESTEP = 25000
+FILTERSTEP  = 1
+CHECKSTEP   = 1
+DUMPSTEP    = 2000
+IMAGESTEP   = 50
+
+#Boundary Condition Information
+[BC]
+BCXTYPE = PERIODIC_SOLVE
+BCYTYPE = DIRICHLET_SOLVE
+BCZTYPE = PERIODIC_SOLVE
+
+BCX0 = INTERNALLY_PERIODIC
+BCX1 = INTERNALLY_PERIODIC
+BCY0 = ADIABATIC_WALL
+BCY1 = CYL_CURVILINEARSPONGE
+BCZ0 = PERIODIC
+BCZ1 = PERIODIC
+
+#Mesh size information if not from a restart
+[DOMAIN]
+NX = 165
+NY = 110
+NZ = 48
+
+#MPI decomposition of the mesh, double zeros tries to figure out the best
+[PENCILDECOMP]
+PROW = 0
+PCOL = 0
+
+#Solver specific items
+[SOLVER]
+ALPHAF = 0.45
+MU_REF = 0.001
+USETIMING = FALSE
+
+#If running from a restart file
+[RESTART]
+FROMRESTART = FALSE
+#FILENAME = ...
+
+
