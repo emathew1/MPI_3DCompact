@@ -2,6 +2,7 @@
 
 #Information about stepping...
 [TIMESTEPPING]
+TSTYPE	    = CONST_CFL
 CFL 	    = 0.5
 MAXTIME     = 3000.0
 MAXTIMESTEP = 25000

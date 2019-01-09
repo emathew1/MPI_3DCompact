@@ -8,6 +8,7 @@
 #include <string>
 #include <boost/program_options.hpp>
 
+#include "TimeStepping.hpp"
 #include "BC.hpp"
 
 using namespace std;
@@ -24,7 +25,9 @@ class Options{
 	int root;
 
 	//Time Stepping Information
-	double CFL, maxTime;
+	TimeStepping::TimeSteppingType TSType;
+	string TSType_str;
+	double CFL, dt, maxTime;
 	int maxTimeStep, filterStep, checkStep, dumpStep, imageStep;
 
 	//Boundary Condition Stuff
@@ -60,7 +63,9 @@ class Options{
 	po::options_description input("Input Parameters");
 
 	input.add_options()
+	    ("TIMESTEPPING.TSTYPE",	 po::value<string>(&TSType_str), "Time Stepping Type")
 	    ("TIMESTEPPING.CFL", 	 po::value<double>(&CFL), "CFL Number")
+	    ("TIMESTEPPING.DT", 	 po::value<double>(&dt), "Time Step Size")
 	    ("TIMESTEPPING.MAXTIME",     po::value<double>(&maxTime), "Max Time")
 	    ("TIMESTEPPING.MAXTIMESTEP", po::value<int>(&maxTimeStep), "Max Time Step")
 	    ("TIMESTEPPING.FILTERSTEP",  po::value<int>(&filterStep), "Filter Step")
@@ -99,7 +104,15 @@ class Options{
 	//Should also probably check that these are positive
 
 	//MISSING A THING FOR WHAT KIND OF TIMESTEPPING IT IS (CONST CFL OR DT)
-	checkValue<double>("TIMESTEPPING.CFL", "CFL", CFL, 0.5);
+	parseTSTypeFromString("TIMESTEPPING.TSTYPE", TSType_str, TSType);
+	if(TSType == TimeSteppingType::CONST_DT){
+	    forceValue<double>("TIMESTEPPING.DT", "DT", dt);
+	    CFL = -1.0;
+	}else if(TSType == TimeSteppingType::CONST_CFL){
+	    checkValue<double>("TIMESTEPPING.CFL", "CFL", CFL, 0.5);
+	    dt = -1.0;
+	}
+
 	checkValue<double>("TIMESTEPPING.MAXTIME", "maxTime", maxTime, 1000);
 	checkValue<int>(   "TIMESTEPPING.MAXTIMESTEP", "maxTimeStep", maxTimeStep, 10000);
 	checkValue<int>(   "TIMESTEPPING.FILTERSTEP", "filterStep", filterStep, 1);
@@ -165,6 +178,29 @@ class Options{
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
 	}
     }
+
+    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType currentType){
+
+	if(vm.count(vmKey)){
+	    
+	    if(strcmp(inString.c_str(), "CONST_CFL")==0){
+		currentType = TimeStepping::CONST_CFL;
+	    }else if(strcmp(inString.c_str(), "CONST_DT")==0){
+	 	currentType = TimeStepping::CONST_DT;
+	    }else{
+		cout << " > UNKNOWN TIMESTEPPING TYPE SPECIFIED: " << inString << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }
+
+	    cout << " > " << vmKey << " = " << inString << endl;
+	    
+	}else{
+	    cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}
+    }
+
+
 
     void parseBCTypeFromString(string vmKey, string inString, BC::BCType currentType){
 
