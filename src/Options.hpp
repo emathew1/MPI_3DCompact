@@ -105,10 +105,10 @@ class Options{
 
 	//MISSING A THING FOR WHAT KIND OF TIMESTEPPING IT IS (CONST CFL OR DT)
 	parseTSTypeFromString("TIMESTEPPING.TSTYPE", TSType_str, TSType);
-	if(TSType == TimeSteppingType::CONST_DT){
+	if(TSType == TimeStepping::CONST_DT){
 	    forceValue<double>("TIMESTEPPING.DT", "DT", dt);
 	    CFL = -1.0;
-	}else if(TSType == TimeSteppingType::CONST_CFL){
+	}else if(TSType == TimeStepping::CONST_CFL){
 	    checkValue<double>("TIMESTEPPING.CFL", "CFL", CFL, 0.5);
 	    dt = -1.0;
 	}
@@ -158,7 +158,7 @@ class Options{
     }	
 
     template<typename T>
-    void checkValue(string vmKey, string informalName, T inputContainer, T defaultVal){
+    void checkValue(string vmKey, string informalName, T &inputContainer, T defaultVal){
 
 	if(vm.count(vmKey)){
 	    cout << " > " << informalName << " = " << inputContainer << endl;
@@ -179,10 +179,11 @@ class Options{
 	}
     }
 
-    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType currentType){
+    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType &currentType){
 
 	if(vm.count(vmKey)){
-	    
+	  
+    
 	    if(strcmp(inString.c_str(), "CONST_CFL")==0){
 		currentType = TimeStepping::CONST_CFL;
 	    }else if(strcmp(inString.c_str(), "CONST_DT")==0){
@@ -202,7 +203,7 @@ class Options{
 
 
 
-    void parseBCTypeFromString(string vmKey, string inString, BC::BCType currentType){
+    void parseBCTypeFromString(string vmKey, string inString, BC::BCType &currentType){
 
 	if(vm.count(vmKey)){
 	    
@@ -223,7 +224,7 @@ class Options{
 	}
     }
 
-    void parseBCKindFromString(string vmKey, string inString, BC::BCKind currentType){
+    void parseBCKindFromString(string vmKey, string inString, BC::BCKind &currentType){
 
 	if(vm.count(vmKey)){
 	    
