@@ -81,6 +81,15 @@ class Options{
 	    ("BC.BCY1",			 po::value<string>(&bcY1_str), "BC Kind for Y1")
 	    ("BC.BCZ0",			 po::value<string>(&bcZ0_str), "BC Kind for Z0")
 	    ("BC.BCZ1",			 po::value<string>(&bcZ1_str), "BC Kind for Z1")
+	    ("BC.PERIODICDISPX_X", 	 po::value<double>(&periodicDisp[0][0]), "Periodic Displacement for X0 face to X1 face in the x-direction")
+	    ("BC.PERIODICDISPX_Y", 	 po::value<double>(&periodicDisp[0][1]), "Periodic Displacement for X0 face to X1 face in the y-direction")
+	    ("BC.PERIODICDISPX_Z", 	 po::value<double>(&periodicDisp[0][2]), "Periodic Displacement for X0 face to X1 face in the z-direction")
+	    ("BC.PERIODICDISPY_X", 	 po::value<double>(&periodicDisp[1][0]), "Periodic Displacement for Y0 face to Y1 face in the x-direction")
+	    ("BC.PERIODICDISPY_Y", 	 po::value<double>(&periodicDisp[1][1]), "Periodic Displacement for Y0 face to Y1 face in the y-direction")
+	    ("BC.PERIODICDISPY_Z", 	 po::value<double>(&periodicDisp[1][2]), "Periodic Displacement for Y0 face to Y1 face in the z-direction")
+	    ("BC.PERIODICDISPZ_X", 	 po::value<double>(&periodicDisp[2][0]), "Periodic Displacement for Z0 face to Z1 face in the x-direction")
+	    ("BC.PERIODICDISPZ_Y", 	 po::value<double>(&periodicDisp[2][1]), "Periodic Displacement for Z0 face to Z1 face in the y-direction")
+	    ("BC.PERIODICDISPZ_Z", 	 po::value<double>(&periodicDisp[2][2]), "Periodic Displacement for Z0 face to Z1 face in the z-direction")
 	    ("DOMAIN.NX",                po::value<int>(&Nx), "Number of points in X-Direction")
 	    ("DOMAIN.NY",                po::value<int>(&Ny), "Number of points in Y-Direction")
 	    ("DOMAIN.NZ",                po::value<int>(&Nz), "Number of points in Z-Direction")
@@ -124,6 +133,12 @@ class Options{
 	forceValue<int>("DOMAIN.NY", "Ny", Ny);
 	forceValue<int>("DOMAIN.NZ", "Nz", Nz);
 
+	//As of right now we're restricted to Nx|Ny|Nz > 10...
+	if(Nx <= 10 || Ny <= 10 || Nz <= 10){
+	    cout << " > Number of grid points in any direction must be greater than 10! " << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}
+
 	checkValue<int>("PENCILDECOMP.PROW", "pRow", pRow, 0);
 	checkValue<int>("PENCILDECOMP.PCOL", "pCol", pCol, 0);
 
@@ -147,7 +162,35 @@ class Options{
 	parseBCKindFromString("BC.BCZ0", bcZ0_str, bcZ0);
 	parseBCKindFromString("BC.BCZ1", bcZ1_str, bcZ1);
 
-	//NEED TO ADD IN PERIODIC DISPLACEMENTS...
+	//PERIODIC BC DISPLACEMENTS...
+	if(bcX0 == BC::PERIODIC && bcX1 == BC::PERIODIC){
+	    forceValue<double>("BC.PERIODICDISPX_X", "x0 to x1 periodic displacement in x", periodicDisp[0][0]); 
+	    forceValue<double>("BC.PERIODICDISPX_Y", "x0 to x1 periodic displacement in y", periodicDisp[0][1]); 
+	    forceValue<double>("BC.PERIODICDISPX_Z", "x0 to x1 periodic displacement in z", periodicDisp[0][2]); 
+	}else if((bcX0 == BC::PERIODIC && bcX1 != BC::PERIODIC) || (bcX0 != BC::PERIODIC && bcX1 == BC::PERIODIC)){
+	    cout << " > " << " BC Mismatch for X0-X1 Faces! " << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}  
+
+	if(bcY0 == BC::PERIODIC && bcY1 == BC::PERIODIC){
+	    forceValue<double>("BC.PERIODICDISPY_X", "y0 to y1 periodic displacement in x", periodicDisp[1][0]); 
+	    forceValue<double>("BC.PERIODICDISPY_Y", "y0 to y1 periodic displacement in y", periodicDisp[1][1]); 
+	    forceValue<double>("BC.PERIODICDISPY_Z", "y0 to y1 periodic displacement in z", periodicDisp[1][2]); 
+	}else if((bcY0 == BC::PERIODIC && bcY1 != BC::PERIODIC) || (bcY0 != BC::PERIODIC && bcY1 == BC::PERIODIC)){
+	    cout << " > " << " BC Mismatch for Y0-Y1 Faces! " << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}  
+
+	if(bcZ0 == BC::PERIODIC && bcZ1 == BC::PERIODIC){
+	    forceValue<double>("BC.PERIODICDISPZ_X", "z0 to z1 periodic displacement in x", periodicDisp[2][0]); 
+	    forceValue<double>("BC.PERIODICDISPZ_Y", "z0 to z1 periodic displacement in y", periodicDisp[2][1]); 
+	    forceValue<double>("BC.PERIODICDISPZ_Z", "z0 to z1 periodic displacement in z", periodicDisp[2][2]); 
+	}else if((bcZ0 == BC::PERIODIC && bcZ1 != BC::PERIODIC) || (bcZ0 != BC::PERIODIC && bcZ1 == BC::PERIODIC)){
+	    cout << " > " << " BC Mismatch for Z0-Z1 Faces! " << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}  
+
+	//Do boundary condition validation to make sure things are peachy...
 
 	//FROM RESTART STUFF DOES NOTHING RIGHT NOW...
       }
@@ -179,88 +222,10 @@ class Options{
 	}
     }
 
-    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType &currentType){
-
-	if(vm.count(vmKey)){
-	  
-    
-	    if(strcmp(inString.c_str(), "CONST_CFL")==0){
-		currentType = TimeStepping::CONST_CFL;
-	    }else if(strcmp(inString.c_str(), "CONST_DT")==0){
-	 	currentType = TimeStepping::CONST_DT;
-	    }else{
-		cout << " > UNKNOWN TIMESTEPPING TYPE SPECIFIED: " << inString << endl;
-		MPI_Abort(MPI_COMM_WORLD, -10);
-	    }
-
-	    cout << " > " << vmKey << " = " << inString << endl;
-	    
-	}else{
-	    cout << " > " << vmKey << " = " << inString << " not specified " << endl;
-	    MPI_Abort(MPI_COMM_WORLD, -10);	    
-	}
-    }
-
-
-
-    void parseBCTypeFromString(string vmKey, string inString, BC::BCType &currentType){
-
-	if(vm.count(vmKey)){
-	    
-	    if(strcmp(inString.c_str(), "PERIODIC_SOLVE")==0){
-		currentType = BC::PERIODIC_SOLVE;
-	    }else if(strcmp(inString.c_str(), "DIRICHLET_SOLVE")==0){
-	 	currentType = BC::DIRICHLET_SOLVE;
-	    }else{
-		cout << " > UNKNOWN BOUNDARY TYPE SPECIFIED: " << inString << endl;
-		MPI_Abort(MPI_COMM_WORLD, -10);
-	    }
-
-	    cout << " > " << vmKey << " = " << inString << endl;
-	    
-	}else{
-	    cout << " > " << vmKey << " = " << inString << " not specified " << endl;
-	    MPI_Abort(MPI_COMM_WORLD, -10);	    
-	}
-    }
-
-    void parseBCKindFromString(string vmKey, string inString, BC::BCKind &currentType){
-
-	if(vm.count(vmKey)){
-	    
-	    if(strcmp(inString.c_str(), "INTERNALLY_PERIODIC")==0){
-		currentType = BC::INTERNALLY_PERIODIC;
-	    }else if(strcmp(inString.c_str(), "PERIODIC")==0){
-	 	currentType = BC::PERIODIC;
-	    }else if(strcmp(inString.c_str(), "ADIABATIC_WALL")==0){
-	 	currentType = BC::ADIABATIC_WALL;
-	    }else if(strcmp(inString.c_str(), "SPONGE")==0){
-	 	currentType = BC::SPONGE;
-	    }else if(strcmp(inString.c_str(), "RECT_CURVILINEARSPONGE")==0){
-	 	currentType = BC::RECT_CURVILINEARSPONGE;
-	    }else if(strcmp(inString.c_str(), "CYL_CURVILINEARSPONGE")==0){
-	 	currentType = BC::CYL_CURVILINEARSPONGE;
-	    }else if(strcmp(inString.c_str(), "SPHERICAL_CURVILINEARSPONGE")==0){
-	 	currentType = BC::SPHERICAL_CURVILINEARSPONGE;
-	    }else if(strcmp(inString.c_str(), "CONST_T_WALL")==0){
-	 	currentType = BC::CONST_T_WALL;
-	    }else if(strcmp(inString.c_str(), "MOVING_ADIABATIC_WALL")==0){
-	 	currentType = BC::MOVING_ADIABATIC_WALL;
-	    }else if(strcmp(inString.c_str(), "INLET")==0){
-	 	currentType = BC::INLET;
-	    }else{
-		cout << " > UNKNOWN BOUNDARY TYPE SPECIFIED: " << inString << endl;
-		MPI_Abort(MPI_COMM_WORLD, -10);
-	    }
-
-	    cout << " > " << vmKey << " = " << inString << endl;
-
-	}else{
-	    cout << " > " << vmKey << " = " << inString << " not specified" << endl;
-	    MPI_Abort(MPI_COMM_WORLD, -10);	    
-	}
-    }
-
+    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType &currentType);
+    void parseBCTypeFromString(string vmKey, string inString, BC::BCType &currentType);
+    void parseBCKindFromString(string vmKey, string inString, BC::BCKind &currentType);
+    void bcValidation();
 
 };
 
