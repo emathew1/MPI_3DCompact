@@ -71,3 +71,44 @@ void Options::parseBCKindFromString(string vmKey, string inString, BC::BCKind &c
     }
 }
 
+void Options::bcValidation(){
+
+   //do X Direction first
+   if(bcXType == BC::PERIODIC_SOLVE){
+	
+	//If not periodic or internally periodic
+	if(!(bcX0 == BC::PERIODIC || bcX0 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcXType PERIODIC_SOLVE must have bcX0 be PERIODIC or INTERNALLY PERIODIC, currently bcX0 = " << bcX0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If not periodic or internally periodic
+	if(!(bcX1 == BC::PERIODIC || bcX1 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcXType PERIODIC_SOLVE must have bcX1 be PERIODIC or INTERNALLY PERIODIC, currently bcX1 = " << bcX1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If periodic and internally periodic at opposite ends
+	if((bcX0 == BC::PERIODIC && bcX1 == BC::INTERNALLY_PERIODIC) || (bcX0 == BC::INTERNALLY_PERIODIC && bcX1 == BC::PERIODIC)){
+	    cout << " > bcX0 and bcX1 have mismatched periodic conditions: bcX0 = " << bcX0_str << ", bcX1 = " << bcX1_str << endl; 
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	} 
+   }
+
+   if(bcXType == BC::DIRICHLET_SOLVE){
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcX0 == BC::PERIODIC || bcX0 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcXType DIRICHLET_SOLVE cannot have bcX0 be PERIODIC or INTERNALLY PERIODIC, currently bcX0 = " << bcX0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcX1 == BC::PERIODIC || bcX1 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcXType DIRICHLET_SOLVE cannot have bcX1 be PERIODIC or INTERNALLY PERIODIC, currently bcX1 = " << bcX1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+   }
+
+   
+
+}

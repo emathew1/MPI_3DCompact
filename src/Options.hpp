@@ -191,6 +191,7 @@ class Options{
 	}  
 
 	//Do boundary condition validation to make sure things are peachy...
+	bcValidation();
 
 	//FROM RESTART STUFF DOES NOTHING RIGHT NOW...
       }
