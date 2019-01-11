@@ -38,6 +38,11 @@ class Options{
 	BC::BCKind bcX0, bcX1, bcY0, bcY1, bcZ0, bcZ1;
 	double periodicDisp[3][3];
 
+	//SPONGE STUFF
+	string spongeType_str;
+	BC::BCKind spongeType;
+	double spongeP, spongeAvgT, spongeStrength, spongeLX, spongeLY, spongeLZ;  
+
 	//DOMAIN Information
 	int Nx, Ny, Nz;
 
@@ -50,6 +55,7 @@ class Options{
 
 	//Restart stuff
 	bool fromRestart;
+	bool pullOnlyGridFromRestart;
 	string filename;
 	int startingTimestep;
     
@@ -90,6 +96,13 @@ class Options{
 	    ("BC.PERIODICDISPZ_X", 	 po::value<double>(&periodicDisp[2][0]), "Periodic Displacement for Z0 face to Z1 face in the x-direction")
 	    ("BC.PERIODICDISPZ_Y", 	 po::value<double>(&periodicDisp[2][1]), "Periodic Displacement for Z0 face to Z1 face in the y-direction")
 	    ("BC.PERIODICDISPZ_Z", 	 po::value<double>(&periodicDisp[2][2]), "Periodic Displacement for Z0 face to Z1 face in the z-direction")
+	    ("SPONGE.TYPE",		 po::value<string>(&spongeType_str), "Type of sponge boundary")
+	    ("SPONGE.AVGTIME",		 po::value<double>(&spongeAvgT), "Sponge averaging time")
+	    ("SPONGE.PINF",		 po::value<double>(&spongeP), "Sponge back pressure")
+	    ("SPONGE.STRENGTH",		 po::value<double>(&spongeStrength), "Sponge strength")
+	    ("SPONGE.LX",		 po::value<double>(&spongeLX), "Sponge LX")
+	    ("SPONGE.LY",		 po::value<double>(&spongeLY), "Sponge LY")
+	    ("SPONGE.LZ",		 po::value<double>(&spongeLZ), "Sponge LZ")
 	    ("DOMAIN.NX",                po::value<int>(&Nx), "Number of points in X-Direction")
 	    ("DOMAIN.NY",                po::value<int>(&Ny), "Number of points in Y-Direction")
 	    ("DOMAIN.NZ",                po::value<int>(&Nz), "Number of points in Z-Direction")
@@ -170,6 +183,10 @@ class Options{
 	}else if((bcX0 == BC::PERIODIC && bcX1 != BC::PERIODIC) || (bcX0 != BC::PERIODIC && bcX1 == BC::PERIODIC)){
 	    cout << " > " << " BC Mismatch for X0-X1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}else{
+	    periodicDisp[0][0] = 0.0;
+	    periodicDisp[0][1] = 0.0;
+	    periodicDisp[0][2] = 0.0;
 	}  
 
 	if(bcY0 == BC::PERIODIC && bcY1 == BC::PERIODIC){
@@ -179,6 +196,10 @@ class Options{
 	}else if((bcY0 == BC::PERIODIC && bcY1 != BC::PERIODIC) || (bcY0 != BC::PERIODIC && bcY1 == BC::PERIODIC)){
 	    cout << " > " << " BC Mismatch for Y0-Y1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}else{
+	    periodicDisp[1][0] = 0.0;
+	    periodicDisp[1][1] = 0.0;
+	    periodicDisp[1][2] = 0.0;
 	}  
 
 	if(bcZ0 == BC::PERIODIC && bcZ1 == BC::PERIODIC){
@@ -188,6 +209,10 @@ class Options{
 	}else if((bcZ0 == BC::PERIODIC && bcZ1 != BC::PERIODIC) || (bcZ0 != BC::PERIODIC && bcZ1 == BC::PERIODIC)){
 	    cout << " > " << " BC Mismatch for Z0-Z1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
+	}else{
+	    periodicDisp[2][0] = 0.0;
+	    periodicDisp[2][1] = 0.0;
+	    periodicDisp[2][2] = 0.0;
 	}  
 
 	//Do boundary condition validation to make sure things are peachy...

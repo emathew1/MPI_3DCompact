@@ -109,6 +109,84 @@ void Options::bcValidation(){
 	}
    }
 
+
+
+
+   //do Y Direction first
+   if(bcYType == BC::PERIODIC_SOLVE){
+	
+	//If not periodic or internally periodic
+	if(!(bcY0 == BC::PERIODIC || bcY0 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcYType PERIODIC_SOLVE must have bcY0 be PERIODIC or INTERNALLY PERIODIC, currently bcY0 = " << bcY0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If not periodic or internally periodic
+	if(!(bcY1 == BC::PERIODIC || bcY1 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcYType PERIODIC_SOLVE must have bcY1 be PERIODIC or INTERNALLY PERIODIC, currently bcY1 = " << bcY1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If periodic and internally periodic at opposite ends
+	if((bcY0 == BC::PERIODIC && bcY1 == BC::INTERNALLY_PERIODIC) || (bcY0 == BC::INTERNALLY_PERIODIC && bcY1 == BC::PERIODIC)){
+	    cout << " > bcY0 and bcY1 have mismatched periodic conditions: bcY0 = " << bcY0_str << ", bcY1 = " << bcY1_str << endl; 
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	} 
+   }
+
+   if(bcYType == BC::DIRICHLET_SOLVE){
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcY0 == BC::PERIODIC || bcY0 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcYType DIRICHLET_SOLVE cannot have bcY0 be PERIODIC or INTERNALLY PERIODIC, currently bcY0 = " << bcY0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcY1 == BC::PERIODIC || bcY1 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcYType DIRICHLET_SOLVE cannot have bcY1 be PERIODIC or INTERNALLY PERIODIC, currently bcY1 = " << bcY1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+   }
+
+
+   //do Z Direction first
+   if(bcZType == BC::PERIODIC_SOLVE){
+	
+	//If not periodic or internally periodic
+	if(!(bcZ0 == BC::PERIODIC || bcZ0 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcZType PERIODIC_SOLVE must have bcZ0 be PERIODIC or INTERNALLY PERIODIC, currently bcZ0 = " << bcZ0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If not periodic or internally periodic
+	if(!(bcZ1 == BC::PERIODIC || bcZ1 == BC::INTERNALLY_PERIODIC)){
+	    cout << " > bcZType PERIODIC_SOLVE must have bcZ1 be PERIODIC or INTERNALLY PERIODIC, currently bcZ1 = " << bcZ1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If periodic and internally periodic at opposite ends
+	if((bcZ0 == BC::PERIODIC && bcZ1 == BC::INTERNALLY_PERIODIC) || (bcZ0 == BC::INTERNALLY_PERIODIC && bcZ1 == BC::PERIODIC)){
+	    cout << " > bcZ0 and bcZ1 have mismatched periodic conditions: bcZ0 = " << bcZ0_str << ", bcZ1 = " << bcZ1_str << endl; 
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	} 
+   }
+
+   if(bcZType == BC::DIRICHLET_SOLVE){
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcZ0 == BC::PERIODIC || bcZ0 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcZType DIRICHLET_SOLVE cannot have bcZ0 be PERIODIC or INTERNALLY PERIODIC, currently bcZ0 = " << bcZ0_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+
+	//If trying to use periodic conditions in dirichlet solve mode
+	if(bcZ1 == BC::PERIODIC || bcZ1 == BC::INTERNALLY_PERIODIC){
+	    cout << " > bcZType DIRICHLET_SOLVE cannot have bcZ1 be PERIODIC or INTERNALLY PERIODIC, currently bcZ1 = " << bcZ1_str << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+	}
+   }
+
+
+
    
 
 }
