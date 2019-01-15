@@ -10,6 +10,7 @@
 
 #include "TimeStepping.hpp"
 #include "BC.hpp"
+#include "SpongeBC.hpp"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -39,9 +40,11 @@ class Options{
 	double periodicDisp[3][3];
 
 	//SPONGE STUFF
-	string spongeType_str;
-	BC::BCKind spongeType;
-	double spongeP, spongeAvgT, spongeStrength, spongeLX, spongeLY, spongeLZ;  
+	string spongeKind_str;
+	SpongeBC::SpongeKind spongeKind;
+	double spongeP, spongeAvgT, spongeStrength, spongeRectXPerc, spongeRectYPerc, spongeRectZPerc;
+	int spongeCylAxisOrient;
+	double spongeCylAxisX, spongeCylAxisY, spongeCylAxisZ;  
 
 	//DOMAIN Information
 	int Nx, Ny, Nz;
@@ -96,13 +99,17 @@ class Options{
 	    ("BC.PERIODICDISPZ_X", 	 po::value<double>(&periodicDisp[2][0]), "Periodic Displacement for Z0 face to Z1 face in the x-direction")
 	    ("BC.PERIODICDISPZ_Y", 	 po::value<double>(&periodicDisp[2][1]), "Periodic Displacement for Z0 face to Z1 face in the y-direction")
 	    ("BC.PERIODICDISPZ_Z", 	 po::value<double>(&periodicDisp[2][2]), "Periodic Displacement for Z0 face to Z1 face in the z-direction")
-	    ("SPONGE.TYPE",		 po::value<string>(&spongeType_str), "Type of sponge boundary")
+	    ("SPONGE.KIND",		 po::value<string>(&spongeKind_str), "Type of sponge boundary")
 	    ("SPONGE.AVGTIME",		 po::value<double>(&spongeAvgT), "Sponge averaging time")
 	    ("SPONGE.PINF",		 po::value<double>(&spongeP), "Sponge back pressure")
 	    ("SPONGE.STRENGTH",		 po::value<double>(&spongeStrength), "Sponge strength")
-	    ("SPONGE.LX",		 po::value<double>(&spongeLX), "Sponge LX")
-	    ("SPONGE.LY",		 po::value<double>(&spongeLY), "Sponge LY")
-	    ("SPONGE.LZ",		 po::value<double>(&spongeLZ), "Sponge LZ")
+	    ("SPONGE.RECTXPERC",	 po::value<double>(&spongeRectXPerc), "Sponge Percent of Domain in X Direction")
+	    ("SPONGE.RECTYPERC",	 po::value<double>(&spongeRectYPerc), "Sponge Percent of Domain in Y Direction")
+	    ("SPONGE.RECTZPERC",	 po::value<double>(&spongeRectZPerc), "Sponge Percent of Domain in Z Direction")
+	    ("SPONGE.CYLAXIS_ORIENT",	 po::value<int>(&spongeCylAxisOrient), "Axis that the cylindrical sponge shape faces")
+	    ("SPONGE.CYLAXIS_X",	 po::value<double>(&spongeCylAxisX), "X-location of cylindrical sponge center")
+	    ("SPONGE.CYLAXIS_Y", 	 po::value<double>(&spongeCylAxisY), "Y-location of cylindrical sponge center")
+	    ("SPONGE.CYLAXIS_Z",	 po::value<double>(&spongeCylAxisZ), "Z-location of cylindrical sponge center")	
 	    ("DOMAIN.NX",                po::value<int>(&Nx), "Number of points in X-Direction")
 	    ("DOMAIN.NY",                po::value<int>(&Ny), "Number of points in Y-Direction")
 	    ("DOMAIN.NZ",                po::value<int>(&Nz), "Number of points in Z-Direction")
@@ -218,6 +225,18 @@ class Options{
 	//Do boundary condition validation to make sure things are peachy...
 	bcValidation();
 
+	//Lets collect and parse all of the sponge stuff...
+	if(bcX0 == BC::SPONGE || \
+	   bcX1 == BC::SPONGE || \
+	   bcY0 == BC::SPONGE || \
+	   bcY1 == BC::SPONGE || \
+	   bcZ0 == BC::SPONGE || \
+	   bcZ1 == BC::SPONGE){
+
+	    parseSpongeFromString("SPONGE.KIND", spongeKind_str, spongeKind); 
+
+	}
+
 	//FROM RESTART STUFF DOES NOTHING RIGHT NOW...
       }
 
@@ -252,6 +271,8 @@ class Options{
     void parseBCTypeFromString(string vmKey, string inString, BC::BCType &currentType);
     void parseBCKindFromString(string vmKey, string inString, BC::BCKind &currentType);
     void bcValidation();
+
+    void parseSpongeFromString(string vmKey, string inString, SpongeBC::SpongeKind &spongeKind);
 
 };
 

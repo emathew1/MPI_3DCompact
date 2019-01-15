@@ -46,12 +46,6 @@ void Options::parseBCKindFromString(string vmKey, string inString, BC::BCKind &c
             currentType = BC::ADIABATIC_WALL;
         }else if(strcmp(inString.c_str(), "SPONGE")==0){
             currentType = BC::SPONGE;
-        }else if(strcmp(inString.c_str(), "RECT_CURVILINEARSPONGE")==0){
-            currentType = BC::RECT_CURVILINEARSPONGE;
-        }else if(strcmp(inString.c_str(), "CYL_CURVILINEARSPONGE")==0){
-            currentType = BC::CYL_CURVILINEARSPONGE;
-        }else if(strcmp(inString.c_str(), "SPHERICAL_CURVILINEARSPONGE")==0){
-            currentType = BC::SPHERICAL_CURVILINEARSPONGE;
         }else if(strcmp(inString.c_str(), "CONST_T_WALL")==0){
             currentType = BC::CONST_T_WALL;
         }else if(strcmp(inString.c_str(), "MOVING_ADIABATIC_WALL")==0){
@@ -185,8 +179,26 @@ void Options::bcValidation(){
 	}
    }
 
-
-
-   
-
 }
+
+void Options::parseSpongeFromString(string vmKey, string inString, SpongeBC::SpongeKind &spongeKind){
+
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "RECTILINEAR")==0){
+            spongeKind = SpongeBC::RECTILINEAR;
+        }else if(strcmp(inString.c_str(), "CYLINDRICAL")==0){
+            spongeKind = SpongeBC::CYLINDRICAL;
+        }else{
+            cout << " > UNKNOWN SPONGE TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+
+        cout << " > " << vmKey << " = " << inString << endl;
+
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified" << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
+
+

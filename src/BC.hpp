@@ -12,9 +12,6 @@ class BC{
 	enum BCKind {PERIODIC,
 		     INTERNALLY_PERIODIC, 
 		     SPONGE,
-		     RECT_CURVILINEARSPONGE,
-		     CYL_CURVILINEARSPONGE,
-		     SPHERICAL_CURVILINEARSPONGE,
 		     ADIABATIC_WALL,
 		     CONST_T_WALL,
 		     MOVING_ADIABATIC_WALL,
@@ -55,7 +52,7 @@ class BC{
 		IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[0] = true;
 	    }else{
-		if(bcX0 == SPONGE || bcX0 == RECT_CURVILINEARSPONGE || bcX0 == CYL_CURVILINEARSPONGE){
+		if(bcX0 == SPONGE){
 		   IF_RANK0 std::cout << " > X0=SPG";
 		}else if(bcX0 == ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > X0=ABW";
@@ -63,7 +60,7 @@ class BC{
 		   IF_RANK0 std::cout << " > X0=MOW";
 		}
 
-		if(bcX1 == SPONGE || bcX1 == RECT_CURVILINEARSPONGE || bcX1 == CYL_CURVILINEARSPONGE){
+		if(bcX1 == SPONGE){
 		   IF_RANK0 std::cout << "----------------SPG=X1" << std::endl;
 		}else if(bcX1 == ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------ABW=X1" << std::endl;
@@ -79,7 +76,7 @@ class BC{
 	        IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[1] = true;
 	    }else{
-		if(bcY0 == SPONGE || bcY0 == RECT_CURVILINEARSPONGE || bcY0 == CYL_CURVILINEARSPONGE){
+		if(bcY0 == SPONGE){
 		   IF_RANK0 std::cout << " > Y0=SPG";
 		}else if(bcY0 == ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > Y0=ABW";
@@ -87,7 +84,7 @@ class BC{
 		   IF_RANK0 std::cout << " > Y0=MOW";
 		}
 
-		if(bcY1 == SPONGE || bcY1 == RECT_CURVILINEARSPONGE || bcY1 == CYL_CURVILINEARSPONGE){
+		if(bcY1 == SPONGE){
 		   IF_RANK0 std::cout << "----------------SPG=Y1" << std::endl;
 		}else if(bcY1 == ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------ABW=Y1" << std::endl;
@@ -103,7 +100,7 @@ class BC{
 		IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[2] = true;
 	    }else{
-		if(bcZ0 == SPONGE || bcZ0 == RECT_CURVILINEARSPONGE || bcZ0 == CYL_CURVILINEARSPONGE){
+		if(bcZ0 == SPONGE){
 		    IF_RANK0 std::cout << " > Z0=SPG";
 		}else if(bcZ0 == ADIABATIC_WALL){
 		    IF_RANK0 std::cout << " > Z0=ABW";
@@ -111,7 +108,7 @@ class BC{
 		    IF_RANK0 std::cout << " > Z0=MOW";
 		}
 
-		if(bcZ1 == SPONGE || bcZ1 == RECT_CURVILINEARSPONGE || bcZ1 == CYL_CURVILINEARSPONGE){
+		if(bcZ1 == SPONGE){
 		    IF_RANK0 std::cout << "----------------SPG=Z1" << std::endl;
 		}else if(bcZ1 == ADIABATIC_WALL){
 		    IF_RANK0 std::cout << "----------------ABW=Z1" << std::endl;

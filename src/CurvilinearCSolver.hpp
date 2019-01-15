@@ -92,7 +92,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *rankfield;
 
 	bool spongeFlag;
-	CurvilinearSpongeBC *spg; 
+	SpongeBC *spg; 
 
 	//See if we have to transpose for Neumann BC calculations
 	bool neumannLocalX, neumannLocalZ;

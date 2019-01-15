@@ -15,20 +15,14 @@ void CurvilinearCSolver::setInitialConditions(){
     spg = NULL;
 
     //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
-    if( bc->bcX0 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcX1 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcY0 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcY1 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcZ0 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcZ1 == BC::RECT_CURVILINEARSPONGE || \
-        bc->bcX0 == BC::CYL_CURVILINEARSPONGE  || \
-        bc->bcX1 == BC::CYL_CURVILINEARSPONGE  || \
-        bc->bcY0 == BC::CYL_CURVILINEARSPONGE  || \
-        bc->bcY1 == BC::CYL_CURVILINEARSPONGE  || \
-        bc->bcZ0 == BC::CYL_CURVILINEARSPONGE  || \
-        bc->bcZ1 == BC::CYL_CURVILINEARSPONGE  ){
+    if( bc->bcX0 == BC::SPONGE || \
+        bc->bcX1 == BC::SPONGE || \
+        bc->bcY0 == BC::SPONGE || \
+        bc->bcY1 == BC::SPONGE || \
+        bc->bcZ0 == BC::SPONGE || \
+        bc->bcZ1 == BC::SPONGE ){
         spongeFlag = true;
-        spg = new CurvilinearSpongeBC(msh, dom, ig, bc, c2d, mpiRank);
+        spg = new SpongeBC(msh, dom, ig, bc, c2d, mpiRank);
     }else{
         spongeFlag = false;
     }
@@ -759,7 +753,7 @@ void CurvilinearCSolver::postStepBCHandling(){
     //SPONGE BC//
     /////////////
 
-    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || bc->bcX0 == BC::CYL_CURVILINEARSPONGE){
+    if(bc->bcX0 == BC::SPONGE){
 	FOR_X0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -769,7 +763,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX0
     }
 
-    if(bc->bcX1 == BC::RECT_CURVILINEARSPONGE || bc->bcX1 == BC::CYL_CURVILINEARSPONGE){
+    if(bc->bcX1 == BC::SPONGE){
 	FOR_X1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -779,7 +773,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX1
     }   
 
-    if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE || bc->bcY0 == BC::CYL_CURVILINEARSPONGE){
+    if(bc->bcY0 == BC::SPONGE){
 	FOR_Y0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -789,7 +783,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY0
     }
 
-    if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE || bc->bcY1 == BC::CYL_CURVILINEARSPONGE ){
+    if(bc->bcY1 == BC::SPONGE){
 	FOR_Y1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -799,7 +793,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY1
     }
 
-    if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE || bc->bcZ0 == BC::CYL_CURVILINEARSPONGE ){
+    if(bc->bcZ0 == BC::SPONGE){
 	FOR_Z0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -809,7 +803,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORZ0
     }
 
-    if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE || bc->bcZ1 == BC::CYL_CURVILINEARSPONGE){
+    if(bc->bcZ1 == BC::SPONGE){
 	FOR_Z1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -844,7 +838,7 @@ void CurvilinearCSolver::updateSponge(){
 					 + spg->spongeRhoWAvg[ip]*spg->spongeRhoWAvg[ip])/spg->spongeRhoAvg[ip]);
 	}
 	
-        if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE || bc->bcX0 == BC::CYL_CURVILINEARSPONGE){
+        if(bc->bcX0 == BC::SPONGE){
 	    FOR_X0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -854,7 +848,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORX0
         }
 
-        if(bc->bcX1 == BC::RECT_CURVILINEARSPONGE || bc->bcX1 == BC::CYL_CURVILINEARSPONGE){
+        if(bc->bcX1 == BC::SPONGE){
 	    FOR_X1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -864,7 +858,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORX1
         }   
 
-        if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE || bc->bcY0 == BC::CYL_CURVILINEARSPONGE){
+        if(bc->bcY0 == BC::SPONGE){
 	    FOR_Y0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -874,7 +868,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORY0
         }
 
-        if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE || bc->bcY1 == BC::CYL_CURVILINEARSPONGE){
+        if(bc->bcY1 == BC::SPONGE){
 	    FOR_Y1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -884,7 +878,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORY1
         }
 
-        if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE || bc->bcZ0 == BC::CYL_CURVILINEARSPONGE){
+        if(bc->bcZ0 == BC::SPONGE){
 	    FOR_Z0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -895,7 +889,7 @@ void CurvilinearCSolver::updateSponge(){
 
         }
 
-        if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE || bc->bcZ1 == BC::CYL_CURVILINEARSPONGE ){
+        if(bc->bcZ1 == BC::SPONGE){
 	    FOR_Z1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
