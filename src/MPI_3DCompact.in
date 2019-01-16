@@ -1,5 +1,12 @@
 #Inputs for MPI_3DCompact...
 
+#If running from a restart file
+[RESTART]
+FROMRESTART = FALSE
+ONLYGRIDFROMRESTART = FALSE
+#FILENAME = dumpSolution.1000
+
+
 #Information about stepping...
 [TIMESTEPPING]
 TSTYPE	    = CONST_CFL
@@ -32,7 +39,11 @@ PERIODICDISPZ_Z = 3.1416
 #Stuff for sponge boundary conditions
 [SPONGE]
 KIND = CYLINDRICAL
-#...more stuff here
+CYLAXIS_ORIENT = 2
+CYLAXIS_X = 0
+CYLAXIS_Y = 0
+CYLAXIS_Z = 0
+RMIN = 8
 
 #Mesh size information if not from a restart
 [DOMAIN]
@@ -50,10 +61,5 @@ PCOL = 0
 ALPHAF = 0.45
 MU_REF = 0.001
 USETIMING = FALSE
-
-#If running from a restart file
-[RESTART]
-FROMRESTART = FALSE
-#FILENAME = ...
 
 

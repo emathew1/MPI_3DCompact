@@ -42,9 +42,11 @@ class Options{
 	//SPONGE STUFF
 	string spongeKind_str;
 	SpongeBC::SpongeKind spongeKind;
-	double spongeP, spongeAvgT, spongeStrength, spongeRectXPerc, spongeRectYPerc, spongeRectZPerc;
+	double spongeP, spongeAvgT, spongeStrength;
+	double spongeRectX0Perc, spongeRectY0Perc, spongeRectZ0Perc;
+	double spongeRectX1Perc, spongeRectY1Perc, spongeRectZ1Perc;
 	int spongeCylAxisOrient;
-	double spongeCylAxisX, spongeCylAxisY, spongeCylAxisZ;  
+	double spongeCylAxisX, spongeCylAxisY, spongeCylAxisZ, rMin;  
 
 	//DOMAIN Information
 	int Nx, Ny, Nz;
@@ -58,7 +60,7 @@ class Options{
 
 	//Restart stuff
 	bool fromRestart;
-	bool pullOnlyGridFromRestart;
+	bool onlyGridFromRestart;
 	string filename;
 	int startingTimestep;
     
@@ -103,13 +105,17 @@ class Options{
 	    ("SPONGE.AVGTIME",		 po::value<double>(&spongeAvgT), "Sponge averaging time")
 	    ("SPONGE.PINF",		 po::value<double>(&spongeP), "Sponge back pressure")
 	    ("SPONGE.STRENGTH",		 po::value<double>(&spongeStrength), "Sponge strength")
-	    ("SPONGE.RECTXPERC",	 po::value<double>(&spongeRectXPerc), "Sponge Percent of Domain in X Direction")
-	    ("SPONGE.RECTYPERC",	 po::value<double>(&spongeRectYPerc), "Sponge Percent of Domain in Y Direction")
-	    ("SPONGE.RECTZPERC",	 po::value<double>(&spongeRectZPerc), "Sponge Percent of Domain in Z Direction")
-	    ("SPONGE.CYLAXIS_ORIENT",	 po::value<int>(&spongeCylAxisOrient), "Axis that the cylindrical sponge shape faces")
+	    ("SPONGE.RECTX0PERC",	 po::value<double>(&spongeRectX0Perc), "Sponge Percent of Domain in X Direction - X0 Face")
+	    ("SPONGE.RECTY0PERC",	 po::value<double>(&spongeRectY0Perc), "Sponge Percent of Domain in Y Direction - Y0 Face")
+	    ("SPONGE.RECTZ0PERC",	 po::value<double>(&spongeRectZ0Perc), "Sponge Percent of Domain in Z Direction - Z0 Face")
+	    ("SPONGE.RECTX1PERC",	 po::value<double>(&spongeRectX1Perc), "Sponge Percent of Domain in X Direction - X1 Face")
+	    ("SPONGE.RECTY1PERC",	 po::value<double>(&spongeRectY1Perc), "Sponge Percent of Domain in Y Direction - Y1 Face")
+	    ("SPONGE.RECTZ1PERC",	 po::value<double>(&spongeRectZ1Perc), "Sponge Percent of Domain in Z Direction - Z1 Face")
+    	    ("SPONGE.CYLAXIS_ORIENT",	 po::value<int>(&spongeCylAxisOrient), "Axis that the cylindrical sponge shape faces")
 	    ("SPONGE.CYLAXIS_X",	 po::value<double>(&spongeCylAxisX), "X-location of cylindrical sponge center")
 	    ("SPONGE.CYLAXIS_Y", 	 po::value<double>(&spongeCylAxisY), "Y-location of cylindrical sponge center")
 	    ("SPONGE.CYLAXIS_Z",	 po::value<double>(&spongeCylAxisZ), "Z-location of cylindrical sponge center")	
+	    ("SPONGE.RMIN",		 po::value<double>(&rMin), "Minimum radius of cylinder sponge")	
 	    ("DOMAIN.NX",                po::value<int>(&Nx), "Number of points in X-Direction")
 	    ("DOMAIN.NY",                po::value<int>(&Ny), "Number of points in Y-Direction")
 	    ("DOMAIN.NZ",                po::value<int>(&Nz), "Number of points in Z-Direction")
@@ -119,6 +125,7 @@ class Options{
 	    ("SOLVER.MU_REF", 		 po::value<double>(&mu_ref), "Reference Viscosity")
 	    ("SOLVER.USETIMING",         po::value<bool>(&useTiming), "Report timing for different code sections")
 	    ("RESTART.FROMRESTART", 	 po::value<bool>(&fromRestart), "Do we start the simulation from a restart")
+	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
 	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file");
 	
 	po::store(po::parse_config_file(input_file, input), vm);    
@@ -166,11 +173,6 @@ class Options{
 	forceValue<double>("SOLVER.MU_REF", "mu_ref", mu_ref);
 	checkValue<bool>("SOLVER.USETIMING", "useTiming", useTiming, false);
 
-	checkValue<bool>("RESTART.FROMRESTART", "fromRestart", fromRestart, false);
-	if(fromRestart == true){
-	    forceValue<string>("RESTART.FILENAME", "filename", filename);
-	}
-	
 	//Parse from string...
 	parseBCTypeFromString("BC.BCXTYPE", bcXType_str, bcXType);
 	parseBCTypeFromString("BC.BCYTYPE", bcYType_str, bcYType);
@@ -234,10 +236,60 @@ class Options{
 	   bcZ1 == BC::SPONGE){
 
 	    parseSpongeFromString("SPONGE.KIND", spongeKind_str, spongeKind); 
+	    checkValue<double>("SPONGE.AVGTIME",  "spongeAvgT", spongeAvgT, 1.0);
+	    checkValue<double>("SPONGE.PINF",     "spongeP"   , spongeP, 1.0/1.4);
+	    checkValue<double>("SPONGE.STRENGTH", "spongeStrength", spongeStrength, 1.0);
+
+	    if(spongeKind == SpongeBC::RECTILINEAR){
+
+		if(bcX0 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTX0PERC", "spongeRectX0Perc", spongeRectX0Perc); 
+		}	
+
+		if(bcX1 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTX1PERC", "spongeRectX1Perc", spongeRectX1Perc); 
+		}	
+
+		if(bcY0 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTY0PERC", "spongeRectY0Perc", spongeRectY0Perc); 
+		}	
+
+		if(bcY1 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTY1PERC", "spongeRectY1Perc", spongeRectY1Perc); 
+		}	
+
+		if(bcZ0 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTZ0PERC", "spongeRectZ0Perc", spongeRectZ0Perc); 
+		}	
+
+		if(bcZ1 == BC::SPONGE){
+	    	    forceValue<double>("SPONGE.RECTZ1PERC", "spongeRectZ1Perc", spongeRectZ1Perc); 
+		}	
+
+	    }else if(spongeKind == SpongeBC::CYLINDRICAL){
+		forceValue<int>("SPONGE.CYLAXIS_ORIENT", "spongeCylAxisOrient", spongeCylAxisOrient);
+                if(spongeCylAxisOrient < 0 || spongeCylAxisOrient > 2){
+                    cout << " > Sponge cylinder orientation invalid number, needs to be 0, 1, 2. value = " << spongeCylAxisOrient << endl;
+                    MPI_Abort(MPI_COMM_WORLD, -10);
+                }
+
+		forceValue<double>("SPONGE.CYLAXIS_X", "spongeCylAxisX", spongeCylAxisX);
+		forceValue<double>("SPONGE.CYLAXIS_Y", "spongeCylAxisY", spongeCylAxisY);
+		forceValue<double>("SPONGE.CYLAXIS_Z", "spongeCylAxisZ", spongeCylAxisZ);
+		forceValue<double>("SPONGE.RMIN", "rMin", rMin);
+	    }
 
 	}
 
-	//FROM RESTART STUFF DOES NOTHING RIGHT NOW...
+
+	//Restart file stuff
+	forceValue<bool>("RESTART.FROMRESTART", "fromRestart", fromRestart);
+	forceValue<bool>("RESTART.ONLYGRIDFROMRESTART", "onlyGridFromRestart", onlyGridFromRestart);
+	
+	if(fromRestart || onlyGridFromRestart){
+	    forceValue<string>("RESTART.FILENAME", "restart filename", filename);
+	}
+
       }
 
       //Now we'll have to broadcast all of that stuff out to the other ranks...
