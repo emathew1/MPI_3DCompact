@@ -128,6 +128,9 @@ class Options{
 	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
 	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file");
 	
+	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
+
+
 	po::store(po::parse_config_file(input_file, input), vm);    
 	po::notify(vm);
 
@@ -288,6 +291,11 @@ class Options{
 	
 	if(fromRestart || onlyGridFromRestart){
 	    forceValue<string>("RESTART.FILENAME", "restart filename", filename);
+	}
+
+	if(fromRestart && onlyGridFromRestart){
+	    cout << "Both 'only use grid from restart file' and 'from restart file' checked off, these are conflicting!" << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);
 	}
 
       }
