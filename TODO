@@ -2,13 +2,9 @@ Add write/read of Sponge average values for restarting simulations, need those o
 
 Need to come up with better way to contain restart grids/statistics/instanteous fields in a single file and propagate through to each location it needs to be. current implementation is clunky and has flags in different places and different files.
 
-Come up with way to enter sponge parameters on the MPI_Compact.cpp file
-
 Add an LES model
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
-
-Implement different computation/communication (overlapping) methods for primary solve portions of code and have flags that allow for choosing which one
 
 Add ability to specify the bounding box of the images being printed out
 
@@ -20,4 +16,4 @@ Add ability to write out to pvtk file formats
 
 Add ability to read in from some standard grid formats
 
-Add abstraction level to derivatives and filters so you can specify the order of accurate and discretization that you want. May need to add pentadiagonal and pentadiagonal cyclical solvers for higher orders and new components for specificing periodic transformations for pentadiagonal schemes.
+Need to add pentadiagonal and pentadiagonal cyclical solvers for higher orders and new components for specificing periodic transformations for pentadiagonal schemes.
