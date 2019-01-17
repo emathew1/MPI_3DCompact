@@ -159,10 +159,6 @@ class Options{
 	checkValue<int>(   "TIMESTEPPING.DUMPSTEP", "dumpStep", dumpStep, 1000);
 	checkValue<int>(   "TIMESTEPPING.IMAGESTEP", "imageStep", imageStep, 25); //IS THIS OBSOLITE?
 
-	forceValue<int>("DOMAIN.NX", "Nx", Nx);
-	forceValue<int>("DOMAIN.NY", "Ny", Ny);
-	forceValue<int>("DOMAIN.NZ", "Nz", Nz);
-
 	//As of right now we're restricted to Nx|Ny|Nz > 10...
 	if(Nx <= 10 || Ny <= 10 || Nz <= 10){
 	    cout << " > Number of grid points in any direction must be greater than 10! " << endl;
@@ -298,10 +294,58 @@ class Options{
 	    MPI_Abort(MPI_COMM_WORLD, -10);
 	}
 
+	//Should this even be an input? we should either have this declared in the restart file or in the 
+	//algebraic mesh stuff?
+	forceValue<int>("DOMAIN.NX", "Nx", Nx);
+	forceValue<int>("DOMAIN.NY", "Ny", Ny);
+	forceValue<int>("DOMAIN.NZ", "Nz", Nz);
+
+
       }
 
       //Now we'll have to broadcast all of that stuff out to the other ranks...
+
+      //Probably not the most efficient way of doing this but definitely the laziest
+
+      //[TIMESTEPPING]
+      MPI_Bcast(&TSType, 1, MPI_INT, root, MPI_COMM_WORLD);
       MPI_Bcast(&CFL, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+      MPI_Bcast(&dt,  1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+      MPI_Bcast(&maxTime, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+      MPI_Bcast(&maxTimeStep, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&filterStep, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&checkStep, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&dumpStep, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&imageStep, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //[BC]
+      MPI_Bcast(&bcXType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcYType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcZType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcX0, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcX1, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcY0, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcY1, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcZ0, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&bcZ1, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(periodicDisp, 9, MPI_DOUBLE, root, MPI_COMM_WORLD);
+
+      //[SPONGE]
+      MPI_Bcast(&spongeKind, 1, MPI_INT, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeP, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeAvgT, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeStrength, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectX0Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectX1Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectY0Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectY1Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectZ0Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeRectZ1Perc, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeCylAxisOrient, 1, MPI_INT, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeCylAxisX, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeCylAxisY, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&spongeCylAxisZ, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&rMin, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
 
     }	
 
