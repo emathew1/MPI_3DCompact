@@ -62,7 +62,6 @@ class Options{
 	bool fromRestart;
 	bool onlyGridFromRestart;
 	string filename;
-	int startingTimestep;
     
     Options(int mpiRank){
    
@@ -347,7 +346,40 @@ class Options{
       MPI_Bcast(&spongeCylAxisZ, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
       MPI_Bcast(&rMin, 1, MPI_DOUBLE, root, MPI_COMM_WORLD); 
 
-    }	
+      //[DOMAIN]
+      MPI_Bcast(&Nx, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&Ny, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&Nz, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //[PENCILDECOMP]
+      MPI_Bcast(&pRow, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&pCol, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //[SOLVER]
+      MPI_Bcast(&alphaF, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+      MPI_Bcast(&mu_ref, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
+      MPI_Bcast(&useTiming, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+
+      //[RESTART]
+      MPI_Bcast(&fromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
+      MPI_Bcast(&onlyGridFromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
+      
+      int stringSize; 
+      if(mpiRank == root){
+          stringSize = filename.size()+1;
+      }
+      MPI_Bcast(&stringSize, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      char filename_c[stringSize];
+      if(mpiRank == root){
+          strcpy(filename_c,filename.c_str());
+      }
+ 
+      MPI_Bcast(filename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
+      filename.assign(filename_c, stringSize);
+
+      cout << mpiRank << " " << filename << endl;
+   }	
 
     template<typename T>
     void checkValue(string vmKey, string informalName, T &inputContainer, T defaultVal){
