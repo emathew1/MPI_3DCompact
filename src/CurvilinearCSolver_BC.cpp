@@ -15,12 +15,12 @@ void CurvilinearCSolver::setInitialConditions(){
     spg = NULL;
 
     //TODO NEED TO ADD EXCEPTIONS FOR WHEN WRONG KIND OF SPONGE OR UNIMPLEMENTED SPONGE BC IS TRYING TO BE USED
-    if( bc->bcX0 == BC::SPONGE || \
-        bc->bcX1 == BC::SPONGE || \
-        bc->bcY0 == BC::SPONGE || \
-        bc->bcY1 == BC::SPONGE || \
-        bc->bcZ0 == BC::SPONGE || \
-        bc->bcZ1 == BC::SPONGE ){
+    if( bc->bcX0 == Options::SPONGE || \
+        bc->bcX1 == Options::SPONGE || \
+        bc->bcY0 == Options::SPONGE || \
+        bc->bcY1 == Options::SPONGE || \
+        bc->bcZ0 == Options::SPONGE || \
+        bc->bcZ1 == Options::SPONGE ){
         spongeFlag = true;
         spg = new SpongeBC(msh, dom, ig, bc, c2d, mpiRank);
     }else{
@@ -65,7 +65,7 @@ void CurvilinearCSolver::setInitialConditions(){
     //No-Slip Wall Boundary Conditions
     //--------------------------------
 
-    if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::CONST_T_WALL){
+    if(bc->bcX0 == Options::ADIABATIC_WALL || bc->bcX0 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_X0_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -74,7 +74,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcX0 == BC::ADIABATIC_WALL){
+	    if(bc->bcX0 == Options::ADIABATIC_WALL){
 
 		int index[10] = FILL_GETMAJIND_YPEN_Xp;
 		double T_out[10];
@@ -86,7 +86,7 @@ void CurvilinearCSolver::setInitialConditions(){
     }
 
 
-    if(bc->bcX1 == BC::ADIABATIC_WALL || bc->bcX1 == BC::CONST_T_WALL){
+    if(bc->bcX1 == Options::ADIABATIC_WALL || bc->bcX1 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_X1_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -95,7 +95,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcX1 == BC::CONST_T_WALL){
+	    if(bc->bcX1 == Options::CONST_T_WALL){
 
 		int index[10] = FILL_GETMAJIND_YPEN_Xm;
 	 	double T_out[10];
@@ -106,7 +106,7 @@ void CurvilinearCSolver::setInitialConditions(){
         }END_FORX1
     }
 
-    if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::CONST_T_WALL){
+    if(bc->bcY0 == Options::ADIABATIC_WALL || bc->bcY0 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_Y0_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -115,7 +115,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcY0 == BC::ADIABATIC_WALL){
+	    if(bc->bcY0 == Options::ADIABATIC_WALL){
 
 		int index[10] = FILL_GETMAJIND_YPEN_Yp;
 		double T_out[10];
@@ -126,7 +126,7 @@ void CurvilinearCSolver::setInitialConditions(){
         }END_FORY0
     }
 
-    if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::CONST_T_WALL){
+    if(bc->bcY1 == Options::ADIABATIC_WALL || bc->bcY1 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_Y1_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -135,7 +135,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcY1 == BC::ADIABATIC_WALL){
+	    if(bc->bcY1 == Options::ADIABATIC_WALL){
 
 		int index[10] = FILL_GETMAJIND_YPEN_Ym;
 		double T_out[10];
@@ -146,7 +146,7 @@ void CurvilinearCSolver::setInitialConditions(){
         }END_FORY1
     }
 
-    if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::CONST_T_WALL){
+    if(bc->bcZ0 == Options::ADIABATIC_WALL || bc->bcZ0 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_Z0_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -155,7 +155,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcZ0 == BC::ADIABATIC_WALL){
+	    if(bc->bcZ0 == Options::ADIABATIC_WALL){
 
 		int index[10] = FILL_GETMAJIND_YPEN_Zp;
 		double T_out[10];
@@ -167,7 +167,7 @@ void CurvilinearCSolver::setInitialConditions(){
 
     }
 
-    if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::CONST_T_WALL){
+    if(bc->bcZ1 == Options::ADIABATIC_WALL || bc->bcZ1 == Options::CONST_T_WALL){
 	wallBCFlag = true;
         FOR_Z1_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -176,7 +176,7 @@ void CurvilinearCSolver::setInitialConditions(){
             rhoU1[ip] = 0.0;
             rhoV1[ip] = 0.0;
             rhoW1[ip] = 0.0;
-	    if(bc->bcZ1 == BC::ADIABATIC_WALL){
+	    if(bc->bcZ1 == Options::ADIABATIC_WALL){
 		
 		int index[10] = FILL_GETMAJIND_YPEN_Zm;
 		double T_out[10];
@@ -192,7 +192,7 @@ void CurvilinearCSolver::setInitialConditions(){
     //Moving Wall Boundary Conditions
     //-------------------------------
 
-    if(bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcX0 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_X0_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -210,7 +210,7 @@ void CurvilinearCSolver::setInitialConditions(){
         }END_FORX0
     }
 
-    if(bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcX1 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_X1_YPEN_MAJ{
             U[ip]  = 0.0;
@@ -228,7 +228,7 @@ void CurvilinearCSolver::setInitialConditions(){
         }END_FORX1
     }
 
-    if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcY0 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y0_YPEN_MAJ{
             U[ip]  = Y0WallU;
@@ -247,7 +247,7 @@ void CurvilinearCSolver::setInitialConditions(){
 
    }
 
-    if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcY1 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Y1_YPEN_MAJ{
             U[ip]  = Y1WallU;
@@ -266,7 +266,7 @@ void CurvilinearCSolver::setInitialConditions(){
 
    }
 
-    if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcZ0 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z0_YPEN_MAJ{
             U[ip]  = Z0WallU;
@@ -286,7 +286,7 @@ void CurvilinearCSolver::setInitialConditions(){
 
     }
 
-    if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcZ1 == Options::MOVING_ADIABATIC_WALL){
 	wallBCFlag = true;
         FOR_Z1_YPEN_MAJ{
             U[ip]  = Z1WallU;
@@ -380,7 +380,7 @@ void CurvilinearCSolver::preStepBCHandling(){
     //No-slip wall boundary conditions
     //--------------------------------
 
-    if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::CONST_T_WALL){
+    if(bc->bcX0 == Options::ADIABATIC_WALL || bc->bcX0 == Options::CONST_T_WALL){
 	FOR_X0_YPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
@@ -388,7 +388,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    if(bc->bcX0 == BC::ADIABATIC_WALL){
+	    if(bc->bcX0 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Xp;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -405,7 +405,7 @@ void CurvilinearCSolver::preStepBCHandling(){
     }
     
 
-    if(bc->bcX1 == BC::ADIABATIC_WALL || bc->bcX1 == BC::CONST_T_WALL){
+    if(bc->bcX1 == Options::ADIABATIC_WALL || bc->bcX1 == Options::CONST_T_WALL){
 	FOR_X1_YPEN_MAJ{
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
@@ -413,7 +413,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
-	    if(bc->bcX1 == BC::ADIABATIC_WALL){
+	    if(bc->bcX1 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Xm;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -429,10 +429,10 @@ void CurvilinearCSolver::preStepBCHandling(){
     }   
 
 
-    if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::CONST_T_WALL){
+    if(bc->bcY0 == Options::ADIABATIC_WALL || bc->bcY0 == Options::CONST_T_WALL){
 
 	FOR_Y0_YPEN_MAJ{
-	    if(bc->bcY0 == BC::ADIABATIC_WALL){
+	    if(bc->bcY0 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Yp;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -453,11 +453,11 @@ void CurvilinearCSolver::preStepBCHandling(){
     }
     
 
-    if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::CONST_T_WALL){
+    if(bc->bcY1 == Options::ADIABATIC_WALL || bc->bcY1 == Options::CONST_T_WALL){
 
 	FOR_Y1_YPEN_MAJ{
 
-	    if(bc->bcY1 == BC::ADIABATIC_WALL){
+	    if(bc->bcY1 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Ym;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -480,10 +480,10 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 
 
-    if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::CONST_T_WALL){
+    if(bc->bcZ0 == Options::ADIABATIC_WALL || bc->bcZ0 == Options::CONST_T_WALL){
 
 	FOR_Z0_YPEN_MAJ{
-	    if(bc->bcZ0 == BC::ADIABATIC_WALL){
+	    if(bc->bcZ0 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Zp;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -505,9 +505,9 @@ void CurvilinearCSolver::preStepBCHandling(){
 
 
 
-    if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::CONST_T_WALL){
+    if(bc->bcZ1 == Options::ADIABATIC_WALL || bc->bcZ1 == Options::CONST_T_WALL){
 	FOR_Z1_YPEN_MAJ{
-	    if(bc->bcZ1 == BC::ADIABATIC_WALL){
+	    if(bc->bcZ1 == Options::ADIABATIC_WALL){
 	        int index[10] = FILL_GETMAJIND_YPEN_Zm;
 	        double T_out[10];
 	        getDataFromIndex(T, index, 10, T_out);
@@ -532,7 +532,7 @@ void CurvilinearCSolver::preStepBCHandling(){
     //Moving wall boundary conditions
     //-------------------------------
 
-    if(bc->bcX0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcX0 == Options::MOVING_ADIABATIC_WALL){
         FOR_X0_YPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X0WallV;
@@ -554,7 +554,7 @@ void CurvilinearCSolver::preStepBCHandling(){
         }END_FORX0
     }
 
-    if(bc->bcX1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcX1 == Options::MOVING_ADIABATIC_WALL){
         FOR_X1_YPEN_MAJ{
             U[ip]  = 0.0;
             V[ip]  = X1WallV;
@@ -576,7 +576,7 @@ void CurvilinearCSolver::preStepBCHandling(){
         }END_FORX1
     }
 
-    if(bc->bcY0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcY0 == Options::MOVING_ADIABATIC_WALL){
 
         FOR_Y0_YPEN_MAJ{
 
@@ -599,7 +599,7 @@ void CurvilinearCSolver::preStepBCHandling(){
         }END_FORY0
     }
 
-    if(bc->bcY1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcY1 == Options::MOVING_ADIABATIC_WALL){
 
         FOR_Y1_YPEN_MAJ{
 
@@ -622,7 +622,7 @@ void CurvilinearCSolver::preStepBCHandling(){
         }END_FORY1
     }
 
-    if(bc->bcZ0 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcZ0 == Options::MOVING_ADIABATIC_WALL){
 
         FOR_Z0_YPEN_MAJ{
 	
@@ -645,7 +645,7 @@ void CurvilinearCSolver::preStepBCHandling(){
         }END_FORZ0
     }
 
-    if(bc->bcZ1 == BC::MOVING_ADIABATIC_WALL){
+    if(bc->bcZ1 == Options::MOVING_ADIABATIC_WALL){
 
         FOR_Z1_YPEN_MAJ{
 	    
@@ -688,7 +688,7 @@ void CurvilinearCSolver::postStepBCHandling(){
     //ADIABATIC AND MOVING WALL BC// 
     ////////////////////////////////
 
-    if(bc->bcX0 == BC::ADIABATIC_WALL || bc->bcX0 == BC::MOVING_ADIABATIC_WALL || bc->bcX0 == BC::CONST_T_WALL){
+    if(bc->bcX0 == Options::ADIABATIC_WALL || bc->bcX0 == Options::MOVING_ADIABATIC_WALL || bc->bcX0 == Options::CONST_T_WALL){
 	FOR_X0_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_1[ip];
 	    rhoUk2[ip] = 0.0;
@@ -698,7 +698,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX0
     }
 
-    if(bc->bcX1 == BC::ADIABATIC_WALL || bc->bcX1 == BC::MOVING_ADIABATIC_WALL || bc->bcX1 == BC::CONST_T_WALL){
+    if(bc->bcX1 == Options::ADIABATIC_WALL || bc->bcX1 == Options::MOVING_ADIABATIC_WALL || bc->bcX1 == Options::CONST_T_WALL){
 	FOR_X1_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_1[ip];
 	    rhoUk2[ip] = 0.0;
@@ -708,7 +708,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX1
     }   
 
-    if(bc->bcY0 == BC::ADIABATIC_WALL || bc->bcY0 == BC::MOVING_ADIABATIC_WALL || bc->bcY0 == BC::CONST_T_WALL){
+    if(bc->bcY0 == Options::ADIABATIC_WALL || bc->bcY0 == Options::MOVING_ADIABATIC_WALL || bc->bcY0 == Options::CONST_T_WALL){
 	FOR_Y0_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_2[ip];
 	    rhoUk2[ip] = 0.0;
@@ -718,7 +718,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY0
     }
 
-    if(bc->bcY1 == BC::ADIABATIC_WALL || bc->bcY1 == BC::MOVING_ADIABATIC_WALL || bc->bcY1 == BC::CONST_T_WALL){
+    if(bc->bcY1 == Options::ADIABATIC_WALL || bc->bcY1 == Options::MOVING_ADIABATIC_WALL || bc->bcY1 == Options::CONST_T_WALL){
 	FOR_Y1_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_2[ip];
 	    rhoUk2[ip] = 0.0;
@@ -728,7 +728,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY1
     }
 
-    if(bc->bcZ0 == BC::ADIABATIC_WALL || bc->bcZ0 == BC::MOVING_ADIABATIC_WALL || bc->bcZ0 == BC::CONST_T_WALL){
+    if(bc->bcZ0 == Options::ADIABATIC_WALL || bc->bcZ0 == Options::MOVING_ADIABATIC_WALL || bc->bcZ0 == Options::CONST_T_WALL){
 	FOR_Z0_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_3[ip];
 	    rhoUk2[ip] = 0.0;
@@ -738,7 +738,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORZ0
     }
 
-    if(bc->bcZ1 == BC::ADIABATIC_WALL || bc->bcZ1 == BC::MOVING_ADIABATIC_WALL || bc->bcZ1 == BC::CONST_T_WALL){
+    if(bc->bcZ1 == Options::ADIABATIC_WALL || bc->bcZ1 == Options::MOVING_ADIABATIC_WALL || bc->bcZ1 == Options::CONST_T_WALL){
 	FOR_Z1_YPEN_MAJ{
 	    rhok2[ip]  = -ts->dt*J[ip]*cont_3[ip];
 	    rhoUk2[ip] = 0.0;
@@ -753,7 +753,7 @@ void CurvilinearCSolver::postStepBCHandling(){
     //SPONGE BC//
     /////////////
 
-    if(bc->bcX0 == BC::SPONGE){
+    if(bc->bcX0 == Options::SPONGE){
 	FOR_X0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -763,7 +763,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX0
     }
 
-    if(bc->bcX1 == BC::SPONGE){
+    if(bc->bcX1 == Options::SPONGE){
 	FOR_X1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -773,7 +773,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORX1
     }   
 
-    if(bc->bcY0 == BC::SPONGE){
+    if(bc->bcY0 == Options::SPONGE){
 	FOR_Y0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -783,7 +783,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY0
     }
 
-    if(bc->bcY1 == BC::SPONGE){
+    if(bc->bcY1 == Options::SPONGE){
 	FOR_Y1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -793,7 +793,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORY1
     }
 
-    if(bc->bcZ0 == BC::SPONGE){
+    if(bc->bcZ0 == Options::SPONGE){
 	FOR_Z0_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -803,7 +803,7 @@ void CurvilinearCSolver::postStepBCHandling(){
 	}END_FORZ0
     }
 
-    if(bc->bcZ1 == BC::SPONGE){
+    if(bc->bcZ1 == Options::SPONGE){
 	FOR_Z1_YPEN_MAJ{
 	    rhok2[ip]  = 0.0;
 	    rhoUk2[ip] = 0.0;
@@ -838,7 +838,7 @@ void CurvilinearCSolver::updateSponge(){
 					 + spg->spongeRhoWAvg[ip]*spg->spongeRhoWAvg[ip])/spg->spongeRhoAvg[ip]);
 	}
 	
-        if(bc->bcX0 == BC::SPONGE){
+        if(bc->bcX0 == Options::SPONGE){
 	    FOR_X0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -848,7 +848,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORX0
         }
 
-        if(bc->bcX1 == BC::SPONGE){
+        if(bc->bcX1 == Options::SPONGE){
 	    FOR_X1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -858,7 +858,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORX1
         }   
 
-        if(bc->bcY0 == BC::SPONGE){
+        if(bc->bcY0 == Options::SPONGE){
 	    FOR_Y0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -868,7 +868,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORY0
         }
 
-        if(bc->bcY1 == BC::SPONGE){
+        if(bc->bcY1 == Options::SPONGE){
 	    FOR_Y1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -878,7 +878,7 @@ void CurvilinearCSolver::updateSponge(){
 	    }END_FORY1
         }
 
-        if(bc->bcZ0 == BC::SPONGE){
+        if(bc->bcZ0 == Options::SPONGE){
 	    FOR_Z0_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];
@@ -889,7 +889,7 @@ void CurvilinearCSolver::updateSponge(){
 
         }
 
-        if(bc->bcZ1 == BC::SPONGE){
+        if(bc->bcZ1 == Options::SPONGE){
 	    FOR_Z1_YPEN_MAJ{
 		rho1[ip]  = spg->spongeRhoAvg[ip];
 		rhoU1[ip] = spg->spongeRhoUAvg[ip];

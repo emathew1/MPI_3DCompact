@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include "AbstractDerivatives.hpp"
+#include "Options.hpp"
 #include "Macros.hpp"
 #include "Domain.hpp"
 #include "Utils.hpp"
@@ -23,7 +24,7 @@ class AbstractFilter{
 	double *diagF, *offlowerF, *offupperF;
 
 	AbstractDerivatives::Direct currentDir;
-	BC::BCType bcType;
+	Options::BCType bcType;
 
 	//Functions that a filter object have to define
 	virtual void filterField(double *dataIn, double *dataOut) = 0;

@@ -8,16 +8,24 @@
 #include <string>
 #include <boost/program_options.hpp>
 
-#include "TimeStepping.hpp"
-#include "BC.hpp"
-#include "SpongeBC.hpp"
-
 using namespace std;
 namespace po = boost::program_options;
 
 class Options{
 
     public:
+
+	//Moving all enums here so Option.hpp can be non-dependent on anything else...
+        enum TimeSteppingType {CONST_DT, CONST_CFL};
+        enum BCType {PERIODIC_SOLVE, DIRICHLET_SOLVE};
+        enum BCKind {PERIODIC,
+                     INTERNALLY_PERIODIC,
+                     SPONGE,
+                     ADIABATIC_WALL,
+                     CONST_T_WALL,
+                     MOVING_ADIABATIC_WALL,
+                     INLET};
+        enum SpongeKind {RECTILINEAR, CYLINDRICAL};
 	
 	//Variable map...
 	po::variables_map vm;
@@ -26,22 +34,22 @@ class Options{
 	int root;
 
 	//Time Stepping Information
-	TimeStepping::TimeSteppingType TSType;
+	TimeSteppingType TSType;
 	string TSType_str;
 	double CFL, dt, maxTime;
 	int maxTimeStep, filterStep, checkStep, dumpStep, imageStep;
 
 	//Boundary Condition Stuff
 	string bcXType_str, bcYType_str, bcZType_str;
-	BC::BCType bcXType, bcYType, bcZType;
+	BCType bcXType, bcYType, bcZType;
 
 	string bcX0_str, bcX1_str, bcY0_str, bcY1_str, bcZ0_str, bcZ1_str;
-	BC::BCKind bcX0, bcX1, bcY0, bcY1, bcZ0, bcZ1;
+	BCKind bcX0, bcX1, bcY0, bcY1, bcZ0, bcZ1;
 	double periodicDisp[3][3];
 
 	//SPONGE STUFF
 	string spongeKind_str;
-	SpongeBC::SpongeKind spongeKind;
+	SpongeKind spongeKind;
 	double spongeP, spongeAvgT, spongeStrength;
 	double spongeRectX0Perc, spongeRectY0Perc, spongeRectZ0Perc;
 	double spongeRectX1Perc, spongeRectY1Perc, spongeRectZ1Perc;
@@ -143,10 +151,10 @@ class Options{
 
 	//MISSING A THING FOR WHAT KIND OF TIMESTEPPING IT IS (CONST CFL OR DT)
 	parseTSTypeFromString("TIMESTEPPING.TSTYPE", TSType_str, TSType);
-	if(TSType == TimeStepping::CONST_DT){
+	if(TSType == CONST_DT){
 	    forceValue<double>("TIMESTEPPING.DT", "DT", dt);
 	    CFL = -1.0;
-	}else if(TSType == TimeStepping::CONST_CFL){
+	}else if(TSType == CONST_CFL){
 	    checkValue<double>("TIMESTEPPING.CFL", "CFL", CFL, 0.5);
 	    dt = -1.0;
 	}
@@ -183,11 +191,11 @@ class Options{
 	parseBCKindFromString("BC.BCZ1", bcZ1_str, bcZ1);
 
 	//PERIODIC BC DISPLACEMENTS...
-	if(bcX0 == BC::PERIODIC && bcX1 == BC::PERIODIC){
+	if(bcX0 == PERIODIC && bcX1 == PERIODIC){
 	    forceValue<double>("BC.PERIODICDISPX_X", "x0 to x1 periodic displacement in x", periodicDisp[0][0]); 
 	    forceValue<double>("BC.PERIODICDISPX_Y", "x0 to x1 periodic displacement in y", periodicDisp[0][1]); 
 	    forceValue<double>("BC.PERIODICDISPX_Z", "x0 to x1 periodic displacement in z", periodicDisp[0][2]); 
-	}else if((bcX0 == BC::PERIODIC && bcX1 != BC::PERIODIC) || (bcX0 != BC::PERIODIC && bcX1 == BC::PERIODIC)){
+	}else if((bcX0 == PERIODIC && bcX1 != PERIODIC) || (bcX0 != PERIODIC && bcX1 == PERIODIC)){
 	    cout << " > " << " BC Mismatch for X0-X1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
 	}else{
@@ -196,11 +204,11 @@ class Options{
 	    periodicDisp[0][2] = 0.0;
 	}  
 
-	if(bcY0 == BC::PERIODIC && bcY1 == BC::PERIODIC){
+	if(bcY0 == PERIODIC && bcY1 == PERIODIC){
 	    forceValue<double>("BC.PERIODICDISPY_X", "y0 to y1 periodic displacement in x", periodicDisp[1][0]); 
 	    forceValue<double>("BC.PERIODICDISPY_Y", "y0 to y1 periodic displacement in y", periodicDisp[1][1]); 
 	    forceValue<double>("BC.PERIODICDISPY_Z", "y0 to y1 periodic displacement in z", periodicDisp[1][2]); 
-	}else if((bcY0 == BC::PERIODIC && bcY1 != BC::PERIODIC) || (bcY0 != BC::PERIODIC && bcY1 == BC::PERIODIC)){
+	}else if((bcY0 == PERIODIC && bcY1 != PERIODIC) || (bcY0 != PERIODIC && bcY1 == PERIODIC)){
 	    cout << " > " << " BC Mismatch for Y0-Y1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
 	}else{
@@ -209,11 +217,11 @@ class Options{
 	    periodicDisp[1][2] = 0.0;
 	}  
 
-	if(bcZ0 == BC::PERIODIC && bcZ1 == BC::PERIODIC){
+	if(bcZ0 == PERIODIC && bcZ1 == PERIODIC){
 	    forceValue<double>("BC.PERIODICDISPZ_X", "z0 to z1 periodic displacement in x", periodicDisp[2][0]); 
 	    forceValue<double>("BC.PERIODICDISPZ_Y", "z0 to z1 periodic displacement in y", periodicDisp[2][1]); 
 	    forceValue<double>("BC.PERIODICDISPZ_Z", "z0 to z1 periodic displacement in z", periodicDisp[2][2]); 
-	}else if((bcZ0 == BC::PERIODIC && bcZ1 != BC::PERIODIC) || (bcZ0 != BC::PERIODIC && bcZ1 == BC::PERIODIC)){
+	}else if((bcZ0 == PERIODIC && bcZ1 != PERIODIC) || (bcZ0 != PERIODIC && bcZ1 == PERIODIC)){
 	    cout << " > " << " BC Mismatch for Z0-Z1 Faces! " << endl;
 	    MPI_Abort(MPI_COMM_WORLD, -10);	    
 	}else{
@@ -226,45 +234,45 @@ class Options{
 	bcValidation();
 
 	//Lets collect and parse all of the sponge stuff...
-	if(bcX0 == BC::SPONGE || \
-	   bcX1 == BC::SPONGE || \
-	   bcY0 == BC::SPONGE || \
-	   bcY1 == BC::SPONGE || \
-	   bcZ0 == BC::SPONGE || \
-	   bcZ1 == BC::SPONGE){
+	if(bcX0 == SPONGE || \
+	   bcX1 == SPONGE || \
+	   bcY0 == SPONGE || \
+	   bcY1 == SPONGE || \
+	   bcZ0 == SPONGE || \
+	   bcZ1 == SPONGE){
 
 	    parseSpongeFromString("SPONGE.KIND", spongeKind_str, spongeKind); 
 	    checkValue<double>("SPONGE.AVGTIME",  "spongeAvgT", spongeAvgT, 1.0);
 	    checkValue<double>("SPONGE.PINF",     "spongeP"   , spongeP, 1.0/1.4);
 	    checkValue<double>("SPONGE.STRENGTH", "spongeStrength", spongeStrength, 1.0);
 
-	    if(spongeKind == SpongeBC::RECTILINEAR){
+	    if(spongeKind == RECTILINEAR){
 
-		if(bcX0 == BC::SPONGE){
+		if(bcX0 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTX0PERC", "spongeRectX0Perc", spongeRectX0Perc); 
 		}	
 
-		if(bcX1 == BC::SPONGE){
+		if(bcX1 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTX1PERC", "spongeRectX1Perc", spongeRectX1Perc); 
 		}	
 
-		if(bcY0 == BC::SPONGE){
+		if(bcY0 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTY0PERC", "spongeRectY0Perc", spongeRectY0Perc); 
 		}	
 
-		if(bcY1 == BC::SPONGE){
+		if(bcY1 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTY1PERC", "spongeRectY1Perc", spongeRectY1Perc); 
 		}	
 
-		if(bcZ0 == BC::SPONGE){
+		if(bcZ0 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTZ0PERC", "spongeRectZ0Perc", spongeRectZ0Perc); 
 		}	
 
-		if(bcZ1 == BC::SPONGE){
+		if(bcZ1 == SPONGE){
 	    	    forceValue<double>("SPONGE.RECTZ1PERC", "spongeRectZ1Perc", spongeRectZ1Perc); 
 		}	
 
-	    }else if(spongeKind == SpongeBC::CYLINDRICAL){
+	    }else if(spongeKind == CYLINDRICAL){
 		forceValue<int>("SPONGE.CYLAXIS_ORIENT", "spongeCylAxisOrient", spongeCylAxisOrient);
                 if(spongeCylAxisOrient < 0 || spongeCylAxisOrient > 2){
                     cout << " > Sponge cylinder orientation invalid number, needs to be 0, 1, 2. value = " << spongeCylAxisOrient << endl;
@@ -403,12 +411,12 @@ class Options{
 	}
     }
 
-    void parseTSTypeFromString(string vmKey, string inString, TimeStepping::TimeSteppingType &currentType);
-    void parseBCTypeFromString(string vmKey, string inString, BC::BCType &currentType);
-    void parseBCKindFromString(string vmKey, string inString, BC::BCKind &currentType);
+    void parseTSTypeFromString(string vmKey, string inString, TimeSteppingType &currentType);
+    void parseBCTypeFromString(string vmKey, string inString, BCType &currentType);
+    void parseBCKindFromString(string vmKey, string inString, BCKind &currentType);
     void bcValidation();
 
-    void parseSpongeFromString(string vmKey, string inString, SpongeBC::SpongeKind &spongeKind);
+    void parseSpongeFromString(string vmKey, string inString, SpongeKind &spongeKind);
 
 };
 

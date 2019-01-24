@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include "Macros.hpp"
+#include "Options.hpp"
 #include "Domain.hpp"
 #include "Utils.hpp"
 #include "BC.hpp"
@@ -27,7 +28,7 @@ class AbstractDerivatives{
 	enum Direct {DIRX, DIRY, DIRZ};
 	Direct currentDir;
 
-	BC::BCType bcType;
+	Options::BCType bcType;
 
 	double Nm3val, Nm2val, Nm1val, N0val, Np1val, Np2val, Np3val; 
 

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Macros.hpp"
+#include "Options.hpp"
 #include "Domain.hpp"
 #include "IdealGas.hpp"
 #include "BC.hpp"
@@ -41,8 +42,7 @@ class SpongeBC{
 	double *spongeRhoWAvg;
 	double *spongeRhoEAvg;
 
-	enum SpongeKind {RECTILINEAR, CYLINDRICAL};
-	SpongeKind spongeKind;
+	Options::SpongeKind spongeKind;
     
 	SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank);
 	void initRectSpongeBC();

@@ -1751,15 +1751,15 @@ void AbstractSingleBlockMesh::handlePeriodicStuff(){
 	    interPeriodicZ = false;
 
 	    //Handle periodic boundary condition flags and displacements
-	    if(cs->bc->bcXType == BC::PERIODIC_SOLVE){
+	    if(cs->bc->bcXType == Options::PERIODIC_SOLVE){
 		periodicBCX = true;
-		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
+		if(cs->bc->bcY0 == Options::PERIODIC && cs->bc->bcY1 == Options::PERIODIC){
 		    transPeriodicX = true;
 		    periodicXTranslation[0] = cs->bc->periodicDisp[0][0];
 		    periodicXTranslation[1] = cs->bc->periodicDisp[0][1];
 		    periodicXTranslation[2] = cs->bc->periodicDisp[0][2];
 		    IF_RANK0 cout << "  Periodic x-face translation = {" << periodicXTranslation[0] << ", " << periodicXTranslation[1] << ", " << periodicXTranslation[2] << "}" << endl;;
-		}else if(cs->bc->bcX0 == BC::INTERNALLY_PERIODIC && cs->bc->bcX1 == BC::INTERNALLY_PERIODIC){
+		}else if(cs->bc->bcX0 == Options::INTERNALLY_PERIODIC && cs->bc->bcX1 == Options::INTERNALLY_PERIODIC){
 		    interPeriodicX = true;
 		    periodicXTranslation[0] = 0.0;
 		    periodicXTranslation[1] = 0.0;
@@ -1769,15 +1769,15 @@ void AbstractSingleBlockMesh::handlePeriodicStuff(){
 		}
 	    }
 
-	    if(cs->bc->bcYType == BC::PERIODIC_SOLVE){
+	    if(cs->bc->bcYType == Options::PERIODIC_SOLVE){
 		periodicBCY = true;
-		if(cs->bc->bcY0 == BC::PERIODIC && cs->bc->bcY1 == BC::PERIODIC){
+		if(cs->bc->bcY0 == Options::PERIODIC && cs->bc->bcY1 == Options::PERIODIC){
 		    transPeriodicY = true;
 		    periodicYTranslation[0] = cs->bc->periodicDisp[1][0]; 
 		    periodicYTranslation[1] = cs->bc->periodicDisp[1][1];
 		    periodicYTranslation[2] = cs->bc->periodicDisp[1][2];
 		    IF_RANK0 cout << "  Periodic y-face translation = {" << periodicYTranslation[0] << ", " << periodicYTranslation[1] << ", " << periodicYTranslation[2] << "}" << endl;
-		}else if(cs->bc->bcY0 == BC::INTERNALLY_PERIODIC && cs->bc->bcY1 == BC::INTERNALLY_PERIODIC){
+		}else if(cs->bc->bcY0 == Options::INTERNALLY_PERIODIC && cs->bc->bcY1 == Options::INTERNALLY_PERIODIC){
 		    interPeriodicY = true;			
 		    periodicYTranslation[0] = 0.0; 
 		    periodicYTranslation[1] = 0.0;
@@ -1787,15 +1787,15 @@ void AbstractSingleBlockMesh::handlePeriodicStuff(){
 		} 
 	    }
 
-	    if(cs->bc->bcZType == BC::PERIODIC_SOLVE){
+	    if(cs->bc->bcZType == Options::PERIODIC_SOLVE){
 		periodicBCZ = true;
-		if(cs->bc->bcZ0 == BC::PERIODIC && cs->bc->bcZ1 == BC::PERIODIC){
+		if(cs->bc->bcZ0 == Options::PERIODIC && cs->bc->bcZ1 == Options::PERIODIC){
 		    transPeriodicZ = true;
 		    periodicZTranslation[0] = cs->bc->periodicDisp[2][0];
 		    periodicZTranslation[1] = cs->bc->periodicDisp[2][1];
 		    periodicZTranslation[2] = cs->bc->periodicDisp[2][2];
 		    IF_RANK0 cout << "  Periodic z-face translation = {" << periodicZTranslation[0] << ", " << periodicZTranslation[1] << ", " << periodicZTranslation[2] << "}" << endl;;
-		}else if(cs->bc->bcZ0 == BC::INTERNALLY_PERIODIC && cs->bc->bcZ1 == BC::INTERNALLY_PERIODIC){
+		}else if(cs->bc->bcZ0 == Options::INTERNALLY_PERIODIC && cs->bc->bcZ1 == Options::INTERNALLY_PERIODIC){
 		    interPeriodicZ = true;
 		    periodicZTranslation[0] = 0.0;
 		    periodicZTranslation[1] = 0.0;

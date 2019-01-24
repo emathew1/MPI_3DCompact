@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "Options.hpp"
 #include "AbstractCSolver.hpp"
 #include "C2Decomp.hpp"
 #include "Domain.hpp"

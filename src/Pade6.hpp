@@ -34,7 +34,7 @@ class Pade6: public AbstractDerivatives{
 	double a2_2D, b2_2D, c2_2D, d2_2D, e2_2D, f2_2D; 
 
 	//Constructor
-        Pade6(Domain *dom, BC::BCType bcType, Direct currentDir){
+        Pade6(Domain *dom, Options::BCType bcType, Direct currentDir){
 
 	    //For this method
 	    rhsBandwidth = BW5;
@@ -131,7 +131,7 @@ class Pade6: public AbstractDerivatives{
 	    offupper_2D[ip]  = alpha_2D;
 	}
 
-	if(bcType == BC::DIRICHLET_SOLVE){
+	if(bcType == Options::DIRICHLET_SOLVE){
 	    offupper_1D[0] = alpha11_1D;  
 	    offupper_1D[1] = alpha22_1D;
 	    offlower_1D[1] = alpha21_1D;

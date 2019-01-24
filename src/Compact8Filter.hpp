@@ -20,7 +20,7 @@ class Compact8Filter: public AbstractFilter{
 	double c00, c01, c02, c03, c04;
 
 
-    Compact8Filter(double alphaF, Domain *dom, BC::BCType bcType, AbstractDerivatives::Direct currentDir){
+    Compact8Filter(double alphaF, Domain *dom, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
 	this->Nx = dom->gNx;
@@ -80,7 +80,7 @@ class Compact8Filter: public AbstractFilter{
             offupperF[ip]  = alphaF;
         }
         
-	if(bcType == BC::DIRICHLET_SOLVE){
+	if(bcType == Options::DIRICHLET_SOLVE){
 	    //explicitly filter the boundary points (Lele)
 	    offlowerF[0] = 0.0;
 	    offlowerF[1] = 0.0;

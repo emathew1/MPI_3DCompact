@@ -2,6 +2,7 @@
 #define _DOMAINH_
 
 #include <iostream>
+#include "Options.hpp"
 #include "BC.hpp"
 #include "Macros.hpp"
 #include "C2Decomp.hpp"
@@ -42,7 +43,7 @@ class Domain{
 	y = new double[gNy];	
 	z = new double[gNz];
 
-	if(bc->bcXType == BC::PERIODIC_SOLVE){
+	if(bc->bcXType == Options::PERIODIC_SOLVE){
 	    for(int ip = 0; ip < gNx; ip++){
 		x[ip] = (double)ip*gLx/(double)gNx;
 	    }
@@ -52,7 +53,7 @@ class Domain{
 	    }	
 	}
 
-	if(bc->bcYType == BC::PERIODIC_SOLVE){
+	if(bc->bcYType == Options::PERIODIC_SOLVE){
 	    for(int jp = 0; jp < gNy; jp++){
 	        y[jp] = (double)jp*gLy/(double)gNy;
 	    }
@@ -62,7 +63,7 @@ class Domain{
 	    }	
 	}
 
-	if(bc->bcZType == BC::PERIODIC_SOLVE){
+	if(bc->bcZType == Options::PERIODIC_SOLVE){
 	    for(int kp = 0; kp < gNz; kp++){	
 		z[kp] = (double)kp*gLz/(double)gNz;
 	    }

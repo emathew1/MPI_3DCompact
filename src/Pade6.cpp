@@ -156,18 +156,18 @@ void Pade6::calc2ndDerivField(double *dataIn, double *dataOut){
 
 void Pade6::calc1stDeriv(double *phi, double *dphi){
 
-    if(bcType == BC::PERIODIC_SOLVE){
+    if(bcType == Options::PERIODIC_SOLVE){
 	Compact1stPeriodic(phi, dphi);	
-    }else if(bcType == BC::DIRICHLET_SOLVE){
+    }else if(bcType == Options::DIRICHLET_SOLVE){
 	Compact1stDirichlet(phi, dphi);	
     }
 
 }
 
 void Pade6::calc1stDeriv_TPB(double *phi, double *dphi){
-    if(bcType == BC::PERIODIC_SOLVE){
+    if(bcType == Options::PERIODIC_SOLVE){
 	Compact1stPeriodic_TPB(phi, dphi);	
-    }else if(bcType == BC::DIRICHLET_SOLVE){
+    }else if(bcType == Options::DIRICHLET_SOLVE){
 	cout << "CANT USE calc1stDeriv_TPB for non-periodic boundary conditions!!" << endl;
     }
 }
@@ -176,9 +176,9 @@ void Pade6::calc1stDeriv_TPB(double *phi, double *dphi){
 
 void Pade6::calc2ndDeriv(double *phi, double *dphi){
 
-    if(bcType == BC::PERIODIC_SOLVE){
+    if(bcType == Options::PERIODIC_SOLVE){
 	Compact2ndPeriodic(phi, dphi);	
-    }else if(bcType == BC::DIRICHLET_SOLVE){
+    }else if(bcType == Options::DIRICHLET_SOLVE){
 	Compact2ndDirichlet(phi, dphi);	
     }
 

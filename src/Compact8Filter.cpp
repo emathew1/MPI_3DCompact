@@ -118,9 +118,9 @@ void Compact8Filter::FilterDirichlet(double *phi, double *phiF){
 
 void Compact8Filter::compactFilter(double *phi, double *phiF){
 
-    if(bcType == BC::PERIODIC_SOLVE){
+    if(bcType == Options::PERIODIC_SOLVE){
 	FilterPeriodic(phi, phiF);
-    }else if(bcType == BC::DIRICHLET_SOLVE){
+    }else if(bcType == Options::DIRICHLET_SOLVE){
 	FilterDirichlet(phi, phiF);
     }
 

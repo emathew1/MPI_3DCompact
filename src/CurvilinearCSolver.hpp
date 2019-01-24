@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "Macros.hpp"
+#include "Options.hpp"
 #include "Utils.hpp"
 #include "SpongeBC.hpp"
 #include "AbstractCSolver.hpp"

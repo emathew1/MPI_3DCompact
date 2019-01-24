@@ -3,28 +3,20 @@
 
 #include <iostream>
 #include "Macros.hpp"
+#include "Options.hpp"
 
 class BC{
 
     public:
 
-	enum BCType {PERIODIC_SOLVE, DIRICHLET_SOLVE};
-	enum BCKind {PERIODIC,
-		     INTERNALLY_PERIODIC, 
-		     SPONGE,
-		     ADIABATIC_WALL,
-		     CONST_T_WALL,
-		     MOVING_ADIABATIC_WALL,
-		     INLET};
-
-	BCType bcXType, bcYType, bcZType;
-	BCKind bcX0, bcX1, bcY0, bcY1, bcZ0, bcZ1;
+	Options::BCType bcXType, bcYType, bcZType;
+	Options::BCKind bcX0, bcX1, bcY0, bcY1, bcZ0, bcZ1;
 
 	double periodicDisp[3][3];
 
-	BC(BCType bcXType, BCKind bcX0, BCKind bcX1, 
-	   BCType bcYType, BCKind bcY0, BCKind bcY1,
-	   BCType bcZType, BCKind bcZ0, BCKind bcZ1,
+	BC(Options::BCType bcXType, Options::BCKind bcX0, Options::BCKind bcX1, 
+	   Options::BCType bcYType, Options::BCKind bcY0, Options::BCKind bcY1,
+	   Options::BCType bcZType, Options::BCKind bcZ0, Options::BCKind bcZ1,
 	   bool bcPeriodic[3], int mpiRank, double periodicDisp[3][3]){
 
 	    this->bcXType = bcXType;
@@ -48,23 +40,23 @@ class BC{
 	    IF_RANK0 std::cout << " > Initializing boundary conditions..." << std::endl;
 	
 	    IF_RANK0 std::cout << " >     X BOUNDARY CONDITIONS    " << std::endl;
-	    if(bcXType == PERIODIC_SOLVE){
+	    if(bcXType == Options::PERIODIC_SOLVE){
 		IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[0] = true;
 	    }else{
-		if(bcX0 == SPONGE){
+		if(bcX0 == Options::SPONGE){
 		   IF_RANK0 std::cout << " > X0=SPG";
-		}else if(bcX0 == ADIABATIC_WALL){
+		}else if(bcX0 == Options::ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > X0=ABW";
-		}else if(bcX0 == MOVING_ADIABATIC_WALL){
+		}else if(bcX0 == Options::MOVING_ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > X0=MOW";
 		}
 
-		if(bcX1 == SPONGE){
+		if(bcX1 == Options::SPONGE){
 		   IF_RANK0 std::cout << "----------------SPG=X1" << std::endl;
-		}else if(bcX1 == ADIABATIC_WALL){
+		}else if(bcX1 == Options::ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------ABW=X1" << std::endl;
-		}else if(bcX1 == MOVING_ADIABATIC_WALL){
+		}else if(bcX1 == Options::MOVING_ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------MOW=X1" << std::endl;
 		}
 
@@ -72,23 +64,23 @@ class BC{
 	    }
 
 	    IF_RANK0 std::cout << " >     Y BOUNDARY CONDITIONS    " << std::endl;
-	    if(bcYType == PERIODIC_SOLVE){
+	    if(bcYType == Options::PERIODIC_SOLVE){
 	        IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[1] = true;
 	    }else{
-		if(bcY0 == SPONGE){
+		if(bcY0 == Options::SPONGE){
 		   IF_RANK0 std::cout << " > Y0=SPG";
-		}else if(bcY0 == ADIABATIC_WALL){
+		}else if(bcY0 == Options::ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > Y0=ABW";
-		}else if(bcY0 == MOVING_ADIABATIC_WALL){
+		}else if(bcY0 == Options::MOVING_ADIABATIC_WALL){
 		   IF_RANK0 std::cout << " > Y0=MOW";
 		}
 
-		if(bcY1 == SPONGE){
+		if(bcY1 == Options::SPONGE){
 		   IF_RANK0 std::cout << "----------------SPG=Y1" << std::endl;
-		}else if(bcY1 == ADIABATIC_WALL){
+		}else if(bcY1 == Options::ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------ABW=Y1" << std::endl;
-		}else if(bcY1 == MOVING_ADIABATIC_WALL){
+		}else if(bcY1 == Options::MOVING_ADIABATIC_WALL){
 		   IF_RANK0 std::cout << "----------------MOW=Y1" << std::endl;
 		}
 
@@ -96,23 +88,23 @@ class BC{
 	    }
 
 	    IF_RANK0 std::cout << " >     Z BOUNDARY CONDITIONS    " << std::endl;
-	    if(bcZType == PERIODIC_SOLVE){
+	    if(bcZType == Options::PERIODIC_SOLVE){
 		IF_RANK0 std::cout << " > ----------PERIODIC---------- " << std::endl;
 		bcPeriodic[2] = true;
 	    }else{
-		if(bcZ0 == SPONGE){
+		if(bcZ0 == Options::SPONGE){
 		    IF_RANK0 std::cout << " > Z0=SPG";
-		}else if(bcZ0 == ADIABATIC_WALL){
+		}else if(bcZ0 == Options::ADIABATIC_WALL){
 		    IF_RANK0 std::cout << " > Z0=ABW";
-		}else if(bcZ0 == MOVING_ADIABATIC_WALL){
+		}else if(bcZ0 == Options::MOVING_ADIABATIC_WALL){
 		    IF_RANK0 std::cout << " > Z0=MOW";
 		}
 
-		if(bcZ1 == SPONGE){
+		if(bcZ1 == Options::SPONGE){
 		    IF_RANK0 std::cout << "----------------SPG=Z1" << std::endl;
-		}else if(bcZ1 == ADIABATIC_WALL){
+		}else if(bcZ1 == Options::ADIABATIC_WALL){
 		    IF_RANK0 std::cout << "----------------ABW=Z1" << std::endl;
-		}else if(bcZ1 == MOVING_ADIABATIC_WALL){
+		}else if(bcZ1 == Options::MOVING_ADIABATIC_WALL){
 		    IF_RANK0 std::cout << "----------------MOW=Z1" << std::endl;
 		}
 		bcPeriodic[2] = false;

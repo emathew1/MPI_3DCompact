@@ -202,9 +202,9 @@ void CurvilinearCSolver::calcDtFromCFL(){
     //done with UChar_dx
     c2d->deallocXYZ(UChar_dx);
 
-    if(ts->CONST_CFL){
+    if(ts->timeSteppingType==Options::CONST_CFL){
 	ts->dt = ts->CFL/max_UChar_dx;
-    }else if(ts->CONST_DT){
+    }else if(ts->timeSteppingType==Options::CONST_DT){
 	ts->CFL = ts->dt*max_UChar_dx;
     }
   

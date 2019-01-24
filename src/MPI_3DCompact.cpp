@@ -12,10 +12,10 @@ using namespace std;
 
 #include "C2Decomp.hpp"
 #include "Macros.hpp"
+#include "Options.hpp"
 #include "TimeStepping.hpp"
 #include "Domain.hpp"
 #include "BC.hpp" 
-#include "Options.hpp"
 
 #include "AbstractCSolver.hpp"
 #include "CurvilinearCSolver.hpp"
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
-    TimeStepping::TimeSteppingType timeSteppingType = TimeStepping::CONST_CFL;
+    Options::TimeSteppingType timeSteppingType = Options::CONST_CFL;
     double CFL       = 0.5;
     int maxTimeStep  = 25000;
     double maxTime   = 3000.0;
@@ -81,16 +81,16 @@ int main(int argc, char *argv[]){
     //Boundary Condition Info//
     ///////////////////////////
 
-    BC::BCType bcXType = BC::PERIODIC_SOLVE;
-    BC::BCType bcYType = BC::DIRICHLET_SOLVE;
-    BC::BCType bcZType = BC::PERIODIC_SOLVE;
+    Options::BCType bcXType = Options::PERIODIC_SOLVE;
+    Options::BCType bcYType = Options::DIRICHLET_SOLVE;
+    Options::BCType bcZType = Options::PERIODIC_SOLVE;
 
-    BC::BCKind bcX0 = BC::INTERNALLY_PERIODIC;
-    BC::BCKind bcX1 = BC::INTERNALLY_PERIODIC;
-    BC::BCKind bcY0 = BC::ADIABATIC_WALL;
-    BC::BCKind bcY1 = BC::CYL_CURVILINEARSPONGE;
-    BC::BCKind bcZ0 = BC::PERIODIC;
-    BC::BCKind bcZ1 = BC::PERIODIC;
+    Options::BCKind bcX0 = Options::INTERNALLY_PERIODIC;
+    Options::BCKind bcX1 = Options::INTERNALLY_PERIODIC;
+    Options::BCKind bcY0 = Options::ADIABATIC_WALL;
+    Options::BCKind bcY1 = Options::CYL_CURVILINEARSPONGE;
+    Options::BCKind bcZ0 = Options::PERIODIC;
+    Options::BCKind bcZ1 = Options::PERIODIC;
 
     double periodicDisp[3][3];
     //x-direction periodic displacement

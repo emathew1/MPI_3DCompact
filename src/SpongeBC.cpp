@@ -78,7 +78,7 @@ void SpongeBC::initRectSpongeBC(){
 	    IF_RANK0 cout << " > spongeLZ = " << spongeLZ << endl;	    
 	
 	    //Use this data to initialize the sponge zones / sponge sigma strength...
-	    if(bc->bcX0 == BC::SPONGE){
+	    if(bc->bcX0 == Options::SPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 			FOR_Z_YPEN{
@@ -93,7 +93,7 @@ void SpongeBC::initRectSpongeBC(){
 	  	}
 	    }
 
-	    if(bc->bcX1 == BC::SPONGE){
+	    if(bc->bcX1 == Options::SPONGE){
 	        FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -108,7 +108,7 @@ void SpongeBC::initRectSpongeBC(){
 	  	}
 	    }     
 
-	    if(bc->bcY0 == BC::SPONGE){
+	    if(bc->bcY0 == Options::SPONGE){
 	        FOR_X_YPEN{
 	            FOR_Y_YPEN{
 			FOR_Z_YPEN{
@@ -123,7 +123,7 @@ void SpongeBC::initRectSpongeBC(){
 		}
 	    }
 	
-	    if(bc->bcY1 == BC::SPONGE){
+	    if(bc->bcY1 == Options::SPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -138,7 +138,7 @@ void SpongeBC::initRectSpongeBC(){
 		}
 	    }    
 
-	    if(bc->bcZ0 == BC::SPONGE){
+	    if(bc->bcZ0 == Options::SPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -153,7 +153,7 @@ void SpongeBC::initRectSpongeBC(){
 		}
   	    }
 	
-	    if(bc->bcZ1 == BC::SPONGE){
+	    if(bc->bcZ1 == Options::SPONGE){
 	        FOR_X_YPEN{
 	            FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -193,7 +193,7 @@ void SpongeBC::initCylSpongeBC(){
 	    double spongeZRmax = spongeZMax;
 	    double spongeZRmin = 5.0;
 		
-	    if(bc->bcY1 == BC::SPONGE){
+	    if(bc->bcY1 == Options::SPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 			FOR_Z_YPEN{
@@ -211,7 +211,7 @@ void SpongeBC::initCylSpongeBC(){
 	    //Default to an 1/8th of the domain size in that direction 
 /*	
 	    //Use this data to initialize the sponge zones / sponge sigma strength...
-	    if(bc->bcX0 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcX0 == Options::RECT_CURVILINEARSPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 			FOR_Z_YPEN{
@@ -226,7 +226,7 @@ void SpongeBC::initCylSpongeBC(){
 	  	}
 	    }
 
-	    if(bc->bcX1 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcX1 == Options::RECT_CURVILINEARSPONGE){
 	        FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -241,7 +241,7 @@ void SpongeBC::initCylSpongeBC(){
 	  	}
 	    }     
 
-	    if(bc->bcY0 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcY0 == Options::RECT_CURVILINEARSPONGE){
 	        FOR_X_YPEN{
 	            FOR_Y_YPEN{
 			FOR_Z_YPEN{
@@ -256,7 +256,7 @@ void SpongeBC::initCylSpongeBC(){
 		}
 	    }
 	
-	    if(bc->bcY1 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcY1 == Options::RECT_CURVILINEARSPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -271,7 +271,7 @@ void SpongeBC::initCylSpongeBC(){
 		}
 	    }    
 
-	    if(bc->bcZ0 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcZ0 == Options::RECT_CURVILINEARSPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_Z_YPEN{
@@ -286,7 +286,7 @@ void SpongeBC::initCylSpongeBC(){
 		}
   	    }
 	
-	    if(bc->bcZ1 == BC::RECT_CURVILINEARSPONGE){
+	    if(bc->bcZ1 == Options::RECT_CURVILINEARSPONGE){
 	        FOR_X_YPEN{
 	            FOR_Y_YPEN{
 		        FOR_Z_YPEN{
