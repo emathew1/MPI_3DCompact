@@ -18,16 +18,18 @@ class TimeStepping{
 	int dumpStep;
 	int imageStep;
 
-	TimeStepping(Options::TimeSteppingType timeSteppingType, 
-		     double CFL, int maxTimeStep, double maxTime, int filterStep, int checkStep, int dumpStep, int imageStep, int mpiRank){
-	    this->timeSteppingType = timeSteppingType;
-	    this->CFL = CFL;
-	    this->maxTimeStep = maxTimeStep;
-	    this->maxTime = maxTime;
-	    this->filterStep = filterStep;
-	    this->checkStep  = checkStep;
-	    this->dumpStep   = dumpStep;
-	    this->imageStep  = imageStep;
+	TimeStepping(Options *opt){
+	    this->timeSteppingType = opt->TSType;
+	    this->CFL         	   = opt->CFL;
+	    this->maxTimeStep      = opt->maxTimeStep;
+	    this->maxTime          = opt->maxTime;
+	    this->filterStep       = opt->filterStep;
+	    this->checkStep        = opt->checkStep;
+	    this->dumpStep         = opt->dumpStep;
+	    this->imageStep        = opt->imageStep;
+	
+	    int mpiRank = opt->mpiRank;
+	
 
 	    if(mpiRank == 0){
 	        std::cout << std::endl;

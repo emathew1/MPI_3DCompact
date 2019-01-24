@@ -32,6 +32,7 @@ class Options{
 
 	//Root rank
 	int root;
+	int mpiRank;
 
 	//Time Stepping Information
 	TimeSteppingType TSType;
@@ -73,7 +74,10 @@ class Options{
     
     Options(int mpiRank){
    
+
       root = 0;
+      this->mpiRank = mpiRank;
+
  
       if(mpiRank == root){
 	ifstream input_file("MPI_3DCompact.in");
@@ -386,7 +390,6 @@ class Options{
       MPI_Bcast(filename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
       filename.assign(filename_c, stringSize);
 
-      cout << mpiRank << " " << filename << endl;
    }	
 
     template<typename T>

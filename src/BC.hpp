@@ -14,25 +14,24 @@ class BC{
 
 	double periodicDisp[3][3];
 
-	BC(Options::BCType bcXType, Options::BCKind bcX0, Options::BCKind bcX1, 
-	   Options::BCType bcYType, Options::BCKind bcY0, Options::BCKind bcY1,
-	   Options::BCType bcZType, Options::BCKind bcZ0, Options::BCKind bcZ1,
-	   bool bcPeriodic[3], int mpiRank, double periodicDisp[3][3]){
+	BC(Options *opt, bool bcPeriodic[3]){
 
-	    this->bcXType = bcXType;
-	    this->bcYType = bcYType;
-	    this->bcZType = bcZType;
+	    int mpiRank = opt->mpiRank;
 
-	    this->bcX0 = bcX0;
-	    this->bcX1 = bcX1;
-	    this->bcY0 = bcY0;
-	    this->bcY1 = bcY1;
-	    this->bcZ0 = bcZ0;
-	    this->bcZ1 = bcZ1;
+	    this->bcXType = opt->bcXType;
+	    this->bcYType = opt->bcYType;
+	    this->bcZType = opt->bcZType;
+
+	    this->bcX0 = opt->bcX0;
+	    this->bcX1 = opt->bcX1;
+	    this->bcY0 = opt->bcY0;
+	    this->bcY1 = opt->bcY1;
+	    this->bcZ0 = opt->bcZ0;
+	    this->bcZ1 = opt->bcZ1;
 
 	    FOR_I3{
 		FOR_J3{
-	            this->periodicDisp[i][j] = periodicDisp[i][j];
+	            this->periodicDisp[i][j] = opt->periodicDisp[i][j];
 	        }
 	    }
 

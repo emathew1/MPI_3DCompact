@@ -54,67 +54,20 @@ int main(int argc, char *argv[]){
     Options *opt = new Options(mpiRank);
 
 
-/*
+
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
-    Options::TimeSteppingType timeSteppingType = Options::CONST_CFL;
-    double CFL       = 0.5;
-    int maxTimeStep  = 25000;
-    double maxTime   = 3000.0;
-    int filterStep   = 1;
-    int checkStep    = 1;
-    int dumpStep     = 2000;
-    int imageStep    = 50;
-    TimeStepping *ts = new TimeStepping(timeSteppingType, 
-					CFL, 
-					maxTimeStep, 
-					maxTime, 
-					filterStep, 
-					checkStep, 
-					dumpStep,
-					imageStep, 
-					mpiRank);
+    TimeStepping *ts = new TimeStepping(opt);
 
 
     ///////////////////////////
     //Boundary Condition Info//
     ///////////////////////////
 
-    Options::BCType bcXType = Options::PERIODIC_SOLVE;
-    Options::BCType bcYType = Options::DIRICHLET_SOLVE;
-    Options::BCType bcZType = Options::PERIODIC_SOLVE;
-
-    Options::BCKind bcX0 = Options::INTERNALLY_PERIODIC;
-    Options::BCKind bcX1 = Options::INTERNALLY_PERIODIC;
-    Options::BCKind bcY0 = Options::ADIABATIC_WALL;
-    Options::BCKind bcY1 = Options::CYL_CURVILINEARSPONGE;
-    Options::BCKind bcZ0 = Options::PERIODIC;
-    Options::BCKind bcZ1 = Options::PERIODIC;
-
-    double periodicDisp[3][3];
-    //x-direction periodic displacement
-    periodicDisp[0][0] = 0.0; // in x
-    periodicDisp[0][1] = 0.0; // in y
-    periodicDisp[0][2] = 0.0; // in z
-
-    //y-direction periodic displacement
-    periodicDisp[1][0] = 0.0; // in x
-    periodicDisp[1][1] = 0.0; // in y
-    periodicDisp[1][2] = 0.0; // in z
-
-    //z-direction periodic displacement
-    periodicDisp[2][0] = 0.0; // in x
-    periodicDisp[2][1] = 0.0; // in y
-    periodicDisp[2][2] = M_PI; // in z
-
-
     bool periodicBC[3];
-    BC *bc = new BC(bcXType, bcX0, bcX1,
-                    bcYType, bcY0, bcY1,
-                    bcZType, bcZ0, bcZ1,
-		    periodicBC, mpiRank, periodicDisp);
-
+    BC *bc = new BC(opt, periodicBC);
+/*
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
