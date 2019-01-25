@@ -67,18 +67,46 @@ int main(int argc, char *argv[]){
 
     bool periodicBC[3];
     BC *bc = new BC(opt, periodicBC);
-/*
+
+
+    //Get the dimesions of the grid so we can initialize the C2Decomp object...
+
+    MPI_Offset disp;
+    int Nx, Ny, Nz;
+    if(opt->fromRestart || opt->onlyGridFromRestart){
+
+	//If we need to read from a file, pull the dimensions from
+	//the leading three doubles from the file...
+        MPI_File fh;
+        MPI_Offset filesize;
+
+        MPI_File_open(MPI_COMM_WORLD, opt->filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+	double cN[3];
+	MPI_File_read_all(fh, cN, 1, MPI_DOUBLE, MPI_STATUS_IGNORE); 
+	Nx = (int)cN[0];
+	Ny = (int)cN[1];
+	Nz = (int)cN[2];
+
+	disp = 24;
+
+	MPI_File_close(&fh);
+
+    }else{
+	Nx = opt->Nx;
+	Ny = opt->Ny;
+	Nz = opt->Nz;
+	disp = 0;
+    }
+
+    cout << Nx << " " << Ny << " " << Nz << endl;; 
+
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
-    int    Nx = 165,
-           Ny = 110,
-           Nz = 48;
-
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
-    double Lx = 1.0,
-           Ly = 1.0,
-           Lz = 1.0;
+    double Lx = 1.0, Ly = 1.0, Lz = 1.0;
+/*
     Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
 
 

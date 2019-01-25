@@ -1150,6 +1150,10 @@ void CurvilinearCSolver::dumpSolution(){
 		    tempY4[jp] = rhoW1[ip];
 		    tempY5[jp] = rhoE1[ip];
 
+		    tempY6[jp] = msh->x[ip];
+		    tempY7[jp] = msh->y[ip];
+		    tempY8[jp] = msh->z[ip];
+
 		}
 	    }
 	}
@@ -1183,6 +1187,18 @@ void CurvilinearCSolver::dumpSolution(){
 	MPI_File_set_size(fh, filesize);
 
 	disp = 0;
+
+	double cNx, cNy, cNz;
+	cNx = (double)Nx;	
+	cNy = (double)Ny;	
+	cNz = (double)Nz;	
+
+	c2d->writeScalar(fh, disp, 1, &cNx); 
+	c2d->writeScalar(fh, disp, 1, &cNy); 
+	c2d->writeScalar(fh, disp, 1, &cNz); 
+	c2d->writeVar(fh, disp, baseDirection, tempY6);
+	c2d->writeVar(fh, disp, baseDirection, tempY7);
+	c2d->writeVar(fh, disp, baseDirection, tempY8);
 	c2d->writeVar(fh, disp, baseDirection, tempY1);
 	c2d->writeVar(fh, disp, baseDirection, tempY2);
 	c2d->writeVar(fh, disp, baseDirection, tempY3);
