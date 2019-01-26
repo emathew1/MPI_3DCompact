@@ -28,11 +28,11 @@ class Domain{
 	int mpiRank;
 
 
-    Domain(BC *bc, int Nx, int Ny, int Nz, double Lx, double Ly, double Lz, int mpiRank){
+    Domain(Options *opt, double Lx, double Ly, double Lz){
 	
-	gNx = Nx;
-	gNy = Ny;
-	gNz = Nz;
+	gNx = opt->Nx;
+	gNy = opt->Ny;
+	gNz = opt->Nz;
 	gN = gNx*gNy*gNz;
 
 	gLx = Lx;
@@ -43,7 +43,7 @@ class Domain{
 	y = new double[gNy];	
 	z = new double[gNz];
 
-	if(bc->bcXType == Options::PERIODIC_SOLVE){
+	if(opt->bcXType == Options::PERIODIC_SOLVE){
 	    for(int ip = 0; ip < gNx; ip++){
 		x[ip] = (double)ip*gLx/(double)gNx;
 	    }
@@ -53,23 +53,23 @@ class Domain{
 	    }	
 	}
 
-	if(bc->bcYType == Options::PERIODIC_SOLVE){
+	if(opt->bcYType == Options::PERIODIC_SOLVE){
 	    for(int jp = 0; jp < gNy; jp++){
 	        y[jp] = (double)jp*gLy/(double)gNy;
 	    }
 	}else{
             for(int jp = 0; jp < gNy; jp++){
-	        y[jp] = (((double)jp)/((double)Ny - 1.0))*gLy;
+	        y[jp] = (((double)jp)/((double)gNy - 1.0))*gLy;
 	    }	
 	}
 
-	if(bc->bcZType == Options::PERIODIC_SOLVE){
+	if(opt->bcZType == Options::PERIODIC_SOLVE){
 	    for(int kp = 0; kp < gNz; kp++){	
 		z[kp] = (double)kp*gLz/(double)gNz;
 	    }
 	}else{
             for(int kp = 0; kp < gNz; kp++){
-	        z[kp] = (((double)kp)/((double)Nz - 1.0))*gLz;
+	        z[kp] = (((double)kp)/((double)gNz - 1.0))*gLz;
 	    }	
 	}
 

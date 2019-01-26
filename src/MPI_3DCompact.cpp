@@ -92,6 +92,10 @@ int main(int argc, char *argv[]){
 
 	MPI_File_close(&fh);
 
+	opt->Nx = Nx;
+	opt->Ny = Ny;
+	opt->Nz = Nz;
+
     }else{
 	Nx = opt->Nx;
 	Ny = opt->Ny;
@@ -106,10 +110,10 @@ int main(int argc, char *argv[]){
     /////////////////////////
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0, Ly = 1.0, Lz = 1.0;
+
+    Domain *d = new Domain(opt, Lx, Ly, Lz);
+
 /*
-    Domain *d = new Domain(bc, Nx, Ny, Nz, Lx, Ly, Lz, mpiRank);
-
-
     /////////////////////////////
     //Initializing Pencil Decomp//
     //////////////////////////////
