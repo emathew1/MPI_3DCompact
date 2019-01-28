@@ -35,8 +35,10 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    //Allocate the memory we need for the mesh...
 	    allocateForMesh();
 
+	
 	    //Generate the mesh...
 	    getMesh();
+	    
 
 	    //Read some info out to the console
 	    getRange(x, "X", pySize[0], pySize[1], pySize[2], mpiRank);
@@ -72,14 +74,15 @@ void AlgebraicSingleBlockMesh::getMesh(){
 	    double x_min_local[3] = {1e10, 1e10, 1e10};
 	    double x_max_local[3] = {-1e10, -1e10, -1e10};
 
-
-	    bool readInGrid = false;
-
+	    bool readInGrid = cs->opt->fromRestart || cs->opt->onlyGridFromRestart;
+  
 	    if(readInGrid){
+
+
 	        MPI_File fh;
 		MPI_Offset disp, filesize;
 
-		string filename = "GridDump.XYZ";
+		string filename = cs->opt->filename;
 		MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 		disp = 0;
 
@@ -90,6 +93,9 @@ void AlgebraicSingleBlockMesh::getMesh(){
 		c2d->allocY(x_temp);
 		c2d->allocY(y_temp);
 		c2d->allocY(z_temp);
+
+	 	//Going to displace by the header with the Nx, Ny, Nz sizes
+		disp += 24;
 
 		c2d->readVar(fh, disp, 1, x_temp);
 		c2d->readVar(fh, disp, 1, y_temp);
@@ -124,6 +130,8 @@ void AlgebraicSingleBlockMesh::getMesh(){
 
 	    }else{
 	         //Generate the mesh algebraically...
+
+
 	         FOR_Z_YPEN{
 		    FOR_Y_YPEN{
 		        FOR_X_YPEN{

@@ -2,6 +2,7 @@
 #define _CABSTRACTSOLVERH_
 
 #include "C2Decomp.hpp"
+#include "Options.hpp"
 #include "AbstractDerivatives.hpp"
 #include "AbstractFilter.hpp"
 #include "IdealGas.hpp"
@@ -41,6 +42,7 @@ class AbstractCSolver{
         double *rhoE1, *rhoEk, *rhoEk2, *rhoE2;       
  
 	C2Decomp *c2d;
+	Options *opt;
 	Domain *dom;
 	BC *bc;
 	TimeStepping *ts;

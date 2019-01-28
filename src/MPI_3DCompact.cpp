@@ -103,28 +103,19 @@ int main(int argc, char *argv[]){
 	disp = 0;
     }
 
-    cout << Nx << " " << Ny << " " << Nz << endl;; 
-
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0, Ly = 1.0, Lz = 1.0;
-
     Domain *d = new Domain(opt, Lx, Ly, Lz);
 
-/*
     /////////////////////////////
     //Initializing Pencil Decomp//
     //////////////////////////////
  
-    int pRow = 0, 
-	pCol = 0;
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
-
-    C2Decomp *c2d;
-    c2d = new C2Decomp(Nx, Ny, Nz, pRow, pCol, periodicBC);
-  
+    C2Decomp *c2d = new C2Decomp(opt->Nx, opt->Ny, opt->Nz, opt->pRow, opt->pCol, periodicBC);
     IF_RANK0 cout << " > Successfully initialized! " << endl;
     IF_RANK0 cout << " > Handing some decomp info back to the domain object... " << endl;
     d->setPencilDecompInfo(c2d);
@@ -135,13 +126,12 @@ int main(int argc, char *argv[]){
     int pxEnd[3], pyEnd[3], pzEnd[3];
     d->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
+
     /////////////////////////
     //Initialize the Solver//
     /////////////////////////
-    double alphaF  = 0.45;
-    double mu_ref  = 0.001;
-    bool useTiming = false;
-    AbstractCSolver *cs= new CurvilinearCSolver(c2d, d, bc, ts, alphaF, mu_ref, useTiming);
+    AbstractCSolver *cs= new CurvilinearCSolver(c2d, d, bc, ts, opt);
+
 
     //Attach the mesh object to the solver...
     cs->msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
@@ -155,8 +145,10 @@ int main(int argc, char *argv[]){
     //Set flow initial conditions//
     ///////////////////////////////
 
-    bool fromRestart = false;
+    bool fromRestart = opt->fromRestart;;
 
+
+/*
     if(!fromRestart){
         FOR_Z_YPEN{
             FOR_Y_YPEN{

@@ -111,16 +111,17 @@ class CurvilinearCSolver: public AbstractCSolver{
 	AbstractFilter *filtXi1, *filtXi2, *filtXi3;
 
 	//Constructor to use for this class...
-	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, double alphaF, double mu_ref, bool useTiming){
+	CurvilinearCSolver(C2Decomp *c2d, Domain *dom, BC *bc, TimeStepping *ts, Options *opt){
 
 	    //Take in input information and initialize data structures...
 	    this->c2d = c2d;
 	    this->dom = dom;
 	    this->bc = bc;
 	    this->ts = ts;
-	    this->alphaF = alphaF;
-	    this->mu_ref = mu_ref;
-	    this->useTiming = useTiming;
+	    this->opt = opt;
+	    this->alphaF = opt->alphaF;
+	    this->mu_ref = opt->mu_ref;
+	    this->useTiming = opt->useTiming;
 
 	    baseDirection = 1;
 
@@ -171,32 +172,6 @@ class CurvilinearCSolver: public AbstractCSolver{
  	    X0WallV = 0.0; X0WallW = 0.0; X1WallV = 0.0; X1WallW = 0.0;
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
-
-	    int minYPenXSize;
-	    int minYPenZSize;
-
-	    MPI_Allreduce(&pySize[0], &minYPenXSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD); 
-	    MPI_Allreduce(&pySize[2], &minYPenZSize, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-
-	    IF_RANK0 cout << " > Mininum number of points in Xi direction in Y-Pencil is " << minYPenXSize << ",";
-	    if(minYPenXSize >= 7){
-		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
-		neumannLocalX = true;
-	    }else{
- 		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
- 		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
-		neumannLocalX = false;
-	    }
-
-	    IF_RANK0 cout << " > Mininum number of points in Zeta direction in Y-Pencil is " << minYPenZSize << ",";
-	    if(minYPenZSize >= 7){
-		IF_RANK0 cout << " don't need to transpose for Neumann BC's" << endl;
-		neumannLocalZ = true;
-	    }else{
- 		IF_RANK0 cout << "need to transpose for Neumann BC's" << endl;
- 		IF_RANK0 cout << "WARNING CURRENTLY NOT IMPLETMENTED FOR YBASE SOLVER!!!" << endl;
-		neumannLocalZ = false;
-	    }
 
 	    t1 = MPI_Wtime();
 	}

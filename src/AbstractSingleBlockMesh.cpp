@@ -1727,7 +1727,7 @@ void AbstractSingleBlockMesh::initMeshADT(){
 
 
 	    //Dump the solution grid
-	    dumpGrid();
+	    //dumpGrid();
 
 	    delete[] boundBoxMin;
 	    delete[] boundBoxMax;
