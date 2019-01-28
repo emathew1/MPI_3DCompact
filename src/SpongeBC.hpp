@@ -19,6 +19,7 @@ class SpongeBC{
 	Domain *domain;
 	IdealGas *idealGas;
 	BC *bc;
+	Options *opt;
 
 	int Nx, Ny, Nz, N;
 
@@ -44,7 +45,7 @@ class SpongeBC{
 
 	Options::SpongeKind spongeKind;
     
-	SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank);
+	SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, Options *opt, int mpiRank);
 	void initRectSpongeBC();
 	void initCylSpongeBC();
 

@@ -132,7 +132,6 @@ int main(int argc, char *argv[]){
     /////////////////////////
     AbstractCSolver *cs= new CurvilinearCSolver(c2d, d, bc, ts, opt);
 
-
     //Attach the mesh object to the solver...
     cs->msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
 
@@ -147,8 +146,6 @@ int main(int argc, char *argv[]){
 
     bool fromRestart = opt->fromRestart;;
 
-
-/*
     if(!fromRestart){
         FOR_Z_YPEN{
             FOR_Y_YPEN{
@@ -179,8 +176,8 @@ int main(int argc, char *argv[]){
         }
     }else{
 
-	string filename = "SolutionDump.2000";
-	int timestep_start = 2000;
+	string filename = opt->filename;
+	int timestep_start = 2000; //This needs to be an input parameter
 
 	cs->timeStep = timestep_start;
 
@@ -188,7 +185,9 @@ int main(int argc, char *argv[]){
 	MPI_Offset disp, filesize;
 
 	MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
-	disp = 0;
+
+	//Need to displace by the first 3 doubles and then three double fields
+	disp = 3*sizeof(double)+ sizeof(double)*3.0*opt->Nx*opt->Ny*opt->Nz;
 
 	IF_RANK0{
 	    cout << " " << endl;
@@ -264,10 +263,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////////
     //Execute the solver timestepping loop//
     ////////////////////////////////////////
-
-
     rk->executeSolverLoop();  
-*/
 
 
     //Now lets kill MPI

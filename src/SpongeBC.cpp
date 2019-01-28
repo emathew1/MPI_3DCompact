@@ -1,6 +1,6 @@
 #include "SpongeBC.hpp"
 
-SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, int mpiRank){
+SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, Options *opt, int mpiRank){
 
 	    
 	    IF_RANK0 std::cout << endl;
