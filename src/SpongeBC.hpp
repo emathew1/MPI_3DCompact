@@ -32,9 +32,9 @@ class SpongeBC{
 	double epsP;
 	double spongeP;
 	double spongeStrength;
-	double spongeLX;
-	double spongeLY;
-	double spongeLZ;
+	double spongeLX0, spongeLX1;
+	double spongeLY0, spongeLY1;
+	double spongeLZ0, spongeLZ1;
 
 	double *sigma;
 	double *spongeRhoAvg;

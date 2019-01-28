@@ -22,7 +22,7 @@ void CurvilinearCSolver::setInitialConditions(){
         bc->bcZ0 == Options::SPONGE || \
         bc->bcZ1 == Options::SPONGE ){
         spongeFlag = true;
-        spg = new SpongeBC(msh, dom, ig, bc, c2d, mpiRank);
+        spg = new SpongeBC(msh, dom, ig, bc, c2d, opt, mpiRank);
     }else{
         spongeFlag = false;
     }

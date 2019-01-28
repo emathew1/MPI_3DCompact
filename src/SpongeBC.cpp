@@ -30,10 +30,10 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
 	    c2d->allocY(spongeRhoWAvg);
 	    c2d->allocY(spongeRhoEAvg);
 
-	    avgT = 1.0;
+	    avgT = opt->spongeAvgT;
 	    epsP = 0.005;
-	    spongeP = 1.0/idealGas->gamma;
-	    spongeStrength = 2;
+	    spongeP = opt->spongeP;
+	    spongeStrength = opt->spongeStrength;
 
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;
@@ -41,11 +41,14 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
  	    //Need to have some way to trigger which one of these is inialized...
 
 	    //If rectangular sponge BC
-	    initRectSpongeBC();
- 
+	    if(spongeKind == Options::RECTILINEAR){
+	    	initRectSpongeBC();
 	    //If cylindrical sponge BC
-	    initCylSpongeBC();	   
-
+ 	    }else if(spongeKind == Options::CYLINDRICAL){
+	    	initCylSpongeBC();	   
+	    }else{
+		//shouldn't get here for now...
+	    }
 	    //If spherical sponge BC
 
 
@@ -69,13 +72,22 @@ void SpongeBC::initRectSpongeBC(){
 	    double spongeZMax = msh->x_max[2];
 
 	    //Default to an 1/8th of the domain size in that direction 
-	    spongeLX = 0.125*(spongeXMax-spongeXMin);
-	    spongeLY = 0.125*(spongeYMax-spongeYMin);
-	    spongeLZ = 0.125*(spongeZMax-spongeZMin);
+	    spongeLX0 = opt->spongeRectX0Perc*(spongeXMax-spongeXMin);
+	    spongeLY0 = opt->spongeRectY0Perc*(spongeYMax-spongeYMin);
+	    spongeLZ0 = opt->spongeRectZ0Perc*(spongeZMax-spongeZMin);
 
-	    IF_RANK0 cout << " > spongeLX = " << spongeLX << endl;	    
-	    IF_RANK0 cout << " > spongeLY = " << spongeLY << endl;	    
-	    IF_RANK0 cout << " > spongeLZ = " << spongeLZ << endl;	    
+	    spongeLX1 = opt->spongeRectX1Perc*(spongeXMax-spongeXMin);
+	    spongeLY1 = opt->spongeRectY1Perc*(spongeYMax-spongeYMin);
+	    spongeLZ1 = opt->spongeRectZ1Perc*(spongeZMax-spongeZMin);
+
+
+
+	    IF_RANK0 cout << " > spongeLX0 = " << spongeLX0 << endl;	    
+	    IF_RANK0 cout << " > spongeLY0 = " << spongeLY0 << endl;	    
+	    IF_RANK0 cout << " > spongeLZ0 = " << spongeLZ0 << endl;	    
+	    IF_RANK0 cout << " > spongeLX1 = " << spongeLX1 << endl;	    
+	    IF_RANK0 cout << " > spongeLY1 = " << spongeLY1 << endl;	    
+	    IF_RANK0 cout << " > spongeLZ1 = " << spongeLZ1 << endl;	    
 	
 	    //Use this data to initialize the sponge zones / sponge sigma strength...
 	    if(bc->bcX0 == Options::SPONGE){
@@ -84,8 +96,8 @@ void SpongeBC::initRectSpongeBC(){
 			FOR_Z_YPEN{
 		    	    int ip = GETMAJIND_YPEN;
 			    double dx = msh->x[ip]-spongeXMin;
-		            if(dx < spongeLX){
-		        	double spongeX = (spongeLX - dx)/spongeLX;
+		            if(dx < spongeLX0){
+		        	double spongeX = (spongeLX0 - dx)/spongeLX0;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -99,8 +111,8 @@ void SpongeBC::initRectSpongeBC(){
 		        FOR_Z_YPEN{
 			    int ip = GETMAJIND_YPEN;
 			    double dx = spongeXMax - msh->x[ip];
-		    	    if(dx < spongeLX){
-		        	double spongeX = (msh->x[ip] - (spongeXMax - spongeLX))/spongeLX;
+		    	    if(dx < spongeLX1){
+		        	double spongeX = (msh->x[ip] - (spongeXMax - spongeLX1))/spongeLX1;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeX, 2.0) + 0.845*pow(spongeX, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -114,8 +126,8 @@ void SpongeBC::initRectSpongeBC(){
 			FOR_Z_YPEN{
 		            int ip = GETMAJIND_YPEN;
 			    double dy = msh->y[ip]-spongeYMin;	
-		            if(dy < spongeLY){
-		                double spongeY = (spongeLY - dy)/spongeLY;
+		            if(dy < spongeLY0){
+		                double spongeY = (spongeLY0 - dy)/spongeLY0;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -129,8 +141,8 @@ void SpongeBC::initRectSpongeBC(){
 		        FOR_Z_YPEN{
 		            int ip = GETMAJIND_YPEN;
 			    double dy = spongeYMax-msh->y[ip];
-		            if(dy < spongeLY){
-		                double spongeY = (msh->y[ip] - (spongeYMax - spongeLY))/spongeLY;
+		            if(dy < spongeLY1){
+		                double spongeY = (msh->y[ip] - (spongeYMax - spongeLY1))/spongeLY1;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeY, 2.0) + 0.845*pow(spongeY, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -144,8 +156,8 @@ void SpongeBC::initRectSpongeBC(){
 		        FOR_Z_YPEN{
 		            int ip = GETMAJIND_YPEN;
 			    double dz = msh->z[ip] - spongeZMin;
-		            if(dz < spongeLZ){
-		                double spongeZ = (spongeLZ - dz)/spongeLZ;
+		            if(dz < spongeLZ0){
+		                double spongeZ = (spongeLZ0 - dz)/spongeLZ0;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ip]);
 			    }
 		        }
@@ -159,8 +171,8 @@ void SpongeBC::initRectSpongeBC(){
 		        FOR_Z_YPEN{
 		    	    int ip = GETMAJIND_YPEN;
 			    double dz = spongeZMax-msh->z[ip];
-		    	    if(dz < spongeLZ){
-		        	double spongeZ = (msh->z[ip] - (spongeZMax-spongeLZ))/spongeLZ;
+		    	    if(dz < spongeLZ1){
+		        	double spongeZ = (msh->z[ip] - (spongeZMax-spongeLZ1))/spongeLZ1;
 			        sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeZ, 2.0) + 0.845*pow(spongeZ, 8.0)), sigma[ip]);
 			    }
 		        }
