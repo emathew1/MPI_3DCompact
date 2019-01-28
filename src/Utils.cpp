@@ -247,7 +247,7 @@ void getRange(double *phi, string Var, int Nx, int Ny, int Nz, int mpiRank){
     MPI_Reduce(&dataMin, &globalMin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
     MPI_Reduce(&dataMax, &globalMax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-    IF_RANK0 cout << "  Range of " << Var << ": " << globalMin << ":" << globalMax << endl;
+    IF_RANK0 cout << "   Range of " << Var << ": " << globalMin << ":" << globalMax << endl;
 
 }
 

@@ -116,8 +116,7 @@ int main(int argc, char *argv[]){
  
     IF_RANK0 cout << endl << " > Initializing the pencil decomposition... " << endl;
     C2Decomp *c2d = new C2Decomp(opt->Nx, opt->Ny, opt->Nz, opt->pRow, opt->pCol, periodicBC);
-    IF_RANK0 cout << " > Successfully initialized! " << endl;
-    IF_RANK0 cout << " > Handing some decomp info back to the domain object... " << endl;
+    IF_RANK0 cout << endl << " > Handing some decomp info back to the domain object... " << endl;
     d->setPencilDecompInfo(c2d);
 
     //This is info needed to use the macros...

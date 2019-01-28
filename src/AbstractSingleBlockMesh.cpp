@@ -1029,8 +1029,6 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    J33[ip] = J[ip]*J33[ip];
 	}
 
-	IF_RANK0 cout << "check" << endl;
-
 	//Copy data over to solver to make simpler to access
 	cs->J = J;
 	cs->J11 = J11;

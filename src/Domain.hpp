@@ -35,6 +35,8 @@ class Domain{
 	gNz = opt->Nz;
 	gN = gNx*gNy*gNz;
 
+	mpiRank = opt->mpiRank;
+
 	gLx = Lx;
 	gLy = Ly;
 	gLz = Lz;

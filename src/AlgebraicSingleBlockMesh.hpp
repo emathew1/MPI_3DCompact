@@ -44,9 +44,9 @@ class AlgebraicSingleBlockMesh:public AbstractSingleBlockMesh{
 	    getRange(x, "X", pySize[0], pySize[1], pySize[2], mpiRank);
 	    getRange(y, "Y", pySize[0], pySize[1], pySize[2], mpiRank);
 	    getRange(z, "Z", pySize[0], pySize[1], pySize[2], mpiRank);
-	    IF_RANK0 cout << "  Range of Xi: "  << d->x[0] <<  ":" << d->x[Nx-1] << endl;
-	    IF_RANK0 cout << "  Range of Eta: " << d->y[0] <<  ":" << d->y[Ny-1] << endl;
-	    IF_RANK0 cout << "  Range of Zta: " << d->z[0] <<  ":" << d->z[Nz-1] << endl;
+	    IF_RANK0 cout << "   Range of Xi: "  << d->x[0] <<  ":" << d->x[Nx-1] << endl;
+	    IF_RANK0 cout << "   Range of Eta: " << d->y[0] <<  ":" << d->y[Ny-1] << endl;
+	    IF_RANK0 cout << "   Range of Zta: " << d->z[0] <<  ":" << d->z[Nz-1] << endl;
 
 	    //Handle the periodic boundary conditions coming in...
 	    handlePeriodicStuff();

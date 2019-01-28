@@ -185,26 +185,59 @@ void SpongeBC::initRectSpongeBC(){
 
 void SpongeBC::initCylSpongeBC(){
 
+        double spongeXMin = msh->x_min[0];
+        double spongeXMax = msh->x_max[0];
+	double spongeYMin = msh->x_min[1];
+	double spongeYMax = msh->x_max[1];
+        double spongeZMin = msh->x_min[2];
+        double spongeZMax = msh->x_max[2];
+
+	double spongeCylAxis[3] = {opt->spongeCylAxisX, opt->spongeCylAxisY, opt->spongeCylAxisZ};
+	double spongeRmin = opt->rMin;
+
+	double spongeRmax;
+
+	if(opt->spongeCylAxisOrient = 2){
+
+	     //This maybe isn't the most general formulation, just takes the most distant boundary point  
+	     //from the cylindrical axis as the the maximum sponge radius
+	     double spongeRXmax1 = fabs(spongeXMin - spongeCylAxis[0]);
+	     double spongeRXmax2 = fabs(spongeXMax - spongeCylAxis[0]);
+	     double spongeRXmax  = fmax(spongeRXmax1, spongeRXmax2);
+
+	     double spongeRYmax1 = fabs(spongeYMin - spongeCylAxis[1]);
+	     double spongeRYmax2 = fabs(spongeYMax - spongeCylAxis[1]);
+	     double spongeRYmax  = fmax(spongeRYmax1, spongeRYmax2);
+
+	     spongeRmax = fmax(spongeRXmax, spongeRYmax);
+
+	     //Is it possible for other faces to be sponges in this kind of configuration? I think so?! Need to implement
+	     if(bc->bcY1 == Options::SPONGE){
+		 FOR_X_YPEN{
+		     FOR_Y_YPEN{
+			 FOR_Z_YPEN{
+			     int ip = GETMAJIND_YPEN;
+			     double r = sqrt(pow(msh->x[ip]-spongeCylAxis[0],2.0) + pow(msh->y[ip]-spongeCylAxis[1],2.0));
+			     if(r > spongeRmin){
+				 double spongeR = (r-spongeRmin)/(spongeRmax-spongeRmin);
+				 sigma[ip] = fmax(spongeStrength*(0.068*pow(spongeR,2.0) + 0.845*pow(spongeR, 8.0)), sigma[ip]);
+			     }
+			 }
+		     }
+	 	 }
+	     }
+
+
+	
+	}else{
+	
+	    cout << "SPONGECYLINDRICAL SHAPE NEEDS TO BE IMPLEMENTED FOR ORIENT = " << opt->spongeCylAxisOrient << endl;
+	    MPI_Abort(MPI_COMM_WORLD, -10);
+	}
 
 	    //Default the maximum ends of the sponge to the domain max, can and may be changed for curvilinear domains
-	    double spongeXMin = msh->x_min[0];
-	    double spongeXMax = msh->x_max[0];
-	    double spongeXAvg = 0.5*(spongeXMin + spongeXMax);
-	    double spongeXRmax = spongeXMax;
-	    double spongeXRmin = 5.0;
 
-	    double spongeYMin = msh->x_min[1];
-	    double spongeYMax = msh->x_max[1];
-	    double spongeYAvg = 0.5*(spongeYMin + spongeYMax);
-	    double spongeYRmax = spongeYMax;
-	    double spongeYRmin = 5.0;
-
-	    double spongeZMin = msh->x_min[2];
-	    double spongeZMax = msh->x_max[2];
-	    double spongeZAvg = 0.5*(spongeZMin + spongeZMax);
-	    double spongeZRmax = spongeZMax;
-	    double spongeZRmin = 5.0;
-		
+/*		
 	    if(bc->bcY1 == Options::SPONGE){
 		FOR_X_YPEN{
 		    FOR_Y_YPEN{
@@ -221,7 +254,7 @@ void SpongeBC::initCylSpongeBC(){
 	    }
 
 	    //Default to an 1/8th of the domain size in that direction 
-/*	
+	
 	    //Use this data to initialize the sponge zones / sponge sigma strength...
 	    if(bc->bcX0 == Options::RECT_CURVILINEARSPONGE){
 		FOR_X_YPEN{
