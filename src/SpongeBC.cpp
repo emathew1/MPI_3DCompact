@@ -11,6 +11,7 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
 	    this->domain = domain;
 	    this->idealGas = idealGas;
 	    this->bc = bc;
+	    this->opt = opt;
 
 	    domain->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
@@ -30,6 +31,7 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
 	    c2d->allocY(spongeRhoWAvg);
 	    c2d->allocY(spongeRhoEAvg);
 
+
 	    avgT = opt->spongeAvgT;
 	    epsP = 0.005;
 	    spongeP = opt->spongeP;
@@ -38,13 +40,14 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
 	    //Need to initialize the sponge sigma to zero
 	    FOR_XYZ_YPEN sigma[ip] = 0.0;
 
- 	    //Need to have some way to trigger which one of these is inialized...
+
+
 
 	    //If rectangular sponge BC
-	    if(spongeKind == Options::RECTILINEAR){
+	    if(opt->spongeKind == Options::RECTILINEAR){
 	    	initRectSpongeBC();
 	    //If cylindrical sponge BC
- 	    }else if(spongeKind == Options::CYLINDRICAL){
+ 	    }else if(opt->spongeKind == Options::CYLINDRICAL){
 	    	initCylSpongeBC();	   
 	    }else{
 		//shouldn't get here for now...
@@ -185,6 +188,8 @@ void SpongeBC::initRectSpongeBC(){
 
 void SpongeBC::initCylSpongeBC(){
 
+
+
         double spongeXMin = msh->x_min[0];
         double spongeXMax = msh->x_max[0];
 	double spongeYMin = msh->x_min[1];
@@ -192,12 +197,17 @@ void SpongeBC::initCylSpongeBC(){
         double spongeZMin = msh->x_min[2];
         double spongeZMax = msh->x_max[2];
 
-	double spongeCylAxis[3] = {opt->spongeCylAxisX, opt->spongeCylAxisY, opt->spongeCylAxisZ};
+	double spongeCylAxis[3];
+	spongeCylAxis[0] = opt->spongeCylAxisX;
+	spongeCylAxis[1] = opt->spongeCylAxisY;
+	spongeCylAxis[2] = opt->spongeCylAxisZ;
+
+
 	double spongeRmin = opt->rMin;
 
 	double spongeRmax;
 
-	if(opt->spongeCylAxisOrient = 2){
+	if(opt->spongeCylAxisOrient == 2){
 
 	     //This maybe isn't the most general formulation, just takes the most distant boundary point  
 	     //from the cylindrical axis as the the maximum sponge radius
