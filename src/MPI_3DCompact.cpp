@@ -77,20 +77,25 @@ int main(int argc, char *argv[]){
 
 	//If we need to read from a file, pull the dimensions from
 	//the leading three doubles from the file...
-        MPI_File fh;
-        MPI_Offset filesize;
-
-        MPI_File_open(MPI_COMM_WORLD, opt->filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
 	double cN[3];
-	MPI_File_read_all(fh, cN, 1, MPI_DOUBLE, MPI_STATUS_IGNORE); 
+	IF_RANK0{
+	    FILE *ptr;
+	    ptr = fopen(opt->filename.c_str(), "rb");
+	    if(ptr == NULL){
+		cout << "ERROR: Couldn't open file " << opt->filename << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }else{
+	        fread(cN, sizeof(double), 3, ptr);
+	    }
+	    fclose(ptr);
+	}
+
+	MPI_Bcast(cN, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
 	Nx = (int)cN[0];
 	Ny = (int)cN[1];
 	Nz = (int)cN[2];
-
-	disp = 24;
-
-	MPI_File_close(&fh);
 
 	opt->Nx = Nx;
 	opt->Ny = Ny;

@@ -3,8 +3,8 @@
 #If running from a restart file
 [RESTART]
 FROMRESTART = FALSE
-ONLYGRIDFROMRESTART = FALSE
-#FILENAME = dumpSolution.1000
+ONLYGRIDFROMRESTART = TRUE
+FILENAME = SolutionDump.5
 
 
 #Information about stepping...
@@ -16,7 +16,7 @@ MAXTIME     = 3000.0
 MAXTIMESTEP = 25000
 FILTERSTEP  = 1
 CHECKSTEP   = 1
-DUMPSTEP    = 2000
+DUMPSTEP    = 5
 IMAGESTEP   = 50
 
 #Boundary Condition Information
