@@ -138,8 +138,8 @@ class CurvilinearCSolver: public AbstractCSolver{
             dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
 	    //initialize time and timestep
-   	    time = 0.0;
-	    timeStep = 0;
+   	    time = opt->time;
+	    timeStep = opt->timeStep;
 	    filterTimeStep = 0;
 	    endFlag = false;
 	    done = false;
@@ -239,7 +239,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	void preStep(){
 
-   	    if(timeStep == 0){
+   	    if(timeStep == opt->timeStep){
 //        	dumpSolution();
         	writeImages();
     	    }

@@ -72,13 +72,14 @@ int main(int argc, char *argv[]){
     //Get the dimesions of the grid so we can initialize the C2Decomp object...
 
     MPI_Offset disp;
-    int Nx, Ny, Nz;
+    int TS, Nx, Ny, Nz;
+    double time;
     if(opt->fromRestart || opt->onlyGridFromRestart){
 
 	//If we need to read from a file, pull the dimensions from
 	//the leading three doubles from the file...
 
-	double cN[3];
+	double cN[5];
 	IF_RANK0{
 	    FILE *ptr;
 	    ptr = fopen(opt->filename.c_str(), "rb");
@@ -86,22 +87,35 @@ int main(int argc, char *argv[]){
 		cout << "ERROR: Couldn't open file " << opt->filename << endl;
 		MPI_Abort(MPI_COMM_WORLD, -10);
 	    }else{
-	        fread(cN, sizeof(double), 3, ptr);
+	        fread(cN, sizeof(double), 5, ptr);
 	    }
 	    fclose(ptr);
 	}
 
-	MPI_Bcast(cN, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Bcast(cN, 5, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-	Nx = (int)cN[0];
-	Ny = (int)cN[1];
-	Nz = (int)cN[2];
+	TS = (int)cN[0];
+	time = cN[1];
+	Nx = (int)cN[2];
+	Ny = (int)cN[3];
+	Nz = (int)cN[4];
 
+	if(opt->fromRestart){
+	    opt->timeStep = TS;
+	    opt->time = time;
+	}else{
+	    opt->timeStep = 0;
+	    opt->time = 0.0;
+	}
 	opt->Nx = Nx;
 	opt->Ny = Ny;
 	opt->Nz = Nz;
 
     }else{
+	TS = 0;
+	time = 0.0;
+	opt->timeStep = TS;
+	opt->time = time;
 	Nx = opt->Nx;
 	Ny = opt->Ny;
 	Nz = opt->Nz;
@@ -181,9 +195,6 @@ int main(int argc, char *argv[]){
     }else{
 
 	string filename = opt->filename;
-	int timestep_start = 2000; //This needs to be an input parameter
-
-	cs->timeStep = timestep_start;
 
 	MPI_File fh;
 	MPI_Offset disp, filesize;
@@ -191,7 +202,7 @@ int main(int argc, char *argv[]){
 	MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
 	//Need to displace by the first 3 doubles and then three double fields
-	disp = 3*sizeof(double)+ sizeof(double)*3.0*opt->Nx*opt->Ny*opt->Nz;
+	disp = 5*sizeof(double)+ sizeof(double)*3.0*opt->Nx*opt->Ny*opt->Nz;
 
 	IF_RANK0{
 	    cout << " " << endl;
@@ -237,10 +248,8 @@ int main(int argc, char *argv[]){
 	cs->c2d->deallocXYZ(rho_in);
 	cs->c2d->deallocXYZ(rhoU_in);
 	cs->c2d->deallocXYZ(rhoV_in);
-
-	//Segfaults for some reason if I dealloc these?
-	//cs->c2d->deallocXYZ(rhoW_in);
-	//cs->c2d->deallocXYZ(rhoE_in);
+	cs->c2d->deallocXYZ(rhoW_in);
+	cs->c2d->deallocXYZ(rhoE_in);
 
     }
 

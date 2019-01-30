@@ -71,7 +71,9 @@ class Options{
 	bool fromRestart;
 	bool onlyGridFromRestart;
 	string filename;
-    
+	int  timeStep;    
+	double time;
+
     Options(int mpiRank){
    
 

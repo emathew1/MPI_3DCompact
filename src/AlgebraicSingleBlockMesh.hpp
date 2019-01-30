@@ -95,7 +95,7 @@ void AlgebraicSingleBlockMesh::getMesh(){
 		c2d->allocY(z_temp);
 
 	 	//Going to displace by the header with the Nx, Ny, Nz sizes
-		disp += 24;
+		disp += 40;
 
 		c2d->readVar(fh, disp, 1, x_temp);
 		c2d->readVar(fh, disp, 1, y_temp);

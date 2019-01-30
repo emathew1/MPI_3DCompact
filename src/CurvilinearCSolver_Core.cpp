@@ -208,9 +208,9 @@ void CurvilinearCSolver::calcDtFromCFL(){
 	ts->CFL = ts->dt*max_UChar_dx;
     }
   
-    if(timeStep == 0){
+    if(timeStep == opt->timeStep){
 	timeStep++;
-	time = 0.0;
+	time = opt->time;
 	IF_RANK0 cout << endl;
     }else{
 	timeStep++;
@@ -1188,11 +1188,14 @@ void CurvilinearCSolver::dumpSolution(){
 
 	disp = 0;
 
-	double cNx, cNy, cNz;
+	double cTS, cNx, cNy, cNz;
+	cTS = (double)timeStep;
 	cNx = (double)Nx;	
 	cNy = (double)Ny;	
 	cNz = (double)Nz;	
 
+	c2d->writeScalar(fh, disp, 1, &cTS);
+	c2d->writeScalar(fh, disp, 1, &time);
 	c2d->writeScalar(fh, disp, 1, &cNx); 
 	c2d->writeScalar(fh, disp, 1, &cNy); 
 	c2d->writeScalar(fh, disp, 1, &cNz); 
@@ -1243,7 +1246,7 @@ void CurvilinearCSolver::writeImages(){
 
 	(*iter)->timeStepString = timeStepString;
 
-	if(timeStep == 0 && (*iter)->dumpInterval == 0){
+	if(timeStep == opt->timeStep && (*iter)->dumpInterval == 0){
 
 	    //if we haven't gotten an interpolator for this pngWriter yet, lets generate it
 	    if((*iter)->interpolatorFlag == false){
