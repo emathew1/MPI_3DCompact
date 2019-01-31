@@ -423,5 +423,15 @@ void SpongeBC::dumpSpongeAvg(int timeStep){
 
 }
 
+void SpongeBC::readSpongeAvgFromRestart(){
 
+    string filename = opt->sponge_filename;
+
+    MPI_File fh;
+    MPI_Offset disp, filesize;
+
+    MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+
+}
 

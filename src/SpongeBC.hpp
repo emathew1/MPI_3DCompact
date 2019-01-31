@@ -50,7 +50,7 @@ class SpongeBC{
 	void initRectSpongeBC();
 	void initCylSpongeBC();
 	void dumpSpongeAvg(int timeStep);
-
+	void readSpongeAvgFromRestart();
 };
 
 #endif

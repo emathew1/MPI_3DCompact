@@ -322,13 +322,18 @@ void CurvilinearCSolver::setInitialConditions(){
     }
 
     if(spongeFlag == true){
-	FOR_XYZ_YPEN{
-	    spg->spongeRhoAvg[ip]  = rho1[ip];
-	    spg->spongeRhoUAvg[ip] = rhoU1[ip];
-	    spg->spongeRhoVAvg[ip] = rhoV1[ip];
-	    spg->spongeRhoWAvg[ip] = rhoW1[ip];
-	    spg->spongeRhoEAvg[ip] = rhoE1[ip];
- 	}
+
+        if(opt->spongeFromRestart){
+            spg->readSpongeAvgFromRestart();   
+	}else{
+	    FOR_XYZ_YPEN{
+	        spg->spongeRhoAvg[ip]  = rho1[ip];
+	        spg->spongeRhoUAvg[ip] = rhoU1[ip];
+	        spg->spongeRhoVAvg[ip] = rhoV1[ip];
+	        spg->spongeRhoWAvg[ip] = rhoW1[ip];
+	        spg->spongeRhoEAvg[ip] = rhoE1[ip];
+ 	    }
+	}
     }
 
 
