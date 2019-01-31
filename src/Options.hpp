@@ -71,6 +71,8 @@ class Options{
 	bool fromRestart;
 	bool onlyGridFromRestart;
 	string filename;
+	bool spongeFromRestart;
+	string sponge_filename;
 	int  timeStep;    
 	double time;
 
@@ -139,7 +141,9 @@ class Options{
 	    ("SOLVER.USETIMING",         po::value<bool>(&useTiming), "Report timing for different code sections")
 	    ("RESTART.FROMRESTART", 	 po::value<bool>(&fromRestart), "Do we start the simulation from a restart")
 	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
-	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file");
+	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file")
+	    ("RESTART.SPONGEAVGFROMRESTART", 	 po::value<bool>(&spongeFromRestart), "Pull the sponge average from file")
+	    ("RESTART.SPONGEAVGFILENAME",	 po::value<string>(&sponge_filename), "Filename of the sponge-avg file");
 	
 	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
 
@@ -307,12 +311,19 @@ class Options{
 	    MPI_Abort(MPI_COMM_WORLD, -10);
 	}
 
-	//Should this even be an input? we should either have this declared in the restart file or in the 
-	//algebraic mesh stuff?
-	forceValue<int>("DOMAIN.NX", "Nx", Nx);
-	forceValue<int>("DOMAIN.NY", "Ny", Ny);
-	forceValue<int>("DOMAIN.NZ", "Nz", Nz);
+	//Need the dimensions of the grid if not from restart frile
+	if(!(fromRestart || onlyGridFromRestart)){
+	    forceValue<int>("DOMAIN.NX", "Nx", Nx);
+	    forceValue<int>("DOMAIN.NY", "Ny", Ny);
+	    forceValue<int>("DOMAIN.NZ", "Nz", Nz);
+	}
 
+	forceValue<bool>("RESTART.SPONGEAVGFROMRESTART", "spongeFromRestart", spongeFromRestart);
+	if(spongeFromRestart){
+	    forceValue<string>("RESTART.SPONGEAVGFILENAME", "sponge_filename", sponge_filename);
+	}
+	
+	
 
       }
 
