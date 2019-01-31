@@ -9,7 +9,7 @@
 #include "BC.hpp"
 #include "Utils.hpp"
 #include "AbstractSingleBlockMesh.hpp"
-
+#include "C2Decomp.hpp"
 
 class SpongeBC{
 
@@ -20,6 +20,7 @@ class SpongeBC{
 	IdealGas *idealGas;
 	BC *bc;
 	Options *opt;
+	C2Decomp *c2d;
 
 	int Nx, Ny, Nz, N;
 
@@ -48,6 +49,7 @@ class SpongeBC{
 	SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *idealGas, BC *bc, C2Decomp *c2d, Options *opt, int mpiRank);
 	void initRectSpongeBC();
 	void initCylSpongeBC();
+	void dumpSpongeAvg(int timeStep);
 
 };
 

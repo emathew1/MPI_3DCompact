@@ -12,6 +12,7 @@ SpongeBC::SpongeBC(AbstractSingleBlockMesh *msh, Domain *domain, IdealGas *ideal
 	    this->idealGas = idealGas;
 	    this->bc = bc;
 	    this->opt = opt;
+	    this->c2d = c2d;
 
 	    domain->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
@@ -357,8 +358,70 @@ void SpongeBC::initCylSpongeBC(){
 	    }    
 */
 
-	}
+}
 
+void SpongeBC::dumpSpongeAvg(int timeStep){
+
+    double *tempY1, *tempY2, *tempY3, *tempY4, *tempY5;
+
+    c2d->allocY(tempY1);  
+    c2d->allocY(tempY2);  
+    c2d->allocY(tempY3);  
+    c2d->allocY(tempY4);  
+    c2d->allocY(tempY5);  
+
+    //Move stuff over to x-major y-pencils for writing out
+    
+    FOR_Z_YPEN{
+	FOR_Y_YPEN{
+	    FOR_X_YPEN{
+		int ip = GETMAJIND_YPEN;
+		int jp = GETIND_YPEN;
+
+		tempY1[jp] = spongeRhoAvg[ip]; 		
+		tempY2[jp] = spongeRhoUAvg[ip]; 		
+		tempY3[jp] = spongeRhoVAvg[ip]; 		
+		tempY4[jp] = spongeRhoWAvg[ip]; 		
+		tempY5[jp] = spongeRhoEAvg[ip]; 		
+	    }
+	}
+    }
+
+    ofstream outfile;
+    outfile.precision(17);
+    string outputFileName;
+    outputFileName = "SpongeAvgDump.";
+
+    ostringstream timeStepString;
+    timeStepString << timeStep;  
+
+    outputFileName.append(timeStepString.str());
+
+    MPI_File fh;
+    MPI_Offset disp, filesize;
+
+    MPI_File_open(MPI_COMM_WORLD, outputFileName.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+    filesize = 0;
+    MPI_File_set_size(fh, filesize);
+  
+    disp = 0;
+
+    c2d->writeVar(fh, disp, 1, tempY1); 
+    c2d->writeVar(fh, disp, 1, tempY2); 
+    c2d->writeVar(fh, disp, 1, tempY3); 
+    c2d->writeVar(fh, disp, 1, tempY4); 
+    c2d->writeVar(fh, disp, 1, tempY5); 
+
+    MPI_File_close(&fh);
+
+    c2d->deallocXYZ(tempY1);
+    c2d->deallocXYZ(tempY2);
+    c2d->deallocXYZ(tempY3);
+    c2d->deallocXYZ(tempY4);
+    c2d->deallocXYZ(tempY5);
+
+}
 
 
 

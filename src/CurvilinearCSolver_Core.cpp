@@ -1210,6 +1210,11 @@ void CurvilinearCSolver::dumpSolution(){
 
 	MPI_File_close(&fh);
 
+
+	if(spongeFlag){
+	    spg->dumpSpongeAvg(timeStep);
+	}
+
 	double time2 = MPI_Wtime();
 
 	IF_RANK0{
