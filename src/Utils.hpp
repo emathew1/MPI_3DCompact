@@ -11,10 +11,11 @@
 
 using namespace std;
 
-//Tridiagonal Matrix solver stuff
+//Tri/Pentadiagonal Matrix solver stuff
 void solveTri(double a[], double b[], double c[], double d[], double x[], double *work, int n);
 void cyclic(double *a, double *b, double *c, double alpha, double beta,
         double *r, int n, double *x);
+void solvePenta(double e[], double a[], double d[], double c[], double f[], double b[], double x[], double B[], double C[], double D[], int size); 
 
 //Transpose Stuff
 void transposeMatrix(double *in, int Nx, int Ny, double *out);

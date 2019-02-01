@@ -49,7 +49,35 @@ int main(int argc, char *argv[]){
 	cout << " > Running on " << totRank << " cores!" << endl;
 	cout << endl;
     }
- 
+
+
+    IF_RANK0{
+	cout << "Testing pentadiagonal solver..." << endl;
+	int N = 25;
+	double e[N], a[N], d[N], c[N], f[N], b[N], x[N], work1[N], work2[N], work3[N];
+	for(int ip = 0; ip < N; ip++){
+	    e[ip] = -1.0;
+	    a[ip] = -2.0;
+	    d[ip] = 10.0;
+	    c[ip] = -2.0;
+	    f[ip] = -1.0;
+	    b[ip] = 3.0;
+	}
+	e[N-1] = 0;
+	e[N-2] = 0;
+	a[N-1] = 0;
+	c[N-1] = 0;
+	f[N-1] = 0;
+	f[N-2] = 0;
+
+	solvePenta(e, a, d, c, f, b, x, work1, work2, work3, N);
+	cout << "Results: " << endl;
+	for(int ip = 0; ip < N; ip++){
+	    cout << x[ip] << endl;
+	}
+    }
+
+   /* 
     //Have the root rank parse the input file and broadcast it out...
     Options *opt = new Options(mpiRank);
 
@@ -278,7 +306,7 @@ int main(int argc, char *argv[]){
     ////////////////////////////////////////
     rk->executeSolverLoop();  
 
-
+*/
     //Now lets kill MPI
     MPI_Finalize();
 

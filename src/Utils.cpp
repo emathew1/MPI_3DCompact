@@ -45,6 +45,42 @@ void cyclic(double *a, double *b, double *c, double alpha, double beta, double *
 
 }
 
+void solvePenta(double e[], double a[], double d[], double c[], double f[], double b[], double x[], double B[], double C[], double D[], int size){
+
+    //e is the left-most band (2:size-1), but is defined as e(0) to e(size-3)
+    //a is the second to left-most band (1:size-1), but is defined as a(0) to a(size-2)
+    //d is the diagonal (0:size-1)
+    //c is the second to right-most band (0:size-2), but the last element isn't used
+    //f is the right-most band (0:size-3), but the last two elements aren't used
+    //b is the RHS 
+    //x is the solution
+    // B, C, D are all just pre-allocated work arrays for the method
+
+    memcpy(x, a, size*sizeof(double));
+    memcpy(B, b, size*sizeof(double));
+    memcpy(C, c, size*sizeof(double));
+    memcpy(D, d, size*sizeof(double));
+    double xmult;
+    for(int ip = 1; ip < size-1; ip++){
+	xmult   = x[ip-1]/D[ip-1];
+	D[ip]   = D[ip] - xmult*C[ip-1];
+	C[ip]   = C[ip] - xmult*f[ip-1];
+	B[ip]   = B[ip] - xmult*B[ip-1];
+	xmult   = e[ip-1]/D[ip-1];
+	x[ip]   = x[ip] - xmult*C[ip-1];
+	D[ip+1] = D[ip+1] - xmult*f[ip-1];
+	B[ip+1] = B[ip+1] - xmult*B[ip-1];
+    }
+    xmult = x[size-2]/D[size-2];
+    D[size-1] =  D[size-1] - xmult*C[size-2];
+    x[size-1] = (B[size-1] - xmult*B[size-2])/D[size-1];
+    x[size-2] = (B[size-2] - C[size-2]*x[size-1])/D[size-2];
+
+    for(int ip = size-3; ip >= 0; ip--){
+	x[ip] = (B[ip] - f[ip]*x[ip+2] - C[ip]*x[ip+1])/D[ip];
+    }
+}
+
 void transposeMatrix(double *in, int Nx, int Ny, double *out){
 
     for(int i = 0; i < Ny; ++i)

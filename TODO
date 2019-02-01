@@ -1,5 +1,3 @@
-Add write/read of Sponge average values for restarting simulations, need those or will start from initial conditions as average and may be wrong.
-
 Add an LES model
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
