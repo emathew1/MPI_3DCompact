@@ -388,7 +388,9 @@ class Options{
       //[RESTART]
       MPI_Bcast(&fromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
       MPI_Bcast(&onlyGridFromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
-      
+      MPI_Bcast(&spongeFromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);     
+
+      //Restart file name 
       int stringSize; 
       if(mpiRank == root){
           stringSize = filename.size()+1;
@@ -402,6 +404,22 @@ class Options{
  
       MPI_Bcast(filename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
       filename.assign(filename_c, stringSize);
+
+      //Sponge Average Restart File name
+      if(mpiRank == root){
+          stringSize = sponge_filename.size()+1;
+      }
+      MPI_Bcast(&stringSize, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      char sfilename_c[stringSize];
+      if(mpiRank == root){
+          strcpy(sfilename_c,sponge_filename.c_str());
+      }
+ 
+      MPI_Bcast(sfilename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
+      sponge_filename.assign(sfilename_c, stringSize);
+
+
 
    }	
 

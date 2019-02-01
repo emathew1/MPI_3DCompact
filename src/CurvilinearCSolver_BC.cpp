@@ -324,7 +324,15 @@ void CurvilinearCSolver::setInitialConditions(){
     if(spongeFlag == true){
 
         if(opt->spongeFromRestart){
+
             spg->readSpongeAvgFromRestart();   
+
+    	    getRange(spg->spongeRhoAvg,   "spongeRhoAvg",  pySize[0], pySize[1], pySize[2], mpiRank);
+    	    getRange(spg->spongeRhoUAvg,  "spongeRhoUAvg", pySize[0], pySize[1], pySize[2], mpiRank);
+    	    getRange(spg->spongeRhoVAvg,  "spongeRhoVAvg", pySize[0], pySize[1], pySize[2], mpiRank);
+    	    getRange(spg->spongeRhoWAvg,  "spongeRhoWAvg", pySize[0], pySize[1], pySize[2], mpiRank);
+    	    getRange(spg->spongeRhoEAvg,  "spongeRhoEAvg", pySize[0], pySize[1], pySize[2], mpiRank);
+
 	}else{
 	    FOR_XYZ_YPEN{
 	        spg->spongeRhoAvg[ip]  = rho1[ip];

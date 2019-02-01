@@ -430,8 +430,58 @@ void SpongeBC::readSpongeAvgFromRestart(){
     MPI_File fh;
     MPI_Offset disp, filesize;
 
-    MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+    IF_RANK0{
+	cout << " > Initializing sponge average field from restart file: " << filename << endl;
+    }
 
+    int err = MPI_File_open(MPI_COMM_WORLD, filename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+    double *rho_in,
+           *rhoU_in, 
+           *rhoV_in,
+           *rhoW_in,
+           *rhoE_in;
+
+    c2d->allocY(rho_in);
+    c2d->allocY(rhoU_in);
+    c2d->allocY(rhoV_in);
+    c2d->allocY(rhoW_in);
+    c2d->allocY(rhoE_in);
+
+    disp = 0;
+
+    c2d->readVar(fh, disp, 1, rho_in);
+    c2d->readVar(fh, disp, 1, rhoU_in);
+    c2d->readVar(fh, disp, 1, rhoV_in);
+    c2d->readVar(fh, disp, 1, rhoW_in);
+    c2d->readVar(fh, disp, 1, rhoE_in);
+
+    MPI_File_close(&fh);
+
+    FOR_Z_YPEN{
+	FOR_Y_YPEN{
+	    FOR_X_YPEN{
+		int ip = GETMAJIND_YPEN;
+		int jp = GETIND_YPEN;
+
+		spongeRhoAvg[ip]  = rho_in[jp];
+		spongeRhoUAvg[ip] = rhoU_in[jp];
+		spongeRhoVAvg[ip] = rhoV_in[jp];
+		spongeRhoWAvg[ip] = rhoW_in[jp];
+		spongeRhoEAvg[ip] = rhoE_in[jp];
+	    }
+	}
+    }
+
+
+    c2d->deallocXYZ(rho_in);
+    c2d->deallocXYZ(rhoU_in);
+    c2d->deallocXYZ(rhoV_in);
+    c2d->deallocXYZ(rhoW_in);
+    c2d->deallocXYZ(rhoE_in);
+
+    IF_RANK0 cout << " > Sponge Average Conditions initialized from file! " << endl;
+    
 
 }
 
