@@ -75,6 +75,28 @@ int main(int argc, char *argv[]){
 	for(int ip = 0; ip < N; ip++){
 	    cout << x[ip] << endl;
 	}
+
+	cout << "Invert Row Major 4x4 Matrix" << endl;
+	double m[16], minv[16];
+	 m[0] = 2;  m[1] = 1;  m[2] = 0;  m[3] = 0;
+	 m[4] = 1;  m[5] = 2;  m[6] = 1;  m[7] = 0;
+	 m[8] = 0;  m[9] = 1; m[10] = 2; m[11] = 1;
+	m[12] = 0; m[13] = 0; m[14] = 1; m[15] = 2;
+	invertRowMajor(m, minv);
+	for(int ip = 0; ip < 16; ip++){
+	    cout << minv[ip] << endl;
+	}
+
+	cout << "Testing cyclicPenta" << endl;
+	double cp[6] = {-1, -2, -1, -1, -2, -1};
+	cyclicPenta(e, a, d, c, f, b, cp, x, N);
+	cout << "Results: " << endl;
+	for(int ip = 0; ip < N; ip++){
+	    cout << x[ip] << endl;
+	}
+
+
+
     }
 
    /* 

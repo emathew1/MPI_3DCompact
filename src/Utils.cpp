@@ -81,7 +81,7 @@ void solvePenta(double e[], double a[], double d[], double c[], double f[], doub
     }
 }
 
-double cyclicPenta(double a[], double b[], double c[], double d[], double e[], double f[], double cp1[6], double x[], int N){
+void cyclicPenta(double a[], double b[], double c[], double d[], double e[], double f[], double cp[6], double x[], int N){
 
 //Solves for x[0:(N-1)] in a pentadiagonal matrix with nonzero entries in the corners
 //
@@ -95,7 +95,7 @@ double cyclicPenta(double a[], double b[], double c[], double d[], double e[], d
 	double u[4][N];
 	double v[4][N];
 	double z[4][N];
-	double y[N], h[4][4], p[4][4];
+	double h[4][4], p[4][4];
    
 	for(int ip = 0; ip < 4; ip++){
 	    for(int jp = 0; jp < N; jp++){
@@ -122,7 +122,7 @@ double cyclicPenta(double a[], double b[], double c[], double d[], double e[], d
 	solvePenta(a, b, c, d, e, u[1], z[1], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[2], z[2], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[3], z[3], work1, work2, work3, N);
-	solvePenta(a, b, c, d, e, f,  y,  work1, work2, work3, N);'
+	solvePenta(a, b, c, d, e, f,  y,  work1, work2, work3, N);
 
  	for(int ip = 0; ip < 4; ip++){
 	    for(int jp = 0; jp < 4; jp++){
