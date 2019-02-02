@@ -81,6 +81,137 @@ void solvePenta(double e[], double a[], double d[], double c[], double f[], doub
     }
 }
 
+double cyclicPenta(double a[], double b[], double c[], double d[], double e[], double f[], double cp1[6], double x[], int N){
+
+//Solves for x[0:(N-1)] in a pentadiagonal matrix with nonzero entries in the corners
+//
+//  x     x     x   0   0   ... 0   cp[0] cp[1]
+//  x     x     x   x   0   ... 0   0     cp[2]
+//  .     .     .   .   .   .   .   .     .
+//  cp[4] 0     0   ... 0   0   x   x     x 
+//  cp[5] cp[6] 0   ... 0   x   x   x     x
+
+	int indx[N];
+	double u[4][N];
+	double v[4][N];
+	double z[4][N];
+	double y[N], h[4][4], p[4][4];
+   
+	for(int ip = 0; ip < 4; ip++){
+	    for(int jp = 0; jp < N; jp++){
+		u[ip][jp] = 0.0;
+		v[ip][jp] = 0.0;
+		z[ip][jp] = 0.0;
+	    }
+	}
+
+	u[0][0]   = 1.0;
+	u[1][1]   = 1.0;
+	u[2][N-2] = 1.0;
+	u[3][N-1] = 1.0;
+
+	v[0][N-2] = cp[0];
+	v[0][N-1] = cp[1];
+	v[1][N-1] = cp[2];
+	v[2][0]   = cp[3];
+	v[3][0]   = cp[4];
+	v[3][1]   = cp[5];
+
+	double work1[N], work2[N], work3[N], y[N];
+	solvePenta(a, b, c, d, e, u[0], z[0], work1, work2, work3, N);
+	solvePenta(a, b, c, d, e, u[1], z[1], work1, work2, work3, N);
+	solvePenta(a, b, c, d, e, u[2], z[2], work1, work2, work3, N);
+	solvePenta(a, b, c, d, e, u[3], z[3], work1, work2, work3, N);
+	solvePenta(a, b, c, d, e, f,  y,  work1, work2, work3, N);'
+
+ 	for(int ip = 0; ip < 4; ip++){
+	    for(int jp = 0; jp < 4; jp++){
+		double sum = 0.0;
+		for(int kp = 0; kp < N; kp++){
+		    sum += v[jp][kp]*z[ip][kp];
+		}
+		p[ip][jp] = sum;
+	    }
+	}
+	for(int ip = 0; ip < 4; ip++){
+	    p[ip][ip] += 1.0;
+	}
+
+	//need to do inverse of matrix...
+	double pr[16], hr[16];
+	for(int ip = 0; ip < 4; ip++){
+	    for(int jp = 0; jp < 4; jp++){
+		pr[ip*4 + jp] = p[ip][jp]; // is this backwards need to test
+	    }
+	}
+	invertRowMajor(pr, hr);
+	for(int ip = 0; ip < 4; ip++){
+	    for(int jp = 0; jp < 4; jp++){
+		h[ip][jp] = hr[ip*4 + jp];
+	    }
+	}
+	//luinv(p, 4, 4, indx, h);
+	//
+	double r[4];
+	for(int ip = 0; ip < 4; ip++){
+	    r[ip] = 0.0;
+	    for(int jp = 0; jp < N; jp++){
+		r[ip] += v[ip][jp]*y[jp];
+	    } 
+	}
+
+	double s[4];
+	for(int ip = 0; ip < 4; ip++){
+	    s[ip] = 0.0;
+	    for(int jp = 0; jp < N; jp++){
+		s[ip] += h[ip][jp]*r[jp];
+	    }
+	}
+
+	for(int ip = 0; ip < N; ip++){
+	    double sum = 0.0;
+	    for(int jp = 0; jp < 4; jp++){
+		sum += z[jp][ip]*s[jp];
+	    }
+	    x[ip] = y[ip] - sum;
+	}
+
+}	
+
+double MINOR(double m[16], int r0, int r1, int r2, int c0, int c1, int c2)
+{
+	    return m[4*r0+c0] * (m[4*r1+c1] * m[4*r2+c2] - m[4*r2+c1] * m[4*r1+c2]) -
+		   m[4*r0+c1] * (m[4*r1+c0] * m[4*r2+c2] - m[4*r2+c0] * m[4*r1+c2]) +
+		   m[4*r0+c2] * (m[4*r1+c0] * m[4*r2+c1] - m[4*r2+c0] * m[4*r1+c1]);
+}
+ 
+ 
+void adjoint(double m[16], double adjOut[16])
+{
+    adjOut[ 0] =  MINOR(m,1,2,3,1,2,3); adjOut[ 1] = -MINOR(m,0,2,3,1,2,3); adjOut[ 2] =  MINOR(m,0,1,3,1,2,3); adjOut[ 3] = -MINOR(m,0,1,2,1,2,3);
+    adjOut[ 4] = -MINOR(m,1,2,3,0,2,3); adjOut[ 5] =  MINOR(m,0,2,3,0,2,3); adjOut[ 6] = -MINOR(m,0,1,3,0,2,3); adjOut[ 7] =  MINOR(m,0,1,2,0,2,3);
+    adjOut[ 8] =  MINOR(m,1,2,3,0,1,3); adjOut[ 9] = -MINOR(m,0,2,3,0,1,3); adjOut[10] =  MINOR(m,0,1,3,0,1,3); adjOut[11] = -MINOR(m,0,1,2,0,1,3);
+    adjOut[12] = -MINOR(m,1,2,3,0,1,2); adjOut[13] =  MINOR(m,0,2,3,0,1,2); adjOut[14] = -MINOR(m,0,1,3,0,1,2); adjOut[15] =  MINOR(m,0,1,2,0,1,2);
+}
+ 
+double det(double m[16])
+{
+    return m[0] * MINOR(m, 1, 2, 3, 1, 2, 3) -
+	   m[1] * MINOR(m, 1, 2, 3, 0, 2, 3) +
+	   m[2] * MINOR(m, 1, 2, 3, 0, 1, 3) -
+	   m[3] * MINOR(m, 1, 2, 3, 0, 1, 2);
+}
+ 
+ 
+void invertRowMajor(double m[16], double invOut[16])
+{
+    adjoint(m, invOut);    
+    double inv_det = 1.0f / det(m);
+    for(int i = 0; i < 16; ++i)
+        invOut[i] = invOut[i] * inv_det;
+}
+
+
 void transposeMatrix(double *in, int Nx, int Ny, double *out){
 
     for(int i = 0; i < Ny; ++i)
