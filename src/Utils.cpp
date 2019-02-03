@@ -91,12 +91,17 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 //  cp[4] 0     0   ... 0   0   x   x     x 
 //  cp[5] cp[6] 0   ... 0   x   x   x     x
 
-	int indx[N];
+//NOTE: simple change that should improve performance some would be to preallocate these arrays and pass them to the function instead
+//of allocating them every time the function is called
+
 	double u[4][N];
 	double v[4][N];
 	double z[4][N];
+	double work1[N], work2[N], work3[N], y[N];
+
+	//These probably don't need to be preallocated for speed because they're small
 	double h[4][4], p[4][4];
-   
+
 	for(int ip = 0; ip < 4; ip++){
 	    for(int jp = 0; jp < N; jp++){
 		u[ip][jp] = 0.0;
@@ -117,7 +122,6 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 	v[3][0]   = cp[4];
 	v[3][1]   = cp[5];
 
-	double work1[N], work2[N], work3[N], y[N];
 	solvePenta(a, b, c, d, e, u[0], z[0], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[1], z[1], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[2], z[2], work1, work2, work3, N);
