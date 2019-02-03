@@ -203,10 +203,6 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    derivX->calc1stDerivField(tempX2, tempX4);
 	}
 
-	///////////////////////////////////////////
-	//LEFT OFF HERE ON ADDING RHS BANDWIDTH 7//
-	///////////////////////////////////////////
-
 	//Transpose back to E2...
 	c2d->transposeX2Y_MajorIndex(tempX3, xE11);
 	c2d->transposeX2Y_MajorIndex(tempX4, xE21);
@@ -222,53 +218,75 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(y, tempZ2);
 
 	//Calculate E3 Derivatives
-	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
-	    double *Nm2x, *Nm1x, *Np1x, *Np2x;
+	if(periodicBCZ){
+	    double *Nm3x, *Nm2x, *Nm1x, *Np1x, *Np2x, *Np3x;
+            Nm3x = new double[pzSize[1]*pzSize[0]];
             Nm2x = new double[pzSize[1]*pzSize[0]];
             Nm1x = new double[pzSize[1]*pzSize[0]];
             Np1x = new double[pzSize[1]*pzSize[0]];
             Np2x = new double[pzSize[1]*pzSize[0]];
+            Np3x = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2y, *Nm1y, *Np1y, *Np2y;
+	    double *Nm3y, *Nm2y, *Nm1y, *Np1y, *Np2y, *Np3y;
+            Nm3y = new double[pzSize[1]*pzSize[0]];
             Nm2y = new double[pzSize[1]*pzSize[0]];
             Nm1y = new double[pzSize[1]*pzSize[0]];
             Np1y = new double[pzSize[1]*pzSize[0]];
             Np2y = new double[pzSize[1]*pzSize[0]];
+            Np3y = new double[pzSize[1]*pzSize[0]];
 
             FOR_Y_ZPEN{
                 FOR_X_ZPEN{
                     int ii = j*pzSize[0] + i;
 
+                    int iim3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-3;
                     int iim2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-2;
                     int iim1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-1;
                     int iip1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 0;
                     int iip2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 1;
+                    int iip3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 2;
 
+                    Nm3x[ii] = tempZ1[iim3]-periodicZTranslation[0];
                     Nm2x[ii] = tempZ1[iim2]-periodicZTranslation[0];
                     Nm1x[ii] = tempZ1[iim1]-periodicZTranslation[0];
                     Np1x[ii] = tempZ1[iip1]+periodicZTranslation[0];
                     Np2x[ii] = tempZ1[iip2]+periodicZTranslation[0];
+                    Np3x[ii] = tempZ1[iip3]+periodicZTranslation[0];
 
+                    Nm3y[ii] = tempZ2[iim3]-periodicZTranslation[1];
                     Nm2y[ii] = tempZ2[iim2]-periodicZTranslation[1];
                     Nm1y[ii] = tempZ2[iim1]-periodicZTranslation[1];
                     Np1y[ii] = tempZ2[iip1]+periodicZTranslation[1];
                     Np2y[ii] = tempZ2[iip2]+periodicZTranslation[1];
+                    Np3y[ii] = tempZ2[iip3]+periodicZTranslation[1];
 
                 }
             }
 
-            derivZ->calc1stDerivField_TPB(tempZ1, tempZ3, Nm2x, Nm1x, Np1x, Np2x);
-            derivZ->calc1stDerivField_TPB(tempZ2, tempZ4, Nm2y, Nm1y, Np1y, Np2y);
+	    if(derivZ->rhsBandwidth == AbstractDerivatives::BW5){
+                derivZ->calc1stDerivField_TPB(tempZ1, tempZ3, Nm2x, Nm1x, Np1x, Np2x);
+                derivZ->calc1stDerivField_TPB(tempZ2, tempZ4, Nm2y, Nm1y, Np1y, Np2y);
+	    }else if(derivZ->rhsBandwidth == AbstractDerivatives::BW7){
+                derivZ->calc1stDerivField_TPB(tempZ1, tempZ3, Nm3x, Nm2x, Nm1x, Np1x, Np2x, Np3x);
+                derivZ->calc1stDerivField_TPB(tempZ2, tempZ4, Nm2y, Nm2y, Nm1y, Np1y, Np2y, Np3y);
+	    }else{
+		cout << "ERROR: Unknown derivZ rhs bandwidth" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }
 
+            delete[] Nm3x;
             delete[] Nm2x;
             delete[] Nm1x;
             delete[] Np1x;
             delete[] Np2x;
+            delete[] Np3x;
 
+            delete[] Nm3y;
             delete[] Nm2y;
             delete[] Nm1y;
             delete[] Np1y;
             delete[] Np2y;
+            delete[] Np3y;
 
 
 	}else{
@@ -345,126 +363,177 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(dVc32);
 
 	//Start doing the E2 derivatives of all of this stuff
-	if(periodicBCY && derivY->rhsBandwidth == AbstractDerivatives::BW5){
-	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
+	if(periodicBCY){
+	    double *Nm3a1, *Nm2a1, *Nm1a1, *Np1a1, *Np2a1, *Np3a1;
+	    Nm3a1 = new double[pySize[0]*pySize[2]];
 	    Nm2a1 = new double[pySize[0]*pySize[2]];
 	    Nm1a1 = new double[pySize[0]*pySize[2]];
 	    Np1a1 = new double[pySize[0]*pySize[2]];
 	    Np2a1 = new double[pySize[0]*pySize[2]];
+	    Np3a1 = new double[pySize[0]*pySize[2]];
 
-	    double *Nm2a3, *Nm1a3, *Np1a3, *Np2a3;
+	    double *Nm3a3, *Nm2a3, *Nm1a3, *Np1a3, *Np2a3, *Np3a3;
+	    Nm3a3 = new double[pySize[0]*pySize[2]];
 	    Nm2a3 = new double[pySize[0]*pySize[2]];
 	    Nm1a3 = new double[pySize[0]*pySize[2]];
 	    Np1a3 = new double[pySize[0]*pySize[2]];
 	    Np2a3 = new double[pySize[0]*pySize[2]];
+	    Np3a3 = new double[pySize[0]*pySize[2]];
 
-	    double *Nm2b1, *Nm1b1, *Np1b1, *Np2b1;
+	    double *Nm3b1, *Nm2b1, *Nm1b1, *Np1b1, *Np2b1, *Np3b1;
+	    Nm3b1 = new double[pySize[0]*pySize[2]];
 	    Nm2b1 = new double[pySize[0]*pySize[2]];
 	    Nm1b1 = new double[pySize[0]*pySize[2]];
 	    Np1b1 = new double[pySize[0]*pySize[2]];
 	    Np2b1 = new double[pySize[0]*pySize[2]];
+	    Np3b1 = new double[pySize[0]*pySize[2]];
 
-	    double *Nm2b3, *Nm1b3, *Np1b3, *Np2b3;
+	    double *Nm3b3, *Nm2b3, *Nm1b3, *Np1b3, *Np2b3, *Np3b3;
+	    Nm3b3 = new double[pySize[0]*pySize[2]];
 	    Nm2b3 = new double[pySize[0]*pySize[2]];
 	    Nm1b3 = new double[pySize[0]*pySize[2]];
 	    Np1b3 = new double[pySize[0]*pySize[2]];
 	    Np2b3 = new double[pySize[0]*pySize[2]];
+	    Np3b3 = new double[pySize[0]*pySize[2]];
 
-	    double *Nm2c1, *Nm1c1, *Np1c1, *Np2c1;
+	    double *Nm3c1, *Nm2c1, *Nm1c1, *Np1c1, *Np2c1, *Np3c1;
+	    Nm3c1 = new double[pySize[0]*pySize[2]];
 	    Nm2c1 = new double[pySize[0]*pySize[2]];
 	    Nm1c1 = new double[pySize[0]*pySize[2]];
 	    Np1c1 = new double[pySize[0]*pySize[2]];
 	    Np2c1 = new double[pySize[0]*pySize[2]];
+	    Np3c1 = new double[pySize[0]*pySize[2]];
 
-	    double *Nm2c3, *Nm1c3, *Np1c3, *Np2c3;
+	    double *Nm3c3, *Nm2c3, *Nm1c3, *Np1c3, *Np2c3, *Np3c3;
+	    Nm3c3 = new double[pySize[0]*pySize[2]];
 	    Nm2c3 = new double[pySize[0]*pySize[2]];
 	    Nm1c3 = new double[pySize[0]*pySize[2]];
 	    Np1c3 = new double[pySize[0]*pySize[2]];
 	    Np2c3 = new double[pySize[0]*pySize[2]];
+	    Np3c3 = new double[pySize[0]*pySize[2]];
 
 
 	    FOR_X_YPEN{
 		FOR_Z_YPEN{
 		    int ii = i*pySize[2] + k;
 
+		    int iim3 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-3;		
 		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;		
 		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
 		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
 		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
+		    int iip3 = i*pySize[2]*pySize[1] + k*pySize[1] + 2;		
 
+		    Nm3a1[ii] = (y[iim3]-periodicYTranslation[1])*xE11[iim3];
 		    Nm2a1[ii] = (y[iim2]-periodicYTranslation[1])*xE11[iim2];
 		    Nm1a1[ii] = (y[iim1]-periodicYTranslation[1])*xE11[iim1];
 		    Np1a1[ii] = (y[iip1]+periodicYTranslation[1])*xE11[iip1];
 		    Np2a1[ii] = (y[iip2]+periodicYTranslation[1])*xE11[iip2];
+		    Np3a1[ii] = (y[iip3]+periodicYTranslation[1])*xE11[iip3];
 	
+		    Nm3a3[ii] = (y[iim3]-periodicYTranslation[1])*xE13[iim3];
 		    Nm2a3[ii] = (y[iim2]-periodicYTranslation[1])*xE13[iim2];
 		    Nm1a3[ii] = (y[iim1]-periodicYTranslation[1])*xE13[iim1];
 		    Np1a3[ii] = (y[iip1]+periodicYTranslation[1])*xE13[iip1];
 		    Np2a3[ii] = (y[iip2]+periodicYTranslation[1])*xE13[iip2];
+		    Np3a3[ii] = (y[iip3]+periodicYTranslation[1])*xE13[iip3];
 
+		    Nm3b1[ii] = (z[iim3]-periodicYTranslation[2])*xE11[iim3];
 		    Nm2b1[ii] = (z[iim2]-periodicYTranslation[2])*xE11[iim2];
 		    Nm1b1[ii] = (z[iim1]-periodicYTranslation[2])*xE11[iim1];
 		    Np1b1[ii] = (z[iip1]+periodicYTranslation[2])*xE11[iip1];
 		    Np2b1[ii] = (z[iip2]+periodicYTranslation[2])*xE11[iip2];
+		    Np3b1[ii] = (z[iip3]+periodicYTranslation[2])*xE11[iip3];
 	
+		    Nm3b3[ii] = (z[iim3]-periodicYTranslation[2])*xE13[iim3];
 		    Nm2b3[ii] = (z[iim2]-periodicYTranslation[2])*xE13[iim2];
 		    Nm1b3[ii] = (z[iim1]-periodicYTranslation[2])*xE13[iim1];
 		    Np1b3[ii] = (z[iip1]+periodicYTranslation[2])*xE13[iip1];
 		    Np2b3[ii] = (z[iip2]+periodicYTranslation[2])*xE13[iip2];
+		    Np3b3[ii] = (z[iip3]+periodicYTranslation[2])*xE13[iip3];
 	
+		    Nm3c1[ii] = (z[iim3]-periodicYTranslation[2])*xE21[iim3];
 		    Nm2c1[ii] = (z[iim2]-periodicYTranslation[2])*xE21[iim2];
 		    Nm1c1[ii] = (z[iim1]-periodicYTranslation[2])*xE21[iim1];
 		    Np1c1[ii] = (z[iip1]+periodicYTranslation[2])*xE21[iip1];
 		    Np2c1[ii] = (z[iip2]+periodicYTranslation[2])*xE21[iip2];
+		    Np3c1[ii] = (z[iip3]+periodicYTranslation[2])*xE21[iip3];
 	
+		    Nm3c3[ii] = (z[iim3]-periodicYTranslation[2])*xE23[iim3];
 		    Nm2c3[ii] = (z[iim2]-periodicYTranslation[2])*xE23[iim2];
 		    Nm1c3[ii] = (z[iim1]-periodicYTranslation[2])*xE23[iim1];
 		    Np1c3[ii] = (z[iip1]+periodicYTranslation[2])*xE23[iip1];
 		    Np2c3[ii] = (z[iip2]+periodicYTranslation[2])*xE23[iip2];
+		    Np3c3[ii] = (z[iip3]+periodicYTranslation[2])*xE23[iip3];
 	
 
 		}
 	    }
 
-	    derivY->calc1stDerivField_TPB(Va1, dVa12, Nm2a1, Nm1a1, Np1a1, Np2a1);
-	    derivY->calc1stDerivField_TPB(Va3, dVa32, Nm2a3, Nm1a3, Np1a3, Np2a3);
+	    if(derivY->rhsBandwidth == AbstractDerivatives::BW5){
+	        derivY->calc1stDerivField_TPB(Va1, dVa12, Nm2a1, Nm1a1, Np1a1, Np2a1);
+	        derivY->calc1stDerivField_TPB(Va3, dVa32, Nm2a3, Nm1a3, Np1a3, Np2a3);
 
-	    derivY->calc1stDerivField_TPB(Vb1, dVb12, Nm2b1, Nm1b1, Np1b1, Np2b1);
-	    derivY->calc1stDerivField_TPB(Vb3, dVb32, Nm2b3, Nm1b3, Np1b3, Np2b3);
+	        derivY->calc1stDerivField_TPB(Vb1, dVb12, Nm2b1, Nm1b1, Np1b1, Np2b1);
+	        derivY->calc1stDerivField_TPB(Vb3, dVb32, Nm2b3, Nm1b3, Np1b3, Np2b3);
 
-	    derivY->calc1stDerivField_TPB(Vc1, dVc12, Nm2c1, Nm1c1, Np1c1, Np2c1);
-	    derivY->calc1stDerivField_TPB(Vc3, dVc32, Nm2c3, Nm1c3, Np1c3, Np2c3);
+	        derivY->calc1stDerivField_TPB(Vc1, dVc12, Nm2c1, Nm1c1, Np1c1, Np2c1);
+	        derivY->calc1stDerivField_TPB(Vc3, dVc32, Nm2c3, Nm1c3, Np1c3, Np2c3);
+	    }else if(derivY->rhsBandwidth == AbstractDerivatives::BW7){
+	        derivY->calc1stDerivField_TPB(Va1, dVa12, Nm3a1, Nm2a1, Nm1a1, Np1a1, Np2a1, Np3a1);
+	        derivY->calc1stDerivField_TPB(Va3, dVa32, Nm3a3, Nm2a3, Nm1a3, Np1a3, Np2a3, Np3a3);
 
+	        derivY->calc1stDerivField_TPB(Vb1, dVb12, Nm3b1, Nm2b1, Nm1b1, Np1b1, Np2b1, Np3b1);
+	        derivY->calc1stDerivField_TPB(Vb3, dVb32, Nm3b3, Nm2b3, Nm1b3, Np1b3, Np2b3, Np3b3);
 
+	        derivY->calc1stDerivField_TPB(Vc1, dVc12, Nm3c1, Nm2c1, Nm1c1, Np1c1, Np2c1, Np3c1);
+	        derivY->calc1stDerivField_TPB(Vc3, dVc32, Nm3c3, Nm2c3, Nm1c3, Np1c3, Np2c3, Np3c3);
+	    }else{
+		cout << "ERROR: Unknown derivY rhs bandwidth" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }
+
+	    delete[] Nm3a1;
 	    delete[] Nm2a1;
 	    delete[] Nm1a1;
 	    delete[] Np1a1;
 	    delete[] Np2a1;
+	    delete[] Np3a1;
 
+	    delete[] Nm3a3;
 	    delete[] Nm2a3;
 	    delete[] Nm1a3;
 	    delete[] Np1a3;
 	    delete[] Np2a3;
+	    delete[] Np3a3;
 
+	    delete[] Nm3b1;
 	    delete[] Nm2b1;
 	    delete[] Nm1b1;
 	    delete[] Np1b1;
 	    delete[] Np2b1;
+	    delete[] Np3b1;
 
+	    delete[] Nm3b3;
 	    delete[] Nm2b3;
 	    delete[] Nm1b3;
 	    delete[] Np1b3;
 	    delete[] Np2b3;
+	    delete[] Np3b3;
 
+	    delete[] Nm3c1;
 	    delete[] Nm2c1;
 	    delete[] Nm1c1;
 	    delete[] Np1c1;
 	    delete[] Np2c1;
+	    delete[] Np3c1;
 
+	    delete[] Nm3c3;
 	    delete[] Nm2c3;
 	    delete[] Nm1c3;
 	    delete[] Np1c3;
 	    delete[] Np2c3;
+	    delete[] Np3c3;
 
 	}else{
 	    derivY->calc1stDerivField(Va1, dVa12);
@@ -493,6 +562,12 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(Vb3, tempX4);
 	c2d->transposeY2X_MajorIndex(Vc2, tempX5);
 	c2d->transposeY2X_MajorIndex(Vc3, tempX6);
+
+
+	///////////////////////////////////////////
+	//LEFT OFF HERE ON ADDING RHS BANDWIDTH 7//
+	///////////////////////////////////////////
+
 
 
 	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
