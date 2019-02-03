@@ -122,13 +122,13 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 	solvePenta(a, b, c, d, e, u[1], z[1], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[2], z[2], work1, work2, work3, N);
 	solvePenta(a, b, c, d, e, u[3], z[3], work1, work2, work3, N);
-	solvePenta(a, b, c, d, e, f,  y,  work1, work2, work3, N);
+	solvePenta(a, b, c, d, e, f,    y,    work1, work2, work3, N);
 
  	for(int ip = 0; ip < 4; ip++){
 	    for(int jp = 0; jp < 4; jp++){
 		double sum = 0.0;
 		for(int kp = 0; kp < N; kp++){
-		    sum += v[jp][kp]*z[ip][kp];
+		    sum += v[ip][kp]*z[jp][kp];
 		}
 		p[ip][jp] = sum;
 	    }
