@@ -39,6 +39,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	//Do the E2 derivatives first...
 	if(periodicBCY){
 
+
 	    double *Nm3x, *Nm2x, *Nm1x, *Np1x, *Np2x, *Np3x; 
 	    Nm3x = new double[pySize[0]*pySize[2]];
 	    Nm2x = new double[pySize[0]*pySize[2]];
@@ -143,6 +144,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
             Np1y = new double[pxSize[1]*pxSize[2]];
             Np2y = new double[pxSize[1]*pxSize[2]];
             Np3y = new double[pxSize[1]*pxSize[2]];
+
 
             FOR_Z_XPEN{
                 FOR_Y_XPEN{
@@ -294,6 +296,8 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    derivZ->calc1stDerivField(tempZ2, tempZ4);
 	}
 
+
+
 	//Transpose over to E2
 	c2d->transposeZ2Y_MajorIndex(tempZ3, xE13);
 	c2d->transposeZ2Y_MajorIndex(tempZ4, xE23);
@@ -417,9 +421,9 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 		FOR_Z_YPEN{
 		    int ii = i*pySize[2] + k;
 
-		    int iim3 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-3;		
-		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;		
-		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
+		    int iim3 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-3;	
+		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;
+		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;
 		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
 		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
 		    int iip3 = i*pySize[2]*pySize[1] + k*pySize[1] + 2;		
@@ -564,13 +568,8 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2X_MajorIndex(Vc3, tempX6);
 
 
-	///////////////////////////////////////////
-	//LEFT OFF HERE ON ADDING RHS BANDWIDTH 7//
-	///////////////////////////////////////////
 
-
-
-	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
+	if(periodicBCX){
 	    
 	    c2d->allocX(y1);
 	    c2d->allocX(z1);
@@ -586,90 +585,127 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->transposeY2X_MajorIndex(xE22, xE22_1);
 	    c2d->transposeY2X_MajorIndex(xE23, xE23_1);
 
-	    double *Nm2a2, *Nm1a2, *Np1a2, *Np2a2;
+	    double *Nm3a2, *Nm2a2, *Nm1a2, *Np1a2, *Np2a2, *Np3a2;
+            Nm3a2 = new double[pxSize[1]*pxSize[2]];
             Nm2a2 = new double[pxSize[1]*pxSize[2]];
             Nm1a2 = new double[pxSize[1]*pxSize[2]];
             Np1a2 = new double[pxSize[1]*pxSize[2]];
             Np2a2 = new double[pxSize[1]*pxSize[2]];
+            Np3a2 = new double[pxSize[1]*pxSize[2]];
 
-	    double *Nm2a3, *Nm1a3, *Np1a3, *Np2a3;
+	    double *Nm3a3, *Nm2a3, *Nm1a3, *Np1a3, *Np2a3, *Np3a3;
+            Nm3a3 = new double[pxSize[1]*pxSize[2]];
             Nm2a3 = new double[pxSize[1]*pxSize[2]];
             Nm1a3 = new double[pxSize[1]*pxSize[2]];
             Np1a3 = new double[pxSize[1]*pxSize[2]];
             Np2a3 = new double[pxSize[1]*pxSize[2]];
+            Np3a3 = new double[pxSize[1]*pxSize[2]];
 
-	    double *Nm2b2, *Nm1b2, *Np1b2, *Np2b2;
+	    double *Nm3b2, *Nm2b2, *Nm1b2, *Np1b2, *Np2b2, *Np3b2;
+	    Nm3b2 = new double[pxSize[1]*pxSize[2]];
 	    Nm2b2 = new double[pxSize[1]*pxSize[2]];
 	    Nm1b2 = new double[pxSize[1]*pxSize[2]];
 	    Np1b2 = new double[pxSize[1]*pxSize[2]];
 	    Np2b2 = new double[pxSize[1]*pxSize[2]];
+	    Np3b2 = new double[pxSize[1]*pxSize[2]];
 
-	    double *Nm2b3, *Nm1b3, *Np1b3, *Np2b3;
+	    double *Nm3b3, *Nm2b3, *Nm1b3, *Np1b3, *Np2b3, *Np3b3;
+	    Nm3b3 = new double[pxSize[1]*pxSize[2]];
 	    Nm2b3 = new double[pxSize[1]*pxSize[2]];
 	    Nm1b3 = new double[pxSize[1]*pxSize[2]];
 	    Np1b3 = new double[pxSize[1]*pxSize[2]];
 	    Np2b3 = new double[pxSize[1]*pxSize[2]];
+	    Np3b3 = new double[pxSize[1]*pxSize[2]];
 
-	    double *Nm2c2, *Nm1c2, *Np1c2, *Np2c2;
+	    double *Nm3c2, *Nm2c2, *Nm1c2, *Np1c2, *Np2c2, *Np3c2;
+	    Nm3c2 = new double[pxSize[1]*pxSize[2]];
 	    Nm2c2 = new double[pxSize[1]*pxSize[2]];
 	    Nm1c2 = new double[pxSize[1]*pxSize[2]];
 	    Np1c2 = new double[pxSize[1]*pxSize[2]];
 	    Np2c2 = new double[pxSize[1]*pxSize[2]];
+	    Np3c2 = new double[pxSize[1]*pxSize[2]];
 
-	    double *Nm2c3, *Nm1c3, *Np1c3, *Np2c3;
+	    double *Nm3c3, *Nm2c3, *Nm1c3, *Np1c3, *Np2c3, *Np3c3;
+	    Nm3c3 = new double[pxSize[1]*pxSize[2]];
 	    Nm2c3 = new double[pxSize[1]*pxSize[2]];
 	    Nm1c3 = new double[pxSize[1]*pxSize[2]];
 	    Np1c3 = new double[pxSize[1]*pxSize[2]];
 	    Np2c3 = new double[pxSize[1]*pxSize[2]];
+	    Np3c3 = new double[pxSize[1]*pxSize[2]];
+
 
             FOR_Z_XPEN{
                 FOR_Y_XPEN{
                     int ii = k*pxSize[1] + j;
 
+                    int iim3 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-3;
                     int iim2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-2;
                     int iim1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-1;
                     int iip1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 0;
                     int iip2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 1;
+                    int iip3 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 2;
 
+                    Nm3a2[ii] = (y1[iim3]-periodicXTranslation[1])*xE12_1[iim3];
                     Nm2a2[ii] = (y1[iim2]-periodicXTranslation[1])*xE12_1[iim2];
                     Nm1a2[ii] = (y1[iim1]-periodicXTranslation[1])*xE12_1[iim1];
                     Np1a2[ii] = (y1[iip1]+periodicXTranslation[1])*xE12_1[iip1];
                     Np2a2[ii] = (y1[iip2]+periodicXTranslation[1])*xE12_1[iip2];
+                    Np3a2[ii] = (y1[iip3]+periodicXTranslation[1])*xE12_1[iip3];
               
+		    Nm3a3[ii] = (y1[iim3]-periodicXTranslation[1])*xE13_1[iim3];
 		    Nm2a3[ii] = (y1[iim2]-periodicXTranslation[1])*xE13_1[iim2];
                     Nm1a3[ii] = (y1[iim1]-periodicXTranslation[1])*xE13_1[iim1];
                     Np1a3[ii] = (y1[iip1]+periodicXTranslation[1])*xE13_1[iip1];
                     Np2a3[ii] = (y1[iip2]+periodicXTranslation[1])*xE13_1[iip2];
+                    Np3a3[ii] = (y1[iip3]+periodicXTranslation[1])*xE13_1[iip3];
              
+		    Nm3b2[ii] = (z1[iim3]-periodicXTranslation[2])*xE12_1[iim3];
 		    Nm2b2[ii] = (z1[iim2]-periodicXTranslation[2])*xE12_1[iim2];
                     Nm1b2[ii] = (z1[iim1]-periodicXTranslation[2])*xE12_1[iim1];
                     Np1b2[ii] = (z1[iip1]+periodicXTranslation[2])*xE12_1[iip1];
                     Np2b2[ii] = (z1[iip2]+periodicXTranslation[2])*xE12_1[iip2];
+                    Np3b2[ii] = (z1[iip3]+periodicXTranslation[2])*xE12_1[iip3];
  
+		    Nm3b3[ii] = (z1[iim3]-periodicXTranslation[2])*xE13_1[iim3];
 		    Nm2b3[ii] = (z1[iim2]-periodicXTranslation[2])*xE13_1[iim2];
                     Nm1b3[ii] = (z1[iim1]-periodicXTranslation[2])*xE13_1[iim1];
                     Np1b3[ii] = (z1[iip1]+periodicXTranslation[2])*xE13_1[iip1];
                     Np2b3[ii] = (z1[iip2]+periodicXTranslation[2])*xE13_1[iip2];
+                    Np3b3[ii] = (z1[iip3]+periodicXTranslation[2])*xE13_1[iip3];
  
+		    Nm3c2[ii] = (z1[iim3]-periodicXTranslation[2])*xE22_1[iim3];
 		    Nm2c2[ii] = (z1[iim2]-periodicXTranslation[2])*xE22_1[iim2];
                     Nm1c2[ii] = (z1[iim1]-periodicXTranslation[2])*xE22_1[iim1];
                     Np1c2[ii] = (z1[iip1]+periodicXTranslation[2])*xE22_1[iip1];
                     Np2c2[ii] = (z1[iip2]+periodicXTranslation[2])*xE22_1[iip2];
+                    Np3c2[ii] = (z1[iip3]+periodicXTranslation[2])*xE22_1[iip3];
 
+		    Nm3c3[ii] = (z1[iim3]-periodicXTranslation[2])*xE23_1[iim3];
 		    Nm2c3[ii] = (z1[iim2]-periodicXTranslation[2])*xE23_1[iim2];
                     Nm1c3[ii] = (z1[iim1]-periodicXTranslation[2])*xE23_1[iim1];
                     Np1c3[ii] = (z1[iip1]+periodicXTranslation[2])*xE23_1[iip1];
                     Np2c3[ii] = (z1[iip2]+periodicXTranslation[2])*xE23_1[iip2];
+                    Np3c3[ii] = (z1[iip3]+periodicXTranslation[2])*xE23_1[iip3];
  
 		}
             }
 
-            derivX->calc1stDerivField_TPB(tempX1, tempX7,  Nm2a2, Nm1a2, Np1a2, Np2a2);
-            derivX->calc1stDerivField_TPB(tempX2, tempX8,  Nm2a3, Nm1a3, Np1a3, Np2a3);
-            derivX->calc1stDerivField_TPB(tempX3, tempX9,  Nm2b2, Nm1b2, Np1b2, Np2b2);
-            derivX->calc1stDerivField_TPB(tempX4, tempX10, Nm2b3, Nm1b3, Np1b3, Np2b3);
-            derivX->calc1stDerivField_TPB(tempX5, tempX11, Nm2c2, Nm1c2, Np1c2, Np2c2);
-            derivX->calc1stDerivField_TPB(tempX6, tempX12, Nm2c3, Nm1c3, Np1c3, Np2c3);
+	    if(derivX->rhsBandwidth == AbstractDerivatives::BW5){
+                derivX->calc1stDerivField_TPB(tempX1, tempX7,  Nm2a2, Nm1a2, Np1a2, Np2a2);
+                derivX->calc1stDerivField_TPB(tempX2, tempX8,  Nm2a3, Nm1a3, Np1a3, Np2a3);
+                derivX->calc1stDerivField_TPB(tempX3, tempX9,  Nm2b2, Nm1b2, Np1b2, Np2b2);
+                derivX->calc1stDerivField_TPB(tempX4, tempX10, Nm2b3, Nm1b3, Np1b3, Np2b3);
+                derivX->calc1stDerivField_TPB(tempX5, tempX11, Nm2c2, Nm1c2, Np1c2, Np2c2);
+                derivX->calc1stDerivField_TPB(tempX6, tempX12, Nm2c3, Nm1c3, Np1c3, Np2c3);
+	    }else if(derivX->rhsBandwidth == AbstractDerivatives::BW7){
+                derivX->calc1stDerivField_TPB(tempX1, tempX7,  Nm3a2, Nm2a2, Nm1a2, Np1a2, Np2a2, Np3a2);
+                derivX->calc1stDerivField_TPB(tempX2, tempX8,  Nm3a3, Nm2a3, Nm1a3, Np1a3, Np2a3, Np3a3);
+                derivX->calc1stDerivField_TPB(tempX3, tempX9,  Nm3b2, Nm2b2, Nm1b2, Np1b2, Np2b2, Np3b2);
+                derivX->calc1stDerivField_TPB(tempX4, tempX10, Nm3b3, Nm2b3, Nm1b3, Np1b3, Np2b3, Np3b3);
+                derivX->calc1stDerivField_TPB(tempX5, tempX11, Nm3c2, Nm2c2, Nm1c2, Np1c2, Np2c2, Np3c2);
+                derivX->calc1stDerivField_TPB(tempX6, tempX12, Nm2c3, Nm2c3, Nm1c3, Np1c3, Np2c3, Np3c3);
+	    }
+
 
 	    c2d->deallocXYZ(y1);
 	    c2d->deallocXYZ(z1);
@@ -678,35 +714,47 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->deallocXYZ(xE22_1);
 	    c2d->deallocXYZ(xE23_1);
 
+	    delete[] Nm3a2;
             delete[] Nm2a2;
             delete[] Nm1a2;
             delete[] Np1a2;
             delete[] Np2a2;
+            delete[] Np3a2;
 
+            delete[] Nm3a3;
             delete[] Nm2a3;
             delete[] Nm1a3;
             delete[] Np1a3;
             delete[] Np2a3;
+            delete[] Np3a3;
 
+            delete[] Nm3b2;
             delete[] Nm2b2;
             delete[] Nm1b2;
             delete[] Np1b2;
             delete[] Np2b2;
+            delete[] Np3b2;
 
+            delete[] Nm3b3;
             delete[] Nm2b3;
             delete[] Nm1b3;
             delete[] Np1b3;
             delete[] Np2b3;
+            delete[] Np3b3;
 
+            delete[] Nm3c2;
             delete[] Nm2c2;
             delete[] Nm1c2;
             delete[] Np1c2;
             delete[] Np2c2;
+            delete[] Np3c2;
 
+            delete[] Nm3c3;
             delete[] Nm2c3;
             delete[] Nm1c3;
             delete[] Np1c3;
             delete[] Np2c3;
+            delete[] Np3c3;
 
 	}else{
 	    derivX->calc1stDerivField(tempX1, tempX7);
@@ -737,6 +785,10 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	double *xE21_3, *xE22_3;
 
 
+	///////////////////////////////////////////
+	//LEFT OFF HERE ON ADDING RHS BANDWIDTH 7//
+	///////////////////////////////////////////
+
 
 	c2d->transposeY2Z_MajorIndex(Va1, tempZ1);
 	c2d->transposeY2Z_MajorIndex(Va2, tempZ2);
@@ -745,7 +797,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->transposeY2Z_MajorIndex(Vc1, tempZ5);
 	c2d->transposeY2Z_MajorIndex(Vc2, tempZ6);
 
-	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
+	if(periodicBCZ){
 	
  	    c2d->allocZ(y3);
 	    c2d->allocZ(z3);
@@ -761,91 +813,126 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->transposeY2Z_MajorIndex(xE21, xE21_3);
 	    c2d->transposeY2Z_MajorIndex(xE22, xE22_3);
 
-	    double *Nm2a1, *Nm1a1, *Np1a1, *Np2a1;
+	    double *Nm3a1, *Nm2a1, *Nm1a1, *Np1a1, *Np2a1, *Np3a1;
+            Nm3a1 = new double[pzSize[1]*pzSize[0]];
             Nm2a1 = new double[pzSize[1]*pzSize[0]];
             Nm1a1 = new double[pzSize[1]*pzSize[0]];
             Np1a1 = new double[pzSize[1]*pzSize[0]];
             Np2a1 = new double[pzSize[1]*pzSize[0]];
+            Np3a1 = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2a2, *Nm1a2, *Np1a2, *Np2a2;
+	    double *Nm3a2, *Nm2a2, *Nm1a2, *Np1a2, *Np2a2, *Np3a2;
+            Nm3a2 = new double[pzSize[1]*pzSize[0]];
             Nm2a2 = new double[pzSize[1]*pzSize[0]];
             Nm1a2 = new double[pzSize[1]*pzSize[0]];
             Np1a2 = new double[pzSize[1]*pzSize[0]];
             Np2a2 = new double[pzSize[1]*pzSize[0]];
+            Np3a2 = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2b1, *Nm1b1, *Np1b1, *Np2b1;
+	    double *Nm3b1, *Nm2b1, *Nm1b1, *Np1b1, *Np2b1, *Np3b1;
+            Nm3b1 = new double[pzSize[1]*pzSize[0]];
             Nm2b1 = new double[pzSize[1]*pzSize[0]];
             Nm1b1 = new double[pzSize[1]*pzSize[0]];
             Np1b1 = new double[pzSize[1]*pzSize[0]];
             Np2b1 = new double[pzSize[1]*pzSize[0]];
+            Np3b1 = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2b2, *Nm1b2, *Np1b2, *Np2b2;
+	    double *Nm3b2, *Nm2b2, *Nm1b2, *Np1b2, *Np2b2, *Np3b2;
+            Nm3b2 = new double[pzSize[1]*pzSize[0]];
             Nm2b2 = new double[pzSize[1]*pzSize[0]];
             Nm1b2 = new double[pzSize[1]*pzSize[0]];
             Np1b2 = new double[pzSize[1]*pzSize[0]];
             Np2b2 = new double[pzSize[1]*pzSize[0]];
+            Np3b2 = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2c1, *Nm1c1, *Np1c1, *Np2c1;
+	    double *Nm3c1, *Nm2c1, *Nm1c1, *Np1c1, *Np2c1, *Np3c1;
+            Nm3c1 = new double[pzSize[1]*pzSize[0]];
             Nm2c1 = new double[pzSize[1]*pzSize[0]];
             Nm1c1 = new double[pzSize[1]*pzSize[0]];
             Np1c1 = new double[pzSize[1]*pzSize[0]];
             Np2c1 = new double[pzSize[1]*pzSize[0]];
+            Np3c1 = new double[pzSize[1]*pzSize[0]];
 
-	    double *Nm2c2, *Nm1c2, *Np1c2, *Np2c2;
+	    double *Nm3c2, *Nm2c2, *Nm1c2, *Np1c2, *Np2c2, *Np3c2;
+            Nm3c2 = new double[pzSize[1]*pzSize[0]];
             Nm2c2 = new double[pzSize[1]*pzSize[0]];
             Nm1c2 = new double[pzSize[1]*pzSize[0]];
             Np1c2 = new double[pzSize[1]*pzSize[0]];
             Np2c2 = new double[pzSize[1]*pzSize[0]];
+            Np3c2 = new double[pzSize[1]*pzSize[0]];
 
             FOR_Y_ZPEN{
                 FOR_X_ZPEN{
                     int ii = j*pzSize[0] + i;
 
+                    int iim3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-3;
                     int iim2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-2;
                     int iim1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-1;
                     int iip1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 0;
                     int iip2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 1;
+                    int iip3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 2;
 
+                    Nm3a1[ii] = (y3[iim3]-periodicZTranslation[1])*xE11_3[iim3];
                     Nm2a1[ii] = (y3[iim2]-periodicZTranslation[1])*xE11_3[iim2];
                     Nm1a1[ii] = (y3[iim1]-periodicZTranslation[1])*xE11_3[iim1];
                     Np1a1[ii] = (y3[iip1]+periodicZTranslation[1])*xE11_3[iip1];
                     Np2a1[ii] = (y3[iip2]+periodicZTranslation[1])*xE11_3[iip2];
+                    Np3a1[ii] = (y3[iip3]+periodicZTranslation[1])*xE11_3[iip3];
 
+                    Nm3a2[ii] = (y3[iim3]-periodicZTranslation[1])*xE12_3[iim3];
                     Nm2a2[ii] = (y3[iim2]-periodicZTranslation[1])*xE12_3[iim2];
                     Nm1a2[ii] = (y3[iim1]-periodicZTranslation[1])*xE12_3[iim1];
                     Np1a2[ii] = (y3[iip1]+periodicZTranslation[1])*xE12_3[iip1];
                     Np2a2[ii] = (y3[iip2]+periodicZTranslation[1])*xE12_3[iip2];
+                    Np3a2[ii] = (y3[iip3]+periodicZTranslation[1])*xE12_3[iip3];
 
+                    Nm3b1[ii] = (z3[iim3]-periodicZTranslation[2])*xE11_3[iim3];
                     Nm2b1[ii] = (z3[iim2]-periodicZTranslation[2])*xE11_3[iim2];
                     Nm1b1[ii] = (z3[iim1]-periodicZTranslation[2])*xE11_3[iim1];
                     Np1b1[ii] = (z3[iip1]+periodicZTranslation[2])*xE11_3[iip1];
                     Np2b1[ii] = (z3[iip2]+periodicZTranslation[2])*xE11_3[iip2];
+                    Np3b1[ii] = (z3[iip3]+periodicZTranslation[2])*xE11_3[iip3];
 
+                    Nm3b2[ii] = (z3[iim3]-periodicZTranslation[2])*xE12_3[iim3];
                     Nm2b2[ii] = (z3[iim2]-periodicZTranslation[2])*xE12_3[iim2];
                     Nm1b2[ii] = (z3[iim1]-periodicZTranslation[2])*xE12_3[iim1];
                     Np1b2[ii] = (z3[iip1]+periodicZTranslation[2])*xE12_3[iip1];
                     Np2b2[ii] = (z3[iip2]+periodicZTranslation[2])*xE12_3[iip2];
+                    Np3b2[ii] = (z3[iip3]+periodicZTranslation[2])*xE12_3[iip3];
 
+                    Nm3c1[ii] = (z3[iim3]-periodicZTranslation[2])*xE21_3[iim3];
                     Nm2c1[ii] = (z3[iim2]-periodicZTranslation[2])*xE21_3[iim2];
                     Nm1c1[ii] = (z3[iim1]-periodicZTranslation[2])*xE21_3[iim1];
                     Np1c1[ii] = (z3[iip1]+periodicZTranslation[2])*xE21_3[iip1];
                     Np2c1[ii] = (z3[iip2]+periodicZTranslation[2])*xE21_3[iip2];
+                    Np3c1[ii] = (z3[iip3]+periodicZTranslation[2])*xE21_3[iip3];
 
+                    Nm3c2[ii] = (z3[iim3]-periodicZTranslation[2])*xE22_3[iim3];
                     Nm2c2[ii] = (z3[iim2]-periodicZTranslation[2])*xE22_3[iim2];
                     Nm1c2[ii] = (z3[iim1]-periodicZTranslation[2])*xE22_3[iim1];
                     Np1c2[ii] = (z3[iip1]+periodicZTranslation[2])*xE22_3[iip1];
                     Np2c2[ii] = (z3[iip2]+periodicZTranslation[2])*xE22_3[iip2];
+                    Np3c2[ii] = (z3[iip3]+periodicZTranslation[2])*xE22_3[iip3];
 
                 }
             }
 
-            derivZ->calc1stDerivField_TPB(tempZ1, tempZ7,  Nm2a1, Nm1a1, Np1a1, Np2a1);
-            derivZ->calc1stDerivField_TPB(tempZ2, tempZ8,  Nm2a2, Nm1a2, Np1a2, Np2a2);
-            derivZ->calc1stDerivField_TPB(tempZ3, tempZ9,  Nm2b1, Nm1b1, Np1b1, Np2b1);
-            derivZ->calc1stDerivField_TPB(tempZ4, tempZ10, Nm2b2, Nm1b2, Np1b2, Np2b2);
-            derivZ->calc1stDerivField_TPB(tempZ5, tempZ11, Nm2c1, Nm1c1, Np1c1, Np2c1);
-	    derivZ->calc1stDerivField_TPB(tempZ6, tempZ12, Nm2c2, Nm1c2, Np1c2, Np2c2);
+	    if(derivZ->rhsBandwidth == AbstractDerivatives::BW5){
+                derivZ->calc1stDerivField_TPB(tempZ1, tempZ7,  Nm2a1, Nm1a1, Np1a1, Np2a1);
+                derivZ->calc1stDerivField_TPB(tempZ2, tempZ8,  Nm2a2, Nm1a2, Np1a2, Np2a2);
+                derivZ->calc1stDerivField_TPB(tempZ3, tempZ9,  Nm2b1, Nm1b1, Np1b1, Np2b1);
+                derivZ->calc1stDerivField_TPB(tempZ4, tempZ10, Nm2b2, Nm1b2, Np1b2, Np2b2);
+                derivZ->calc1stDerivField_TPB(tempZ5, tempZ11, Nm2c1, Nm1c1, Np1c1, Np2c1);
+	        derivZ->calc1stDerivField_TPB(tempZ6, tempZ12, Nm2c2, Nm1c2, Np1c2, Np2c2);
+	    }else if(derivZ->rhsBandwidth == AbstractDerivatives::BW7){
+                derivZ->calc1stDerivField_TPB(tempZ1, tempZ7,  Nm3a1, Nm2a1, Nm1a1, Np1a1, Np2a1, Np3a1);
+                derivZ->calc1stDerivField_TPB(tempZ2, tempZ8,  Nm3a2, Nm2a2, Nm1a2, Np1a2, Np2a2, Np3a2);
+                derivZ->calc1stDerivField_TPB(tempZ3, tempZ9,  Nm3b1, Nm2b1, Nm1b1, Np1b1, Np2b1, Np3b1);
+                derivZ->calc1stDerivField_TPB(tempZ4, tempZ10, Nm3b2, Nm2b2, Nm1b2, Np1b2, Np2b2, Np3b2);
+                derivZ->calc1stDerivField_TPB(tempZ5, tempZ11, Nm3c1, Nm2c1, Nm1c1, Np1c1, Np2c1, Np3c1);
+	        derivZ->calc1stDerivField_TPB(tempZ6, tempZ12, Nm3c2, Nm2c2, Nm1c2, Np1c2, Np2c2, Np3c2);
 
+	    }
 
 	    c2d->deallocXYZ(y3);
 	    c2d->deallocXYZ(z3);
@@ -854,35 +941,47 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->deallocXYZ(xE21_3);
 	    c2d->deallocXYZ(xE22_3);
 
+            delete[] Nm3a1;
             delete[] Nm2a1;
             delete[] Nm1a1;
             delete[] Np1a1;
             delete[] Np2a1;
+            delete[] Np3a1;
 
+            delete[] Nm3a2;
             delete[] Nm2a2;
             delete[] Nm1a2;
             delete[] Np1a2;
             delete[] Np2a2;
+            delete[] Np3a2;
 
+            delete[] Nm3b1;
             delete[] Nm2b1;
             delete[] Nm1b1;
             delete[] Np1b1;
             delete[] Np2b1;
+            delete[] Np3b1;
 
+            delete[] Nm3b2;
             delete[] Nm2b2;
             delete[] Nm1b2;
             delete[] Np1b2;
             delete[] Np2b2;
+            delete[] Np3b2;
 
+            delete[] Nm3c1;
             delete[] Nm2c1;
             delete[] Nm1c1;
             delete[] Np1c1;
             delete[] Np2c1;
+            delete[] Np3c1;
 
+            delete[] Nm3c2;
             delete[] Nm2c2;
             delete[] Nm1c2;
             delete[] Np1c2;
             delete[] Np2c2;
+            delete[] Np3c2;
 
 	}else{
 	    derivZ->calc1stDerivField(tempZ1, tempZ7);
@@ -974,21 +1073,29 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 
 
 	//Compute the E2 component...
-	if(periodicBCY && derivY->rhsBandwidth == AbstractDerivatives::BW5){
-	    double *Nm2, *Nm1, *Np1, *Np2;
+	if(periodicBCY){
+	    double *Nm3, *Nm2, *Nm1, *Np1, *Np2, *Np3;
+	    Nm3 = new double[pySize[0]*pySize[2]];
 	    Nm2 = new double[pySize[0]*pySize[2]];
 	    Nm1 = new double[pySize[0]*pySize[2]];
 	    Np1 = new double[pySize[0]*pySize[2]];
 	    Np2 = new double[pySize[0]*pySize[2]];
+	    Np3 = new double[pySize[0]*pySize[2]];
 
 	    FOR_X_YPEN{
 		FOR_Z_YPEN{
 		    int ii = i*pySize[2] + k;
 
-		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2;			     
-		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;		
+		    int iim3 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-3;  
+		    int iim2 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-2; 
+		    int iim1 = i*pySize[2]*pySize[1] + k*pySize[1] + pySize[1]-1;
 		    int iip1 = i*pySize[2]*pySize[1] + k*pySize[1] + 0;		
 		    int iip2 = i*pySize[2]*pySize[1] + k*pySize[1] + 1;		
+		    int iip3 = i*pySize[2]*pySize[1] + k*pySize[1] + 2;		
+
+		    Nm3[ii] = (x[iim3]-periodicYTranslation[0])*J21[iim3] + 
+			      (y[iim3]-periodicYTranslation[1])*J22[iim3] +
+			      (z[iim3]-periodicYTranslation[2])*J23[iim3];
 	
 		    Nm2[ii] = (x[iim2]-periodicYTranslation[0])*J21[iim2] + 
 			      (y[iim2]-periodicYTranslation[1])*J22[iim2] +
@@ -1006,15 +1113,25 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 			      (y[iip2]+periodicYTranslation[1])*J22[iip2] +
 			      (z[iip2]+periodicYTranslation[2])*J23[iip2];
 
+		    Np3[ii] = (x[iip3]+periodicYTranslation[0])*J21[iip3] + 
+			      (y[iip3]+periodicYTranslation[1])*J22[iip3] +
+			      (z[iip3]+periodicYTranslation[2])*J23[iip3];
+
 		}
 	    }
 
-	    derivY->calc1stDerivField_TPB(preJdet2, Jdet2, Nm2, Nm1, Np1, Np2);
+	    if(derivY->rhsBandwidth == AbstractDerivatives::BW5){
+	        derivY->calc1stDerivField_TPB(preJdet2, Jdet2, Nm2, Nm1, Np1, Np2);
+	    }else if(derivY->rhsBandwidth == AbstractDerivatives::BW7){
+	        derivY->calc1stDerivField_TPB(preJdet2, Jdet2, Nm3, Nm2, Nm1, Np1, Np2, Np3);
+	    }
 
+	    delete[] Nm3;
 	    delete[] Nm2;
 	    delete[] Nm1;
 	    delete[] Np1;
 	    delete[] Np2;
+	    delete[] Np3;
 	
 	}else{
 	    derivY->calc1stDerivField(preJdet2, Jdet2);
@@ -1023,7 +1140,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	//Compute the E1 component....
 	c2d->transposeY2X_MajorIndex(preJdet1, tempX1);
 
-	if(periodicBCX && derivX->rhsBandwidth == AbstractDerivatives::BW5){
+	if(periodicBCX){
 
 	    c2d->transposeY2X_MajorIndex(x, tempX2);
 	    c2d->transposeY2X_MajorIndex(y, tempX3);
@@ -1033,20 +1150,28 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->transposeY2X_MajorIndex(J12, tempX7);
 	    c2d->transposeY2X_MajorIndex(J13, tempX8);
 
-	    double *Nm2, *Nm1, *Np1, *Np2;
+	    double *Nm3, *Nm2, *Nm1, *Np1, *Np2, *Np3;
+	    Nm3 = new double[pxSize[1]*pxSize[2]];
 	    Nm2 = new double[pxSize[1]*pxSize[2]];
 	    Nm1 = new double[pxSize[1]*pxSize[2]];
 	    Np1 = new double[pxSize[1]*pxSize[2]];
 	    Np2 = new double[pxSize[1]*pxSize[2]];
+	    Np3 = new double[pxSize[1]*pxSize[2]];
 
 	    FOR_Z_XPEN{
                 FOR_Y_XPEN{
                     int ii = k*pxSize[1] + j;
 
+                    int iim3 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-3;
                     int iim2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-2;
                     int iim1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + pxSize[0]-1;
                     int iip1 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 0;
                     int iip2 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 1;
+                    int iip3 = k*pxSize[0]*pxSize[1] + j*pxSize[0] + 2;
+
+		    Nm3[ii] = (tempX2[iim3]-periodicXTranslation[0])*tempX6[iim3] + 
+			      (tempX3[iim3]-periodicXTranslation[1])*tempX7[iim3] +
+			      (tempX4[iim3]-periodicXTranslation[2])*tempX8[iim3];
 
 		    Nm2[ii] = (tempX2[iim2]-periodicXTranslation[0])*tempX6[iim2] + 
 			      (tempX3[iim2]-periodicXTranslation[1])*tempX7[iim2] +
@@ -1064,16 +1189,25 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 			      (tempX3[iip2]+periodicXTranslation[1])*tempX7[iip2] +
 			      (tempX4[iip2]+periodicXTranslation[2])*tempX8[iip2];
 
+		    Np3[ii] = (tempX2[iip3]+periodicXTranslation[0])*tempX6[iip3] + 
+			      (tempX3[iip3]+periodicXTranslation[1])*tempX7[iip3] +
+			      (tempX4[iip3]+periodicXTranslation[2])*tempX8[iip3];
+
 		}
 	    }	
 
+	    if(derivX->rhsBandwidth == AbstractDerivatives::BW5){
+	        derivX->calc1stDerivField_TPB(tempX1, tempX5, Nm2, Nm1, Np1, Np2);
+	    }else if(derivX->rhsBandwidth == AbstractDerivatives::BW7){
+	        derivX->calc1stDerivField_TPB(tempX1, tempX5, Nm3, Nm2, Nm1, Np1, Np2, Np3);
+	    }
 
-	    derivX->calc1stDerivField_TPB(tempX1, tempX5, Nm2, Nm1, Np1, Np2);
-
+	    delete[] Nm3;
 	    delete[] Nm2;
 	    delete[] Nm1;
 	    delete[] Np1;
 	    delete[] Np2;
+	    delete[] Np3;
 
 	}else{
 	    derivX->calc1stDerivField(tempX1, tempX5);
@@ -1084,7 +1218,7 @@ void AbstractSingleBlockMesh::solveForJacobians(){
  	//Compute the E3 component....
 	c2d->transposeY2Z_MajorIndex(preJdet3, tempZ1);
 
-	if(periodicBCZ && derivZ->rhsBandwidth == AbstractDerivatives::BW5){
+	if(periodicBCZ){
 
 	    c2d->transposeY2Z_MajorIndex(x, tempZ2);
 	    c2d->transposeY2Z_MajorIndex(y, tempZ3);
@@ -1094,20 +1228,28 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	    c2d->transposeY2Z_MajorIndex(J32, tempZ7);
 	    c2d->transposeY2Z_MajorIndex(J33, tempZ8);
 
-	    double *Nm2, *Nm1, *Np1, *Np2;
+	    double *Nm3, *Nm2, *Nm1, *Np1, *Np2, *Np3;
+	    Nm3 = new double[pzSize[0]*pzSize[1]];
 	    Nm2 = new double[pzSize[0]*pzSize[1]];
 	    Nm1 = new double[pzSize[0]*pzSize[1]];
 	    Np1 = new double[pzSize[0]*pzSize[1]];
 	    Np2 = new double[pzSize[0]*pzSize[1]];
+	    Np3 = new double[pzSize[0]*pzSize[1]];
 
             FOR_Y_ZPEN{
                 FOR_X_ZPEN{
                     int ii = j*pzSize[0] + i;
 
+                    int iim3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-3;
                     int iim2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-2;
                     int iim1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + pzSize[2]-1;
                     int iip1 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 0;
                     int iip2 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 1;
+                    int iip3 = j*pzSize[0]*pzSize[2] + i*pzSize[2] + 2;
+
+		    Nm3[ii] = (tempZ2[iim3]-periodicZTranslation[0])*tempZ6[iim3] + 
+			      (tempZ3[iim3]-periodicZTranslation[1])*tempZ7[iim3] +
+			      (tempZ4[iim3]-periodicZTranslation[2])*tempZ8[iim3];
 
 		    Nm2[ii] = (tempZ2[iim2]-periodicZTranslation[0])*tempZ6[iim2] + 
 			      (tempZ3[iim2]-periodicZTranslation[1])*tempZ7[iim2] +
@@ -1125,15 +1267,25 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 			      (tempZ3[iip2]+periodicZTranslation[1])*tempZ7[iip2] +
 			      (tempZ4[iip2]+periodicZTranslation[2])*tempZ8[iip2];
 
+		    Np3[ii] = (tempZ2[iip3]+periodicZTranslation[0])*tempZ6[iip3] + 
+			      (tempZ3[iip3]+periodicZTranslation[1])*tempZ7[iip3] +
+			      (tempZ4[iip3]+periodicZTranslation[2])*tempZ8[iip3];
+
 		}
 	    }
 
-	    derivZ->calc1stDerivField_TPB(tempZ1, tempZ5, Nm2, Nm1, Np1, Np2);
+	    if(derivZ->rhsBandwidth == AbstractDerivatives::BW5){
+	        derivZ->calc1stDerivField_TPB(tempZ1, tempZ5, Nm2, Nm1, Np1, Np2);
+	    }else if(derivZ->rhsBandwidth == AbstractDerivatives::BW7){
+	        derivZ->calc1stDerivField_TPB(tempZ1, tempZ5, Nm3, Nm2, Nm1, Np1, Np2, Np3);
+	    }
 
+	    delete[] Nm3;
 	    delete[] Nm2;
 	    delete[] Nm1;
 	    delete[] Np1;
 	    delete[] Np2;
+	    delete[] Np3;
 
 	}else{
 	    derivZ->calc1stDerivField(tempZ1, tempZ5);
