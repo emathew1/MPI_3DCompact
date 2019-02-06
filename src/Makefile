@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o
 
 default: MPI_3DCompact
 
@@ -40,6 +40,9 @@ AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.h
 	$(CC) $(CFLAGS) -c $<
 
 Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
+	$(CC) $(CFLAGS) -c $<
+
+Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp 

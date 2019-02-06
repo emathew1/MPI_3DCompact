@@ -13,6 +13,7 @@
 #include "CurvilinearInterpolator.hpp"
 #include "Pade6.hpp"
 #include "Compact8Filter.hpp"
+#include "Compact10Filter.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -161,9 +162,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    derivXi3 = derivZ;
 
 	    //Initialize the filters we're going to use for each direction
-	    filtX  = new Compact8Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
-	    filtY  = new Compact8Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
-	    filtZ  = new Compact8Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    filtX  = new Compact10Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    filtY  = new Compact10Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    filtZ  = new Compact10Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    filtXi1 = filtX;
 	    filtXi2 = filtY;

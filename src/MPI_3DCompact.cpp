@@ -267,11 +267,11 @@ int main(int argc, char *argv[]){
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(25, 1028, 1028, cs->varData[4], "DIL", 2, 0.5, -2.0,2.0, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(11, 4096, 4096, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs->varData[4], "DIL", 2, 0.5, -2.0,2.0, PngWriter::BWR));
 
 
     ////////////////////////////////////////
