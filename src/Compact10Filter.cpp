@@ -4,58 +4,69 @@ using namespace std;
 
 void Compact10Filter::multRHSPeriodicFilter(double *phi, double *RHSvec){
 
-    double cc0 = a0_8;
-    double cc1 = a1_8/2.0;
-    double cc2 = a2_8/2.0;
-    double cc3 = a3_8/2.0;
-    double cc4 = a4_8/2.0;
+    double cc0 = a0_10;
+    double cc1 = a1_10/2.0;
+    double cc2 = a2_10/2.0;
+    double cc3 = a3_10/2.0;
+    double cc4 = a4_10/2.0;
+    double cc5 = a5_10/2.0
 
     for(int ip = 0; ip < N; ip++){
         if(ip == 0){
-            RHSvec[ip] = cc4*phi[N-4]  + cc3*phi[N-3]  +
+            RHSvec[ip] = cc5*phi[N-5]  + cc4*phi[N-4]  + cc3*phi[N-3]  +
                          cc2*phi[N-2]  + cc1*phi[N-1]  + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[ip+4];
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
         }else if(ip == 1){
-            RHSvec[ip] = cc4*phi[N-3]  + cc3*phi[N-2]  +
+            RHSvec[ip] = cc5*phi[N-4]  + cc4*phi[N-3]  + cc3*phi[N-2]  +
                          cc2*phi[N-1]  + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[ip+4];
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
         }else if(ip == 2){
-            RHSvec[ip] = cc4*phi[N-2]  + cc3*phi[N-1]  +
+            RHSvec[ip] = cc5*phi[N-3]  + cc4*phi[N-2]  + cc3*phi[N-1]  +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[ip+4];
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
         }else if(ip == 3){
-            RHSvec[ip] = cc4*phi[N-1]  + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[N-2]  + cc4*phi[N-1]  + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[ip+4];
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
+        }else if(ip == 4){
+            RHSvec[ip] = cc5*phi[N-1]  + cc4*phi[ip-4] + cc3*phi[ip-3] +
+                         cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
+                         cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
+        }else if(ip == N-5){
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
+                         cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
+                         cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
+                         cc4*phi[ip+4] + cc5*phi[0];
         }else if(ip == N-4){
-            RHSvec[ip] = cc4*phi[ip-4] + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[0];
+                         cc4*phi[0]    + cc5*phi[1];
         }else if(ip == N-3){
-            RHSvec[ip] = cc4*phi[ip-4] + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[0]    +
-                         cc4*phi[1];
+                         cc4*phi[1]    + cc5*phi[2];
         }else if(ip == N-2){
-            RHSvec[ip] = cc4*phi[ip-4] + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[0]    + cc3*phi[1]    +
-                         cc4*phi[2];   
+                         cc4*phi[2]    + cc5*phi[3];   
         }else if(ip == N-1){
-            RHSvec[ip] = cc4*phi[ip-4] + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[0]    + cc2*phi[1]    + cc3*phi[2]    +
-                         cc4*phi[3];
+                         cc4*phi[3]    + cc5*phi[4];
         }else{           
-            RHSvec[ip] = cc4*phi[ip-4] + cc3*phi[ip-3] +
+            RHSvec[ip] = cc5*phi[ip-5] + cc4*phi[ip-4] + cc3*phi[ip-3] +
                          cc2*phi[ip-2] + cc1*phi[ip-1] + cc0*phi[ip]   +
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
-                         cc4*phi[ip+4];
+                         cc4*phi[ip+4] + cc5*phi[ip+5];
         }                
         
     }
