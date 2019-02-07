@@ -20,6 +20,12 @@ class Compact10Filter: public AbstractFilter{
 	double FB4_a, FB4_b, FB4_c, FB4_d, FB4_e, FB4_f, FB4_g, FB4_h, FB4_i, FB4_j, FB4_k;
 	double FB5_a, FB5_b, FB5_c, FB5_d, FB5_e, FB5_f, FB5_g, FB5_h, FB5_i, FB5_j, FB5_k;
 
+	//explicit filtering coefficients at boundaries
+	double a00, a01, a02, a03, a04;
+	double b00, b01, b02, b03, b04;
+	double c00, c01, c02, c03, c04;
+
+
     Compact10Filter(double alphaF, Domain *dom, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
@@ -112,6 +118,25 @@ class Compact10Filter: public AbstractFilter{
 	FB5_j    = (   5.0 -  10.0*alphaF)/512.0;
 	FB5_k    = (  -1.0 +   2.0*alphaF)/1024.0;
 
+	a00 = 15.0/16.0;	    
+	a01 =  4.0/16.0;
+	a02 = -6.0/16.0;
+	a03 =  4.0/16.0;
+	a04 = -1.0/16.0;
+
+	b00 =  1.0/16.0;
+	b01 =  3.0/4.0;
+	b02 =  6.0/16.0;
+	b03 = -4.0/16.0;
+	b04 =  1.0/16.0;
+
+	c00 = -1.0/16.0;
+	c01 =  4.0/16.0;
+	c02 =  5.0/8.0;
+	c03 =  4.0/16.0;
+	c04 = -1.0/16.0;
+
+
         for(int ip = 0; ip < N; ip++){
             diagF[ip] = 1.0;
             offlowerF[ip]  = alphaF;
@@ -120,7 +145,7 @@ class Compact10Filter: public AbstractFilter{
         
 	if(bcType == Options::DIRICHLET_SOLVE){
 	    //explicitly filter the boundary points (Lele)
-	/*
+	
 	    offlowerF[0] = 0.0;
 	    offlowerF[1] = 0.0;
 	    offlowerF[2] = 0.0;
@@ -133,7 +158,7 @@ class Compact10Filter: public AbstractFilter{
 	    offlowerF[N-3] = 0.0;
 	    offupperF[N-1] = 0.0;
 	    offupperF[N-2] = 0.0;
-	    offupperF[N-3] = 0.0;*/
+	    offupperF[N-3] = 0.0;
 	}
 
     }
