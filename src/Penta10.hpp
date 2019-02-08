@@ -31,11 +31,14 @@ class Penta10: public AbstractDerivatives{
 	double alpha3_1, alpha3_2, beta3_1, beta3_2;
 	double a3, b3, c3, d3, e3, f3, g3;
 
+	//cp vector for pentadiagonal cyclic solver
+	double cpvec[6];
+
 	//Constructor
         Penta10(Domain *dom, Options::BCType bcType, Direct currentDir){
 
 	    //For this method
-	    rhsBandwidth = BW5;
+	    rhsBandwidth = BW7;
 	    lhsBandwidth = BW5;
 
    	    this->Nx = dom->gNx;
@@ -63,14 +66,14 @@ class Penta10: public AbstractDerivatives{
 	    }
 
 	    //1st Derivative coefficients
-	    alpha =   1.0/2.0;
 	    beta  =   1.0/20.0;
+	    alpha =   1.0/2.0;
 	    a     =  17.0/12.0;
 	    b     = 101.0/150.0;
 	    c     =   1.0/100.0;
 
-   	    alpha1 = 16.0;
    	    beta1  = 28.0;
+   	    alpha1 = 16.0;
 	    a1     = -1181.0/280.0;
 	    b1     =  -892.0/35.0;
 	    c1     =    77.0/5.0;
@@ -81,108 +84,95 @@ class Penta10: public AbstractDerivatives{
 	    h1     =     8.0/105.0; 
 	    i1     =    -1.0/168.0; 
 
-	    //LEFT OFF HERE
 
-	    alpha21_1D = 1.0/8.0;
-	    alpha22_1D = 3.0/4.0;
-	    a2_1D = -43.0/96.0;
-	    b2_1D = -5.0/6.0;
-	    c2_1D =  9.0/8.0;
-	    d2_1D =  1.0/6.0;
-	    e2_1D = -1.0/96.0;
+	    beta2    = 5.0/3.0;
+	    alpha2_1 = 1.0/21.0;
+	    alpha2_2 = 3.0;
+	    a2       = -544.0/2581.0;
+	    b2       =  -39.0/20.0;
+	    c2       =  -17.0/20.0;
+	    d2       =   95.0/36.0;
+	    e2       =    5.0/12.0;
+	    f2       =   -1.0/20.0;
+	    g2       =    1.0/180.0;
+	    h2       =   -1.0/2940.0;
 
-	    //2nd Derivative coefficients
-	    alpha_2D = 2.0/11.0;
-	    a_2D     = 12.0/11.0;
-	    b_2D     = 3.0/11.0;
-
-	    //4th order here
-   	    alpha11_2D = 10.0;
-	    a1_2D =  145.0/12.0;
-	    b1_2D =  -76.0/3.0;
-	    c1_2D =   29.0/2.0;
-	    d1_2D =   -4.0/3.0;
- 	    e1_2D =    1.0/12.0;
-
-	    //6th order here...
-	    alpha21_2D = 2.0/11.0;
-	    alpha22_2D = -131.0/22.0;
-	    a2_2D =  177.0/88.0;
-	    b2_2D = -507.0/44.0;
-	    c2_2D =  783.0/44.0;
-	    d2_2D = -201.0/22.0;
-	    e2_2D =  81.0/88.0;
-	    f2_2D =  -3.0/44.0;
+	    beta3_1  = 1.0/90.0;
+	    beta3_2  = 1.0;
+	    alpha3_1 = 4.0/15.0;
+	    alpha3_2 = 8.0/9.0;
+	    a3       =  -34.0/675.0;
+	    b3       = -127.0/225.0;
+	    c3       =   -7.0/12.0;
+	    d3       =   20.0/27.0;
+	    e3       =    4.0/9.0;
+	    f3       =    1.0/75.0;
+	    g3       =   -1.0/2700.0;
 
 
-	    diag_1D     = new double[N]; 
-	    offlower_1D = new double[N];
-	    offupper_1D = new double[N];
+	    diag_1D      = new double[N]; 
+	    offlower_1D  = new double[N];
+	    offlower2_1D = new double[N];
+	    offupper_1D  = new double[N];
+	    offupper2_1D = new double[N];
 
-	    diag_2D     = new double[N]; 
-	    offlower_2D = new double[N];
-	    offupper_2D = new double[N];
 
-	//Left off here!     
-  
+	//Base banded matrix layout
 	for(int ip = 0; ip < N; ip++){ 
 	    diag_1D[ip] = 1.0;
-	    offlower_1D[ip]  = alpha_1D;
-	    offupper_1D[ip]  = alpha_1D;
+	    offlower_1D[ip]  = alpha;
+	    offupper_1D[ip]  = alpha;
+	    offlower2_1D[ip] = beta;
+	    offupper2_1D[ip] = beta;
 	}
 
-	for(int ip = 0; ip < N; ip++){
-	    diag_2D[ip] = 1.0;
-	    offlower_2D[ip]  = alpha_2D;
-	    offupper_2D[ip]  = alpha_2D;
-	}
-
+	//These are the modified lhs band values for dirichlet BC's
 	if(bcType == Options::DIRICHLET_SOLVE){
-	    offupper_1D[0] = alpha11_1D;  
-	    offupper_1D[1] = alpha22_1D;
-	    offlower_1D[1] = alpha21_1D;
+	    //NOTE: LAYOUT FOR PENTA SOLVER IS DIFFERENT FROM TRI SOLVER,
+	    //TRI SOLVER SKIPS FIRST INDEX FOR LOWER DIAGONAL, PENTA SOLVER 
+	    //SKIPS LAST INDEX FOR LOWER DIAGONAL
+	    offupper_1D[0] = alpha1;  
+	    offupper_1D[1] = alpha2_2;
+	    offupper_1D[2] = alpha3_2;
 
-	    offlower_1D[N-1] = alpha11_1D;
-	    offlower_1D[N-2] = alpha22_1D;
-	    offupper_1D[N-2] = alpha21_1D;
+	    offlower_1D[0] = alpha2_1;
+	    offlower_1D[1] = alpha3_1;
 
-	    offupper_2D[0] = alpha11_2D;  
-	    offupper_2D[1] = alpha22_2D;
-	    offlower_2D[1] = alpha21_2D;
+	    offupper2_1D[0] = beta1;
+	    offupper2_1D[1] = beta2;
+	    offupper2_1D[2] = beta3_2;
 
-	    offlower_2D[N-1] = alpha11_2D;
-	    offlower_2D[N-2] = alpha22_2D;
-	    offupper_2D[N-2] = alpha21_2D;
+	    offlower2_1D[0] = beta3_1;
 	}	
 
+	//cyclical Pentadiagonal solver corner values
+	cpvec[0] = beta;
+	cpvec[1] = alpha;
+	cpvec[2] = beta;
+	cpvec[3] = beta;
+	cpvec[4] = alpha;
+	cpvec[5] = beta;
 
     }
 
     //Function's to call...
     void calc1stDerivField(double *dataIn, double *dataOut);
-    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2);
-    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm3, double *Nm2, double *Nm1, double *Np1, double *Np2, double *Np3){};//empty call here since our bandwidth is 5
-    void calc2ndDerivField(double *dataIn, double *dataOut);
+    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm2, double *Nm1, double *Np1, double *Np2){}; //Empty call since rhs BW is 7
+    void calc1stDerivField_TPB(double *dataIn, double *dataOut, double *Nm3, double *Nm2, double *Nm1, double *Np1, double *Np2, double *Np3);
 
     void calc1stDeriv(double *phi, double *dphi);
     void calc1stDeriv_TPB(double *phi, double *dphi);
-    void calc2ndDeriv(double *phi, double *dphi);
 
     double calcNeumann(double *f);
 
     //Need a cleaner way of passing these things...
     void multRHS1stDerivPeriodic(double dh, double *phi, int N, double *RHSvec);
     void multRHS1stDerivPeriodic_TPB(double dh, double *phi, int N, double *RHSvec);
-    void multRHS2ndDerivPeriodic(double dh, double *phi, int N, double *RHSvec);
     void multRHS1stDerivDirichlet(double dh, double *phi, int N, double *RHSvec);
-    void multRHS2ndDerivDirichlet(double dh, double *phi, int N, double *RHSvec);
-
 
     void Compact1stPeriodic(double *phi, double *dphidx);
     void Compact1stPeriodic_TPB(double *phi, double *dphidx);
-    void Compact2ndPeriodic(double *phi, double *dphidx);
     void Compact1stDirichlet(double *phi, double *dphidx);
-    void Compact2ndDirichlet(double *phi, double *dphidx);
 };
 
 #endif

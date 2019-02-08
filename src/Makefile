@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o
 
 default: MPI_3DCompact
 
@@ -33,10 +33,13 @@ Utils.o: Utils.cpp Domain.hpp Utils.hpp
 Pade6.o: Pade6.cpp Pade6.hpp AbstractDerivatives.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp 
 	$(CC) $(CFLAGS) -c $<
 
+Penta10.o: Penta10.cpp Penta10.hpp AbstractDerivatives.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp 
+	$(CC) $(CFLAGS) -c $<
+
 SpongeBC.o: SpongeBC.cpp SpongeBC.hpp Domain.hpp BC.hpp Macros.hpp IdealGas.hpp AbstractSingleBlockMesh.hpp Utils.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
-AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.hpp AbstractCSolver.hpp Domain.hpp Pade6.hpp Adt.hpp Options.hpp
+AbstractSingleBlockMesh.o: AbstractSingleBlockMesh.cpp AbstractSingleBlockMesh.hpp AbstractCSolver.hpp Domain.hpp Penta10.hpp Pade6.hpp Adt.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
 Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
@@ -48,7 +51,7 @@ Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Do
 CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Pade6.cpp Compact8Filter.hpp Options.hpp
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp Options.hpp

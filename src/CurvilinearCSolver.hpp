@@ -12,6 +12,7 @@
 #include "PngWriter.hpp"
 #include "CurvilinearInterpolator.hpp"
 #include "Pade6.hpp"
+#include "Penta10.hpp"
 #include "Compact8Filter.hpp"
 #include "Compact10Filter.hpp"
 
@@ -153,9 +154,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    initializeSolverData();		    	    
 
 	    //Initialize our derivative calculations for each direction...
-	    derivX = new Pade6(dom, bc->bcXType, AbstractDerivatives::DIRX);
-	    derivY = new Pade6(dom, bc->bcYType, AbstractDerivatives::DIRY);
-	    derivZ = new Pade6(dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    derivX = new Penta10(dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    derivY = new Penta10(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    derivZ = new Penta10(dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    derivXi1 = derivX;
 	    derivXi2 = derivY;

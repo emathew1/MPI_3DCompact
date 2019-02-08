@@ -23,6 +23,7 @@ class AbstractDerivatives{
 	int pxEnd[3], pyEnd[3], pzEnd[3];
 
 	double *diag_1D, *offlower_1D, *offupper_1D;
+	double *offlower2_1D, *offupper2_1D;
 	double *diag_2D, *offlower_2D, *offupper_2D;
 
 	enum Direct {DIRX, DIRY, DIRZ};

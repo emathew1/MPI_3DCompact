@@ -1350,6 +1350,8 @@ void AbstractSingleBlockMesh::solveForJacobians(){
 	c2d->allocY(I3_2);
 	c2d->allocY(I3_3);
 
+	//In calculating these identities does there need to be a transformation at the periodic boundaries??
+
 	derivY->calc1stDerivField(J21, I1_2);
 	derivY->calc1stDerivField(J22, I2_2);
 	derivY->calc1stDerivField(J23, I3_2);
