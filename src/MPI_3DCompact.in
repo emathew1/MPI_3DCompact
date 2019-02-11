@@ -18,7 +18,7 @@ MAXTIME     = 3000.0
 MAXTIMESTEP = 25000
 FILTERSTEP  = 1
 CHECKSTEP   = 1
-DUMPSTEP    = 2000
+DUMPSTEP    = 3000
 IMAGESTEP   = 50
 
 #Boundary Condition Information
@@ -36,7 +36,7 @@ BCZ1 = PERIODIC
 
 PERIODICDISPZ_X = 0
 PERIODICDISPZ_Y = 0
-PERIODICDISPZ_Z = 3.1416
+PERIODICDISPZ_Z = 2.0
 
 #Stuff for sponge boundary conditions
 [SPONGE]
@@ -45,13 +45,16 @@ CYLAXIS_ORIENT = 2
 CYLAXIS_X = 0
 CYLAXIS_Y = 0
 CYLAXIS_Z = 0
-RMIN = 8
+RMIN = 9
 
 #Mesh size information if not from a restart
 [DOMAIN]
-NX = 165
-NY = 110
-NZ = 48
+#NX = 180
+#NY = 140
+#NZ = 36
+NX = 25
+NY = 25
+NZ = 25
 
 #MPI decomposition of the mesh, double zeros tries to figure out the best
 [PENCILDECOMP]
@@ -60,8 +63,8 @@ PCOL = 0
 
 #Solver specific items
 [SOLVER]
-ALPHAF = 0.45
-MU_REF = 0.001
+ALPHAF = 0.49
+MU_REF = 0.0003
 USETIMING = FALSE
 
 

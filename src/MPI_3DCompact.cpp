@@ -28,6 +28,10 @@ using namespace std;
 
 #include "CurvilinearInterpolator.hpp"
 
+#include "AbstractDerivatives.hpp"
+#include "Penta10.hpp"
+#include "Pade6.hpp"
+
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
 
@@ -55,7 +59,7 @@ int main(int argc, char *argv[]){
     Options *opt = new Options(mpiRank);
 
 
-
+/*
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
@@ -123,13 +127,34 @@ int main(int argc, char *argv[]){
 	disp = 0;
     }
 
+*/
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
-    double Lx = 1.0, Ly = 1.0, Lz = 1.0;
+    double Lx = 2.0*M_PI, Ly = 2.0*M_PI, Lz = 1.0;
     Domain *d = new Domain(opt, Lx, Ly, Lz);
 
+    Pade6   *dtest6  = new   Pade6(d, Options::DIRICHLET_SOLVE, AbstractDerivatives::DIRY);
+    Penta10 *dtest10 = new Penta10(d, Options::DIRICHLET_SOLVE, AbstractDerivatives::DIRY);
+
+    double y_in[d->gNy];
+    double dy6[d->gNy];
+    double dy10[d->gNy];
+    for(int ip = 0; ip < d->gNy; ip++){
+	double x = d->y[ip];
+	y_in[ip] = sin(x);
+	IF_RANK0 cout << y_in[ip] << endl;
+    } 
+
+    dtest6->calc1stDeriv(y_in, dy6);
+    dtest10->calc1stDeriv(y_in, dy10);
+
+    for(int ip = 0; ip < d->gNy; ip++){
+	IF_RANK0 cout << setw(10) << y_in[ip] << " " << setw(10) << dy6[ip] << " " << setw(10) << dy10[ip] << endl;
+    }   
+ 
+/*
     /////////////////////////////
     //Initializing Pencil Decomp//
     //////////////////////////////
@@ -267,17 +292,19 @@ int main(int argc, char *argv[]){
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(11, 1028, 1028, cs->varData[4], "DIL", 2, 0.5, -2.0,2.0, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
 
 
     ////////////////////////////////////////
     //Execute the solver timestepping loop//
     ////////////////////////////////////////
     rk->executeSolverLoop();  
+
+*/
 
     //Now lets kill MPI
     MPI_Finalize();
