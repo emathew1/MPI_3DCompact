@@ -66,48 +66,53 @@ class Penta10: public AbstractDerivatives{
 	    }
 
 	    //1st Derivative coefficients
+	    //Interior Pentadiagonal 10th order scheme
 	    beta  =   1.0/20.0;
 	    alpha =   1.0/2.0;
 	    a     =  17.0/12.0;
 	    b     = 101.0/150.0;
 	    c     =   1.0/100.0;
 
-   	    beta1  = 28.0;
-   	    alpha1 = 16.0;
-	    a1     = -1181.0/280.0;
-	    b1     =  -892.0/35.0;
-	    c1     =    77.0/5.0;
-	    d1     =    56.0/3.0;
- 	    e1     =   -35.0/6.0;
-	    f1     =    28.0/15.0;
-	    g1     =    -7.0/15.0;
-	    h1     =     8.0/105.0; 
-	    i1     =    -1.0/168.0; 
+	    //Boundary point 1, using 6th order tri scheme,
+	    //can't find stable/correct tenth order for all boundary points
+   	    beta1  = 0.0;
+   	    alpha1 = 5.0;
+	    a1     = -197.0/60.0;
+	    b1     =   -5.0/12.0;
+	    c1     =    5.0/1.0;
+	    d1     =   -5.0/3.0;
+ 	    e1     =    5.0/12.0;
+	    f1     =   -1.0/20.0;
+	    g1     =    0.0;
+	    h1     =    0.0; 
+	    i1     =    0.0; 
 
+	    //Boundary point 2, using 8th order tridiagonal boundary
+	    //point from Visbal et al.
+	    beta2    = 0.0;
+	    alpha2_1 = 1.0/12.0;
+	    alpha2_2 = 5.0/4.0;
+	    a2       =  -79.0/240.0;
+	    b2       =  -77.0/60.0;
+	    c2       =   55.0/48.0;
+	    d2       =    5.0/9.0;
+	    e2       =   -5.0/48.0;
+	    f2       =    1.0/60.0;
+	    g2       =   -1.0/720.0;
+	    h2       =    0.0;
 
-	    beta2    = 5.0/3.0;
-	    alpha2_1 = 1.0/21.0;
-	    alpha2_2 = 3.0;
-	    a2       = -544.0/2581.0;
-	    b2       =  -39.0/20.0;
-	    c2       =  -17.0/20.0;
-	    d2       =   95.0/36.0;
-	    e2       =    5.0/12.0;
-	    f2       =   -1.0/20.0;
-	    g2       =    1.0/180.0;
-	    h2       =   -1.0/2940.0;
-
-	    beta3_1  = 1.0/90.0;
-	    beta3_2  = 1.0;
-	    alpha3_1 = 4.0/15.0;
-	    alpha3_2 = 8.0/9.0;
-	    a3       =  -34.0/675.0;
-	    b3       = -127.0/225.0;
-	    c3       =   -7.0/12.0;
-	    d3       =   20.0/27.0;
-	    e3       =    4.0/9.0;
-	    f3       =    1.0/75.0;
-	    g3       =   -1.0/2700.0;
+	    //Boundary point 3, using 8th order pentadiagonal interior scheme
+	    beta3_1  = 1.0/36.0;
+	    beta3_2  = 1.0/36.0;
+	    alpha3_1 = 4.0/9.0;
+	    alpha3_2 = 4.0/9.0;
+	    a3       =  -25.0/54.0/4.0;
+	    b3       =  -40.0/27.0/2.0;
+	    c3       =    0.0;
+	    d3       =   40.0/27.0/2.0;
+	    e3       =   25.0/54.0/4.0;
+	    f3       =    0.0;
+	    g3       =    0.0;
 
 
 	    diag_1D      = new double[N]; 
@@ -131,7 +136,9 @@ class Penta10: public AbstractDerivatives{
 	    //NOTE: LAYOUT FOR PENTA SOLVER IS DIFFERENT FROM TRI SOLVER,
 	    //TRI SOLVER SKIPS FIRST INDEX FOR LOWER DIAGONAL, PENTA SOLVER 
 	    //SKIPS LAST INDEX FOR LOWER DIAGONAL
-	    offupper_1D[0] = alpha1;  
+
+    	    //Upper left of the matrix changes
+  	    offupper_1D[0] = alpha1;  
 	    offupper_1D[1] = alpha2_2;
 	    offupper_1D[2] = alpha3_2;
 
@@ -143,6 +150,20 @@ class Penta10: public AbstractDerivatives{
 	    offupper2_1D[2] = beta3_2;
 
 	    offlower2_1D[0] = beta3_1;
+
+	    //Bottom right of the matrix changes
+	    offupper_1D[N-2] = alpha2_1;
+	    offupper_1D[N-3] = alpha3_1;
+
+	    offlower_1D[N-2] = alpha1;
+	    offlower_1D[N-3] = alpha2_2;
+	    offlower_1D[N-4] = alpha3_2;
+
+	    offupper2_1D[N-3] = beta3_1;
+
+	    offlower2_1D[N-3] = beta1;
+	    offlower2_1D[N-4] = beta2;
+	    offlower2_1D[N-5] = beta3_2;
 	}	
 
 	//cyclical Pentadiagonal solver corner values

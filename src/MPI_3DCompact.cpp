@@ -135,22 +135,22 @@ int main(int argc, char *argv[]){
     double Lx = 2.0*M_PI, Ly = 2.0*M_PI, Lz = 1.0;
     Domain *d = new Domain(opt, Lx, Ly, Lz);
 
-    Pade6   *dtest6  = new   Pade6(d, Options::DIRICHLET_SOLVE, AbstractDerivatives::DIRY);
-    Penta10 *dtest10 = new Penta10(d, Options::DIRICHLET_SOLVE, AbstractDerivatives::DIRY);
+    Pade6   *dtest6  = new   Pade6(d, Options::PERIODIC_SOLVE, AbstractDerivatives::DIRX);
+    Penta10 *dtest10 = new Penta10(d, Options::PERIODIC_SOLVE, AbstractDerivatives::DIRX);
 
-    double y_in[d->gNy];
-    double dy6[d->gNy];
-    double dy10[d->gNy];
-    for(int ip = 0; ip < d->gNy; ip++){
-	double x = d->y[ip];
+    double y_in[d->gNx];
+    double dy6[d->gNx];
+    double dy10[d->gNx];
+    for(int ip = 0; ip < d->gNx; ip++){
+	double x = d->x[ip];
 	y_in[ip] = sin(x);
-	IF_RANK0 cout << y_in[ip] << endl;
+	IF_RANK0 cout << x << " " <<  y_in[ip] << endl;
     } 
 
     dtest6->calc1stDeriv(y_in, dy6);
     dtest10->calc1stDeriv(y_in, dy10);
 
-    for(int ip = 0; ip < d->gNy; ip++){
+    for(int ip = 0; ip < d->gNx; ip++){
 	IF_RANK0 cout << setw(10) << y_in[ip] << " " << setw(10) << dy6[ip] << " " << setw(10) << dy10[ip] << endl;
     }   
  
