@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
     Options *opt = new Options(mpiRank);
 
 
-/*
+
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
@@ -127,34 +127,13 @@ int main(int argc, char *argv[]){
 	disp = 0;
     }
 
-*/
     /////////////////////////
     //Initialize the Domain//
     /////////////////////////
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
-    double Lx = 2.0*M_PI, Ly = 2.0*M_PI, Lz = 1.0;
+    double Lx = 1.0, Ly = 1.0, Lz = 1.0;
     Domain *d = new Domain(opt, Lx, Ly, Lz);
 
-    Pade6   *dtest6  = new   Pade6(d, Options::PERIODIC_SOLVE, AbstractDerivatives::DIRX);
-    Penta10 *dtest10 = new Penta10(d, Options::PERIODIC_SOLVE, AbstractDerivatives::DIRX);
-
-    double y_in[d->gNx];
-    double dy6[d->gNx];
-    double dy10[d->gNx];
-    for(int ip = 0; ip < d->gNx; ip++){
-	double x = d->x[ip];
-	y_in[ip] = sin(x);
-	IF_RANK0 cout << x << " " <<  y_in[ip] << endl;
-    } 
-
-    dtest6->calc1stDeriv(y_in, dy6);
-    dtest10->calc1stDeriv(y_in, dy10);
-
-    for(int ip = 0; ip < d->gNx; ip++){
-	IF_RANK0 cout << setw(10) << y_in[ip] << " " << setw(10) << dy6[ip] << " " << setw(10) << dy10[ip] << endl;
-    }   
- 
-/*
     /////////////////////////////
     //Initializing Pencil Decomp//
     //////////////////////////////
@@ -292,19 +271,17 @@ int main(int argc, char *argv[]){
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(50, 2056, 2056, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
+    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
 
 
     ////////////////////////////////////////
     //Execute the solver timestepping loop//
     ////////////////////////////////////////
     rk->executeSolverLoop();  
-
-*/
 
     //Now lets kill MPI
     MPI_Finalize();

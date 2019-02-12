@@ -36,7 +36,7 @@ BCZ1 = PERIODIC
 
 PERIODICDISPZ_X = 0
 PERIODICDISPZ_Y = 0
-PERIODICDISPZ_Z = 2.0
+PERIODICDISPZ_Z = 3.1416
 
 #Stuff for sponge boundary conditions
 [SPONGE]
@@ -49,12 +49,12 @@ RMIN = 9
 
 #Mesh size information if not from a restart
 [DOMAIN]
-#NX = 180
-#NY = 140
-#NZ = 36
-NX = 25
-NY = 25
-NZ = 25
+NX = 180
+NY = 140
+NZ = 36
+#NX = 25
+#NY = 25
+#NZ = 25
 
 #MPI decomposition of the mesh, double zeros tries to figure out the best
 [PENCILDECOMP]
@@ -63,7 +63,7 @@ PCOL = 0
 
 #Solver specific items
 [SOLVER]
-ALPHAF = 0.49
+ALPHAF = 0.45
 MU_REF = 0.0003
 USETIMING = FALSE
 
