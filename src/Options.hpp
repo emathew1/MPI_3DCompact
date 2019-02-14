@@ -27,6 +27,8 @@ class Options{
                      INLET};
         enum SpongeKind {RECTILINEAR, CYLINDRICAL};
 	
+	enum FDType {CD2, PADE6, PENTA10};
+
 	//Variable map...
 	po::variables_map vm;
 
@@ -66,6 +68,8 @@ class Options{
 	//SOLVER Information
 	double alphaF, mu_ref;
 	bool useTiming;
+	FDType xFDType, yFDType, zFDType;
+	string xFDType_str, yFDType_str, zFDType_str;
 
 	//Restart stuff
 	bool fromRestart;
@@ -139,6 +143,9 @@ class Options{
 	    ("SOLVER.ALPHAF", 		 po::value<double>(&alphaF), "Filter alpha coefficient value")
 	    ("SOLVER.MU_REF", 		 po::value<double>(&mu_ref), "Reference Viscosity")
 	    ("SOLVER.USETIMING",         po::value<bool>(&useTiming), "Report timing for different code sections")
+	    ("SOLVER.XFDTYPE",		 po::value<string>(&xFDType_str), "Finite Differences Type in the X-Direction")
+	    ("SOLVER.YFDTYPE",		 po::value<string>(&yFDType_str), "Finite Differences Type in the Y-Direction")
+	    ("SOLVER.ZFDTYPE",		 po::value<string>(&zFDType_str), "Finite Differences Type in the Z-Direction")
 	    ("RESTART.FROMRESTART", 	 po::value<bool>(&fromRestart), "Do we start the simulation from a restart")
 	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
 	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file")
@@ -188,6 +195,10 @@ class Options{
 	checkValue<double>("SOLVER.ALPHAF", "alphaF", alphaF, 0.45);
 	forceValue<double>("SOLVER.MU_REF", "mu_ref", mu_ref);
 	checkValue<bool>("SOLVER.USETIMING", "useTiming", useTiming, false);
+	parseFDTypeFromString("SOLVER.XFDTYPE", xFDType_str, xFDType);
+	parseFDTypeFromString("SOLVER.YFDTYPE", yFDType_str, yFDType);
+	parseFDTypeFromString("SOLVER.ZFDTYPE", zFDType_str, zFDType);
+
 
 	//Parse from string...
 	parseBCTypeFromString("BC.BCXTYPE", bcXType_str, bcXType);
@@ -384,6 +395,9 @@ class Options{
       MPI_Bcast(&alphaF, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
       MPI_Bcast(&mu_ref, 1, MPI_DOUBLE, root, MPI_COMM_WORLD);
       MPI_Bcast(&useTiming, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+      MPI_Bcast(&xFDType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&yFDType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&zFDType, 1, MPI_INT, root, MPI_COMM_WORLD);
 
       //[RESTART]
       MPI_Bcast(&fromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
@@ -445,6 +459,7 @@ class Options{
 	}
     }
 
+    void parseFDTypeFromString(string vmKey, string inString, FDType &currentType);
     void parseTSTypeFromString(string vmKey, string inString, TimeSteppingType &currentType);
     void parseBCTypeFromString(string vmKey, string inString, BCType &currentType);
     void parseBCKindFromString(string vmKey, string inString, BCKind &currentType);

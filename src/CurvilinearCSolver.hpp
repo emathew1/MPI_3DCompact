@@ -155,9 +155,18 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    initializeSolverData();		    	    
 
 	    //Initialize our derivative calculations for each direction...
-	    derivX = new CD2(dom, bc->bcXType, AbstractDerivatives::DIRX);
-	    derivY = new CD2(dom, bc->bcYType, AbstractDerivatives::DIRY);
-	    derivZ = new CD2(dom, bc->bcZType, AbstractDerivatives::DIRZ);
+
+	    if(opt->xFDType == Options::CD2){
+	        derivX = new CD2(dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    }else if(opt->xFDType == Options::PADE6){
+	        derivX = new Pade6(dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    }else if(opt->xFDType == Options::PENTA10){
+	        derivX = new Penta10(dom, bc->bcXType, AbstractDerivatives::DIRX);
+	    }else{
+
+	    }
+		derivY = new CD2(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	        derivZ = new CD2(dom, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    derivXi1 = derivX;
 	    derivXi2 = derivY;

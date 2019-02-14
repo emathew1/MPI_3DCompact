@@ -1,5 +1,27 @@
 #include "Options.hpp"
 
+void Options::parseFDTypeFromString(string vmKey, string inString, FDType &currentType){
+
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "CD2")==0){
+            currentType = CD2;
+        }else if(strcmp(inString.c_str(), "PADE6")==0){
+            currentType = PADE6;
+        }else if(strcmp(inString.c_str(), "PENTA10")==0){
+            currentType = PENTA10;
+	}else{
+            cout << " > UNKNOWN TIMESTEPPING TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+        cout << " > " << vmKey << " = " << inString << endl;
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
+
+
+
 void Options::parseTSTypeFromString(string vmKey, string inString, TimeSteppingType &currentType){
 
     if(vm.count(vmKey)){
