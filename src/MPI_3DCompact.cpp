@@ -28,10 +28,6 @@ using namespace std;
 
 #include "CurvilinearInterpolator.hpp"
 
-#include "AbstractDerivatives.hpp"
-#include "Penta10.hpp"
-#include "Pade6.hpp"
-
 int main(int argc, char *argv[]){
    int ierr, totRank, mpiRank;
 
