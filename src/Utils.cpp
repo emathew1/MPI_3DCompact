@@ -149,11 +149,14 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 	    }
 	}
 	invertRowMajor(pr, hr);
+
+
 	for(int ip = 0; ip < 4; ip++){
 	    for(int jp = 0; jp < 4; jp++){
 		h[ip][jp] = hr[ip*4 + jp];
 	    }
 	}
+
 	//luinv(p, 4, 4, indx, h);
 	//
 	double r[4];
@@ -167,10 +170,13 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 	double s[4];
 	for(int ip = 0; ip < 4; ip++){
 	    s[ip] = 0.0;
-	    for(int jp = 0; jp < N; jp++){
+	    for(int jp = 0; jp < 4; jp++){
 		s[ip] += h[ip][jp]*r[jp];
 	    }
 	}
+
+
+
 
 	for(int ip = 0; ip < N; ip++){
 	    double sum = 0.0;
@@ -179,6 +185,7 @@ void cyclicPenta(double a[], double b[], double c[], double d[], double e[], dou
 	    }
 	    x[ip] = y[ip] - sum;
 	}
+
 
 }	
 

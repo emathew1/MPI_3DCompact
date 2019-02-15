@@ -129,7 +129,7 @@ int main(int argc, char *argv[]){
     //For curvilinear coordinates these should all correspond to the max xi, eta, and zeta values
     double Lx = 1.0, Ly = 1.0, Lz = 1.0;
     Domain *d = new Domain(opt, Lx, Ly, Lz);
-
+  
     /////////////////////////////
     //Initializing Pencil Decomp//
     //////////////////////////////
@@ -278,6 +278,7 @@ int main(int argc, char *argv[]){
     //Execute the solver timestepping loop//
     ////////////////////////////////////////
     rk->executeSolverLoop();  
+
 
     //Now lets kill MPI
     MPI_Finalize();

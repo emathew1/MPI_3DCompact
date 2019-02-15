@@ -163,10 +163,31 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    }else if(opt->xFDType == Options::PENTA10){
 	        derivX = new Penta10(dom, bc->bcXType, AbstractDerivatives::DIRX);
 	    }else{
-
+		cout << "Should never get here? unknown x-derivative" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
 	    }
-		derivY = new CD2(dom, bc->bcYType, AbstractDerivatives::DIRY);
+
+	    if(opt->yFDType == Options::CD2){
+	        derivY = new CD2(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    }else if(opt->yFDType == Options::PADE6){
+	        derivY = new Pade6(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    }else if(opt->yFDType == Options::PENTA10){
+	        derivY = new Penta10(dom, bc->bcYType, AbstractDerivatives::DIRY);
+	    }else{
+		cout << "Should never get here? unknown y-derivative" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }
+
+	    if(opt->zFDType == Options::CD2){
 	        derivZ = new CD2(dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    }else if(opt->zFDType == Options::PADE6){
+	        derivZ = new Pade6(dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    }else if(opt->zFDType == Options::PENTA10){
+	        derivZ = new Penta10(dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    }else{
+		cout << "Should never get here? unknown z-derivative" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+	    }
 
 	    derivXi1 = derivX;
 	    derivXi2 = derivY;
