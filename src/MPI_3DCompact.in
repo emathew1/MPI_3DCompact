@@ -19,7 +19,6 @@ MAXTIMESTEP = 25000
 FILTERSTEP  = 1
 CHECKSTEP   = 5
 DUMPSTEP    = 5000
-IMAGESTEP   = 50
 
 #Boundary Condition Information
 [BC]

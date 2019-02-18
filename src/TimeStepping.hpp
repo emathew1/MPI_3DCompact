@@ -16,7 +16,6 @@ class TimeStepping{
 	int filterStep;  
 	int checkStep;
 	int dumpStep;
-	int imageStep;
 
 	TimeStepping(Options *opt){
 	    this->timeSteppingType = opt->TSType;
@@ -26,7 +25,6 @@ class TimeStepping{
 	    this->filterStep       = opt->filterStep;
 	    this->checkStep        = opt->checkStep;
 	    this->dumpStep         = opt->dumpStep;
-	    this->imageStep        = opt->imageStep;
 	
 	    int mpiRank = opt->mpiRank;
 	

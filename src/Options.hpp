@@ -41,7 +41,7 @@ class Options{
 	TimeSteppingType TSType;
 	string TSType_str;
 	double CFL, dt, maxTime;
-	int maxTimeStep, filterStep, checkStep, dumpStep, imageStep;
+	int maxTimeStep, filterStep, checkStep, dumpStep;
 
 	//Boundary Condition Stuff
 	string bcXType_str, bcYType_str, bcZType_str;
@@ -104,7 +104,6 @@ class Options{
 	    ("TIMESTEPPING.FILTERSTEP",  po::value<int>(&filterStep), "Filter Step")
 	    ("TIMESTEPPING.CHECKSTEP",   po::value<int>(&checkStep), "Check Step")
 	    ("TIMESTEPPING.DUMPSTEP",    po::value<int>(&dumpStep), "Dump Step")
-	    ("TIMESTEPPING.IMAGESTEP",   po::value<int>(&imageStep), "Image Step")
 	    ("BC.BCXTYPE", 		 po::value<string>(&bcXType_str), "BC Type in X") 
 	    ("BC.BCYTYPE", 		 po::value<string>(&bcYType_str), "BC Type in Y") 
 	    ("BC.BCZTYPE", 		 po::value<string>(&bcZType_str), "BC Type in Z") 
@@ -185,7 +184,6 @@ class Options{
 	checkValue<int>(   "TIMESTEPPING.FILTERSTEP", "filterStep", filterStep, 1);
 	checkValue<int>(   "TIMESTEPPING.CHECKSTEP", "checkStep", checkStep, 1);
 	checkValue<int>(   "TIMESTEPPING.DUMPSTEP", "dumpStep", dumpStep, 1000);
-	checkValue<int>(   "TIMESTEPPING.IMAGESTEP", "imageStep", imageStep, 25); //IS THIS OBSOLITE?
 
 	//As of right now we're restricted to Nx|Ny|Nz > 10...
 	if(Nx <= 10 || Ny <= 10 || Nz <= 10){
@@ -355,7 +353,6 @@ class Options{
       MPI_Bcast(&filterStep, 1, MPI_INT, root, MPI_COMM_WORLD);
       MPI_Bcast(&checkStep, 1, MPI_INT, root, MPI_COMM_WORLD);
       MPI_Bcast(&dumpStep, 1, MPI_INT, root, MPI_COMM_WORLD);
-      MPI_Bcast(&imageStep, 1, MPI_INT, root, MPI_COMM_WORLD);
 
       //[BC]
       MPI_Bcast(&bcXType, 1, MPI_INT, root, MPI_COMM_WORLD);
