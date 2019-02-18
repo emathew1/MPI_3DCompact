@@ -194,9 +194,20 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    derivXi3 = derivZ;
 
 	    //Initialize the filters we're going to use for each direction
-	    filtX  = new Compact10Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
-	    filtY  = new Compact10Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
-	    filtZ  = new Compact10Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    if(opt->filterType == Options::COMPACT8){
+	        filtX  = new Compact8Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
+	        filtY  = new Compact8Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
+	        filtZ  = new Compact8Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	    }else if(opt->filterType == Options::COMPACT10){
+	        filtX  = new Compact10Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
+	        filtY  = new Compact10Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
+	        filtZ  = new Compact10Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+
+	    }else{
+		cout << "Should never get here? unknown z-derivative" << endl;
+		MPI_Abort(MPI_COMM_WORLD, -10);
+
+	    }
 
 	    filtXi1 = filtX;
 	    filtXi2 = filtY;

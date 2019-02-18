@@ -1,5 +1,25 @@
 #include "Options.hpp"
 
+void Options::parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType){
+
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "COMPACT8")==0){
+            currentType = COMPACT8;
+        }else if(strcmp(inString.c_str(), "COMPACT10")==0){
+            currentType = COMPACT10;
+	}else{
+            cout << " > UNKNOWN FILTER TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+        cout << " > " << vmKey << " = " << inString << endl;
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
+
+
+
 void Options::parseFDTypeFromString(string vmKey, string inString, FDType &currentType){
 
     if(vm.count(vmKey)){
@@ -10,7 +30,7 @@ void Options::parseFDTypeFromString(string vmKey, string inString, FDType &curre
         }else if(strcmp(inString.c_str(), "PENTA10")==0){
             currentType = PENTA10;
 	}else{
-            cout << " > UNKNOWN TIMESTEPPING TYPE SPECIFIED: " << inString << endl;
+            cout << " > UNKNOWN FINITE DIFFERENCE TYPE SPECIFIED: " << inString << endl;
             MPI_Abort(MPI_COMM_WORLD, -10);
         }
         cout << " > " << vmKey << " = " << inString << endl;

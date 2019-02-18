@@ -11,5 +11,3 @@ Add true interpolation methods to the Curvilinear interpolant object
 Add ability to write out to pvtk file formats
 
 Add ability to read in from some standard grid formats
-
-Need to add new components for specificing periodic transformations for pentadiagonal schemes.
