@@ -267,11 +267,11 @@ int main(int argc, char *argv[]){
     //This is probably bad programming, but we'll downcast the abstract solver class pointer to the
     //solver pointer so we can access the add image function and the solver member we want to print out
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->V, "V", 2, 0.5, -0.4, 0.4, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs_downcast->U, "U", 2, 0.5, 0.0, 0.65, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(50, 1024, 1024, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
+    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.35, 0.35, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.2, 0.65, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
 
 
     ////////////////////////////////////////
@@ -321,7 +321,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     vort_mag = varData[3];
     dil      = varData[4];
 
-    if(timeStep%25 == 0){
+    if(timeStep%100 == 0){
 
     //Specifiy our input and output vectors for the computeGradient call
     double *vi[] = {U, V, W};
