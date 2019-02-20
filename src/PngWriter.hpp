@@ -62,6 +62,9 @@ class PngWriter {
     int planeInd;
     double fraction;
 
+    double x_min[3], x_max[3];
+    bool bboxFlag;
+
     bool interpolatorFlag;
     CurvilinearInterpolator *ci;  
 
@@ -103,6 +106,8 @@ class PngWriter {
     valMax  = 0.0;
     valMin  = 0.0;
 
+    bboxFlag = false;
+
     this->dumpInterval = dumpInterval;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
@@ -135,10 +140,52 @@ class PngWriter {
     this->valMax  = valMax;
     this->valMin  = valMin;
 
+    bboxFlag = false;
+
     this->dumpInterval = dumpInterval;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
   }
+
+  //Constructor for fixed value bounds and fixed bounds
+  PngWriter(int dumpInterval, const int width, const int height, double *fieldPtr, string varName, int planeInd, double fraction, double valMin, double valMax, double x_min[3], double x_max[3], Colormap cm){
+    nx = width;
+    ny = height;
+    buffer = new unsigned char[nx*ny][3];
+
+    // fill buffer with a "nice" cyan [73,175,205] -- eventually a designer should choose this ;)
+    for (int i = 0; i < nx*ny; ++i) {
+      buffer[i][0] = 73;
+      buffer[i][1] = 175;
+      buffer[i][2] = 205;
+    }
+
+    this->fieldPtr = fieldPtr;
+    this->varName  = varName;
+    this->planeInd = planeInd;
+    this->fraction = fraction;
+
+    this->cm = cm;
+
+    interpolatorFlag = false;
+    ci = NULL;
+
+    valFlag = true;
+    this->valMax  = valMax;
+    this->valMin  = valMin;
+
+    this->dumpInterval = dumpInterval;
+
+   
+    bboxFlag = true;
+    for(int ip = 0; ip < 3; ip++){
+        this->x_min[ip] = x_min[ip];
+        this->x_max[ip] = x_max[ip];
+    }
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
+  }
+
 
 
   ~PngWriter() {

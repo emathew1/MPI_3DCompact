@@ -1305,17 +1305,37 @@ void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 
 	//Get the coordinates for this case...
 	//each pixel should represent a equal area box
-	
+
+
+	double d1, d2;	
 	//See which case is the limiting box size
-	double d1 = (msh->x_max[1]-msh->x_min[1])/((double)N1+1.0);
-	double d2 = (msh->x_max[2]-msh->x_min[2])/((double)N2+1.0);
+	if(pw->bboxFlag){
+	    d1 = (pw->x_max[1]-pw->x_min[1])/((double)N1+1.0);
+	    d2 = (pw->x_max[2]-pw->x_min[2])/((double)N2+1.0);
+	}else{
+	    d1 = (msh->x_max[1]-msh->x_min[1])/((double)N1+1.0);
+	    d2 = (msh->x_max[2]-msh->x_min[2])/((double)N2+1.0);
+	}
 
 	//limited by the larger box...
 	double dx = fmax(d1, d2);
 
 	//Doing the pixed kind of as a "cell centered" location
-	double base1 = msh->x_min[1] + dx/2;
-	double base2 = msh->x_min[2] + dx/2;
+	double base1, base2;
+	if(pw->bboxFlag){
+	    base1 = pw->x_min[1] + dx/2;
+	    base2 = pw->x_min[2] + dx/2;
+	    
+	    if((pw->x_max[2]-pw->x_min[2])>(pw->x_max[1]-pw->x_min[1])){
+		base1 -= (dx*(N1-1))/2.0 - (pw->x_max[1]- pw->x_min[1])/2.0;
+	    }else{
+		base2 -= (dx*(N2-1))/2.0 - (pw->x_max[2]- pw->x_min[2])/2.0;
+	    }
+
+	}else{
+	    base1 = msh->x_min[1] + dx/2;
+	    base2 = msh->x_min[2] + dx/2;
+	}
 
 	//Finally calculating the positions of the pixels
 	for(int ip = 0; ip < N1; ip++){
@@ -1335,14 +1355,33 @@ void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 	double y_plane = fraction*(msh->x_max[1] - msh->x_min[1]) + msh->x_min[1];
 
 	//See which case is the limited box size
-	double d1 = (msh->x_max[2] - msh->x_min[2])/((double)N1 + 1.0);
-	double d2 = (msh->x_max[0] - msh->x_min[0])/((double)N2 + 1.0);
+	double d1, d2;
+	if(pw->bboxFlag){
+	    d1 = (pw->x_max[2] - pw->x_min[2])/((double)N1 + 1.0);
+	    d2 = (pw->x_max[0] - pw->x_min[0])/((double)N2 + 1.0);
+	}else{
+	    d1 = (msh->x_max[2] - msh->x_min[2])/((double)N1 + 1.0);
+	    d2 = (msh->x_max[0] - msh->x_min[0])/((double)N2 + 1.0);
+	}
 
 	double dx = fmax(d1, d2);
 
 	//Get the base locations
-	double base1 = msh->x_min[2] + dx/2;
-	double base2 = msh->x_min[0] + dx/2;
+	double base1, base2;
+	if(pw->bboxFlag){
+	    base1 = pw->x_min[2] + dx/2;
+	    base2 = pw->x_min[0] + dx/2;
+
+	    if((pw->x_max[0]-pw->x_min[0])>(pw->x_max[2]-pw->x_min[2])){
+		base1 -= (dx*(N2-1))/2.0-(pw->x_max[2]- pw->x_min[2])/2.0;
+	    }else{
+		base2 -= (dx*(N1-1))/2.0-(pw->x_max[0]- pw->x_min[0])/2.0;
+	    }
+
+	}else{
+	    base1 = msh->x_min[2] + dx/2;
+	    base2 = msh->x_min[0] + dx/2;
+	}
 
 	//Now calculate the positions of the pixels
 	for(int ip = 0; ip < N1; ip++){
@@ -1363,14 +1402,33 @@ void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 	double z_plane = fraction*(msh->x_max[2]-msh->x_min[2]) + msh->x_min[2];
 
 	//See which case is the limited box size
-	double d1 = (msh->x_max[0] - msh->x_min[0])/((double)N1 + 1.0);
-	double d2 = (msh->x_max[1] - msh->x_min[1])/((double)N2 + 1.0);
+	double d1, d2;
+	if(pw->bboxFlag){
+	    d1 = (pw->x_max[0] - pw->x_min[0])/((double)N1 + 1.0);
+	    d2 = (pw->x_max[1] - pw->x_min[1])/((double)N2 + 1.0);
+	}else{
+	    d1 = (msh->x_max[0] - msh->x_min[0])/((double)N1 + 1.0);
+	    d2 = (msh->x_max[1] - msh->x_min[1])/((double)N2 + 1.0);
+	}
 
 	double dx = fmax(d1, d2);
 
 	//Get the base locations
-	double base1 = msh->x_min[0] + dx/2;
-	double base2 = msh->x_min[1] + dx/2;
+	double base1, base2;
+	if(pw->bboxFlag){
+	    base1 = pw->x_min[0] + dx/2;
+	    base2 = pw->x_min[1] + dx/2;
+
+	    if((pw->x_max[1]-pw->x_min[1])>(pw->x_max[0]-pw->x_min[0])){
+		base1 -= (dx*(N1-1))/2.0-(pw->x_max[0]- pw->x_min[0])/2.0;
+	    }else{
+		base2 -= (dx*(N2-1))/2.0-(pw->x_max[1]- pw->x_min[1])/2.0;
+	    }
+
+	}else{
+	    base1 = msh->x_min[0] + dx/2;
+	    base2 = msh->x_min[1] + dx/2;
+	}
 
 	//Now calculate the positions of the pixels
 	for(int ip = 0; ip < N1; ip++){
