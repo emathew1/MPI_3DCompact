@@ -30,6 +30,8 @@ class Options{
 	enum FDType {CD2, PADE6, PENTA10};
 	enum FilterType {COMPACT8, COMPACT10};
 
+	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG};
+
 	//Variable map...
 	po::variables_map vm;
 
@@ -74,7 +76,7 @@ class Options{
 	FilterType filterType;
 	string filterType_str;
 
-	//Restart stuff
+	//RESTART stuff
 	bool fromRestart;
 	bool onlyGridFromRestart;
 	string filename;
@@ -82,6 +84,24 @@ class Options{
 	string sponge_filename;
 	int  timeStep;    
 	double time;
+
+
+	//STATS stuff
+	StatsAvgType statsAvgType;
+	string statsAvgType_str;
+
+	bool velocityStats;
+	bool velocityStatsFromRestart;
+	string velocityStatsFilename;
+
+	bool thermoStats;
+	bool thermoStatsFromRestart;
+	string thermoStatsFilename;
+
+	bool restartStats;
+	int stats_interval;
+
+
 
     Options(int mpiRank){
    
@@ -153,7 +173,18 @@ class Options{
 	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
 	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file")
 	    ("RESTART.SPONGEAVGFROMRESTART", 	 po::value<bool>(&spongeFromRestart), "Pull the sponge average from file")
-	    ("RESTART.SPONGEAVGFILENAME",	 po::value<string>(&sponge_filename), "Filename of the sponge-avg file");
+	    ("RESTART.SPONGEAVGFILENAME",	 po::value<string>(&sponge_filename), "Filename of the sponge-avg file")
+	    ("STATS.VELOCITYSTATS",	 po::value<bool>(&velocityStats), "Flag for recording velocity statistics")
+	    ("STATS.THERMOSTATS",	 po::value<bool>(&thermoStats), "Flag for recording thermodynamic quantity statistics")
+	    ("STATS.VELOCITYSTATSFROMRESTART",	 po::value<bool>(&velocityStatsFromRestart), "Flag for using restart in velocity stats")
+	    ("STATS.THERMOSTATSFROMRESTART",	 po::value<bool>(&thermoStatsFromRestart), "Flag for using restart in thermo statistics")
+	    ("STATS.VELOCITYSTATSFILENAME",	 po::value<string>(&velocityStatsFilename), "Velocity statistics restart filename")
+	    ("STATS.THERMOSTATSFILENAME",	 po::value<string>(&thermoStatsFilename), "Thermo statistics restart filename")
+	    ("STATS.STATSAVGTYPE",	 po::value<string>(&statsAvgType_str), "Name of spacial averaging type for statistics")
+	    ("STATS.RESTARTSTATS",	 po::value<bool>(&restartStats), "Flag for whether or not we're restarting recording statistics")
+	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data")
+	    ;
+
 	
 	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
 
@@ -336,7 +367,34 @@ class Options{
 	    forceValue<string>("RESTART.SPONGEAVGFILENAME", "sponge_filename", sponge_filename);
 	}
 	
+
+	//Now lets do all of the statistics stuff	
+	checkValue<bool>("STATS.VELOCITYSTATS", "velocityStats", velocityStats, false);
 	
+	if(velocityStats){
+	    forceValue<bool>("STATS.VELOCITYSTATSFROMRESTART", "velocityStatsFromRestart", velocityStatsFromRestart);
+	    if(velocityStatsFromRestart){
+		forceValue<string>("STATS.VELOCITYSTATSFILENAME", "velocityStatsFilename", velocityStatsFilename);
+	    }
+	}
+
+	checkValue<bool>("STATS.THERMOSTATS",   "thermoStats",   thermoStats,   false);
+	if(thermoStats){
+	    forceValue<bool>("STATS.THERMOSTATSFROMRESTART", "thermoStatsFromRestart", thermoStatsFromRestart);
+	    if(thermoStatsFromRestart){
+		forceValue<string>("STATS.THERMOSTATSFILENAME", "thermoStatsFilename", thermoStatsFilename);
+	    }
+
+	}
+
+	//Do the averaging type check here
+	//parseStatsAvgType()...
+
+	//Is the restart redundant?	
+	checkValue<bool>("STATS.RESTARTSTATS", "restartStats", restartStats, false);
+	checkValue<int>("STATS.INTERVAL", "stats_interval", stats_interval, 25);
+
+
 
       }
 

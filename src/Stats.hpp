@@ -11,7 +11,6 @@ class Stats{
 	CurvilinearCSolver *cs;
 	Options *opt;
 
-	double prev_time;
 
 	bool velocityStats;
 	double velocityStatsWeight;
@@ -28,7 +27,8 @@ class Stats{
 	double *TAVG, *TRMS;
 
 	Options::StatsAvgType statsAvgType; 
-
+	int stats_interval; 
+	double prev_time;
 
 	Stats(CurvilinearCSolver *cs, Options *opt){
 
