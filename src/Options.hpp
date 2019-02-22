@@ -98,7 +98,6 @@ class Options{
 	bool thermoStatsFromRestart;
 	string thermoStatsFilename;
 
-	bool restartStats;
 	int stats_interval;
 
 
@@ -181,9 +180,7 @@ class Options{
 	    ("STATS.VELOCITYSTATSFILENAME",	 po::value<string>(&velocityStatsFilename), "Velocity statistics restart filename")
 	    ("STATS.THERMOSTATSFILENAME",	 po::value<string>(&thermoStatsFilename), "Thermo statistics restart filename")
 	    ("STATS.STATSAVGTYPE",	 po::value<string>(&statsAvgType_str), "Name of spacial averaging type for statistics")
-	    ("STATS.RESTARTSTATS",	 po::value<bool>(&restartStats), "Flag for whether or not we're restarting recording statistics")
-	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data")
-	    ;
+	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data");
 
 	
 	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
@@ -389,12 +386,10 @@ class Options{
 
 	//Do the averaging type check here
 	//parseStatsAvgType()...
+	parseStatsAvgTypeString("STATS.STATSAVGTYPE", statsAvgType_str, statsAvgType);
 
 	//Is the restart redundant?	
-	checkValue<bool>("STATS.RESTARTSTATS", "restartStats", restartStats, false);
-	checkValue<int>("STATS.INTERVAL", "stats_interval", stats_interval, 25);
-
-
+	checkValue<int>("STATS.INTERVAL", "stats_interval", stats_interval, 5);
 
       }
 
@@ -494,7 +489,63 @@ class Options{
       sponge_filename.assign(sfilename_c, stringSize);
 
 
+      //STATS Stuff
 
+
+      MPI_Bcast(&velocityStats, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+      if(velocityStats){
+
+	  //if we're doing velocity stats, see if we need to pull from restartt
+	  MPI_Bcast(&velocityStatsFromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+
+	  //If we're pulling from restart, get the filename
+	  if(velocityStatsFromRestart){
+
+	      if(mpiRank == root){
+          	  stringSize = velocityStatsFilename.size()+1;
+      	      }
+     	      MPI_Bcast(&stringSize, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      	      char sfilename_c[stringSize];
+      	      if(mpiRank == root){
+          	  strcpy(sfilename_c,velocityStatsFilename.c_str());
+      	      }
+ 
+      	      MPI_Bcast(sfilename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
+      	      velocityStatsFilename.assign(sfilename_c, stringSize);
+	  }
+      }
+
+      //Same stuff but for thermodynamic stats
+      MPI_Bcast(&thermoStats, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+      if(thermoStats){
+
+	  //if we're doing thermo stats, see if we need to pull from restartt
+	  MPI_Bcast(&thermoStatsFromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+
+	  //If we're pulling from restart, get the filename
+	  if(thermoStatsFromRestart){
+
+	      if(mpiRank == root){
+          	  stringSize = thermoStatsFilename.size()+1;
+      	      }
+     	      MPI_Bcast(&stringSize, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      	      char sfilename_c[stringSize];
+      	      if(mpiRank == root){
+          	  strcpy(sfilename_c, thermoStatsFilename.c_str());
+      	      }
+ 
+      	      MPI_Bcast(sfilename_c, stringSize, MPI_CHAR, root, MPI_COMM_WORLD);
+      	      thermoStatsFilename.assign(sfilename_c, stringSize);
+	  }
+      }
+
+      //Type of statistical avering type
+      MPI_Bcast(&statsAvgType, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //Stats interval
+      MPI_Bcast(&stats_interval, 1, MPI_INT, root, MPI_COMM_WORLD);
    }	
 
     template<typename T>
@@ -519,6 +570,7 @@ class Options{
 	}
     }
 
+    void parseStatsAvgTypeString(string vmKey, string inString, StatsAvgType &currentType);
     void parseFDTypeFromString(string vmKey, string inString, FDType &currentType);
     void parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType);
     void parseTSTypeFromString(string vmKey, string inString, TimeSteppingType &currentType);

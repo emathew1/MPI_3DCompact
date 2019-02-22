@@ -1,5 +1,29 @@
 #include "Options.hpp"
 
+void Options::parseStatsAvgTypeString(string vmKey, string inString, StatsAvgType &currentType){
+
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "NONE")==0){
+            currentType = NONE;
+        }else if(strcmp(inString.c_str(), "XI1_AVG")==0){
+            currentType = XI1_AVG;
+        }else if(strcmp(inString.c_str(), "XI2_AVG")==0){
+            currentType = XI2_AVG;
+        }else if(strcmp(inString.c_str(), "XI3_AVG")==0){
+            currentType = XI3_AVG;
+	}else{
+            cout << " > UNKNOWN STATS AVERAGE TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+        cout << " > " << vmKey << " = " << inString << endl;
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
+
+
+
 void Options::parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType){
 
     if(vm.count(vmKey)){
