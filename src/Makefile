@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o
 
 default: MPI_3DCompact
 
@@ -62,6 +62,10 @@ CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.h
 
 Options.o: Options.cpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
+
+Stats.o: Stats.cpp Stats.hpp Macros.hpp Domain.hpp Options.hpp CurvilinearCSolver.hpp
+	$(CC) $(CFLAGS) -c $<
+
 
 clean: 
 	rm -rf   *.o *.exe *.a

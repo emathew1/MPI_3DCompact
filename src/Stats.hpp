@@ -13,6 +13,8 @@ class Stats{
 	CurvilinearCSolver *cs;
 	Options *opt;
 
+	int mpiRank;
+
         int pxSize[3], pySize[3], pzSize[3];
         int pxStart[3], pyStart[3], pzStart[3];
         int pxEnd[3], pyEnd[3], pzEnd[3];
@@ -45,20 +47,24 @@ class Stats{
 	    //Get local copies of the domain sizes
             cs->dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
 
-
+	    mpiRank = cs->mpiRank;
 
 	    //Get the links to the correct source info
 	    U = cs->U; 
 	    V = cs->V; 
 	    W = cs->W; 
  
-	    rho = cs->rho;
+	    rho = cs->rho2;
 	    p   = cs->p;
 	    T   = cs->T;
 
 	    //get the flags for the statistics
 	    velocityStats = opt->velocityStats;
 	    thermoStats   = opt->thermoStats;
+
+	    //get the filenames for the statistics
+	    velocityStatsFilename = opt->velocityStatsFilename;
+	    thermoStatsFilename = opt->thermoStatsFilename;
 
 	    //If from restart file
 	    if(opt->velocityStats){
@@ -76,6 +82,58 @@ class Stats{
 
 	        if(opt->velocityStatsFromRestart){
 		     //read in the weight and the stat fields from the files
+		    IF_RANK0{
+			FILE *ptr;
+			ptr = fopen(velocityStatsFilename.c_str(), "rb");
+			if(ptr == NULL){
+			    cout << "ERROR: Couldn't open file " << velocityStatsFilename << endl;
+			    MPI_Abort(MPI_COMM_WORLD, -10);
+
+			}else{
+			    fread(&velocityStatsWeight, sizeof(double), 1, ptr);
+			}
+			fclose(ptr);
+		    }
+		    MPI_Bcast(&velocityStatsWeight, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+
+		    MPI_File fh;
+		    MPI_Offset disp, filesize;
+		    MPI_File_open(MPI_COMM_WORLD, velocityStatsFilename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+		    disp = sizeof(double);
+	
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY1); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY2); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY3); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY4); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY5); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY6); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY7); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY8); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY9); 
+		
+		    MPI_File_close(&fh);
+
+		    FOR_Z_YPEN{
+			FOR_Y_YPEN{
+			    FOR_X_YPEN{
+				int ip = GETMAJIND_YPEN;
+				int jp = GETIND_YPEN;
+				
+				UAVG[ip] = cs->tempY1[jp];
+				URMS[ip] = cs->tempY2[jp];
+				VAVG[ip] = cs->tempY3[jp];
+				VRMS[ip] = cs->tempY4[jp];
+				WAVG[ip] = cs->tempY5[jp];
+				WRMS[ip] = cs->tempY6[jp];
+				UVREY[ip] = cs->tempY7[jp];
+				UWREY[ip] = cs->tempY8[jp];
+				VWREY[ip] = cs->tempY9[jp];
+
+			    }
+			}
+		    }
 
 	        }else{
 		
@@ -95,6 +153,14 @@ class Stats{
 		}
 	    }	
 
+	    IF_RANK0{
+		if(opt->velocityStats){
+		    cout << " > Initialized Velocity Stats, Weight = " << velocityStatsWeight << endl;
+		    if(opt->velocityStatsFromRestart){
+		        cout << " > Initialized from file: " << velocityStatsFilename << endl;
+		    }
+		}
+	    }
 
 	    if(opt->thermoStats){
 
@@ -110,20 +176,79 @@ class Stats{
 		if(opt->thermoStatsFromRestart){
 		    //read in the weight and the stat fields from the files
 
+		    IF_RANK0{
+			FILE *ptr;
+			ptr = fopen(thermoStatsFilename.c_str(), "rb");
+			if(ptr == NULL){
+			    cout << "ERROR: Couldn't open file " << thermoStatsFilename << endl;
+			    MPI_Abort(MPI_COMM_WORLD, -10);
+
+			}else{
+			    fread(&thermoStatsWeight, sizeof(double), 1, ptr);
+			}
+			fclose(ptr);
+		    }
+		    MPI_Bcast(&thermoStatsWeight, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+
+		    MPI_File fh;
+		    MPI_Offset disp, filesize;
+		    MPI_File_open(MPI_COMM_WORLD, thermoStatsFilename.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+		    disp = sizeof(double);
+	
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY1); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY2); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY3); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY4); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY5); 
+		    cs->c2d->readVar(fh, disp, 1, cs->tempY6); 
+		
+		    MPI_File_close(&fh);
+
+		    FOR_Z_YPEN{
+			FOR_Y_YPEN{
+			    FOR_X_YPEN{
+				int ip = GETMAJIND_YPEN;
+				int jp = GETIND_YPEN;
+				
+				RHOAVG[ip] = cs->tempY1[jp];
+				RHORMS[ip] = cs->tempY2[jp];
+				PAVG[ip] = cs->tempY3[jp];
+				PRMS[ip] = cs->tempY4[jp];
+				TAVG[ip] = cs->tempY5[jp];
+				TRMS[ip] = cs->tempY6[jp];
+
+			    }
+			}
+		    }
+
 		}else{
 		
 		    thermoStatsWeight = 0.0;
 		    //initialize the fields
-		    RHOAVG[ip] = 0.0;
-		    RHORMS[ip] = 0.0;
-		    PAVG[ip] = 0.0;
-		    PRMS[ip] = 0.0;
-		    TAVG[ip] = 0.0;
-		    TRMS[ip] = 0.0;
+		    FOR_XYZ_YPEN{
+		        RHOAVG[ip] = 0.0;
+		        RHORMS[ip] = 0.0;
+		        PAVG[ip] = 0.0;
+		        PRMS[ip] = 0.0;
+		        TAVG[ip] = 0.0;
+		        TRMS[ip] = 0.0;
+		    }
 		}
 
 	    }
-	    
+	
+
+	    IF_RANK0{
+		if(opt->thermoStats){
+		    cout << " > Initialized Thermo Stats, Weight = " << thermoStatsWeight << endl;
+		    if(opt->thermoStatsFromRestart){
+		        cout << " > Initialized from file: " << thermoStatsFilename << endl;
+		    }
+		}
+	    }
+
 	}
 
 
