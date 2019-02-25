@@ -66,6 +66,9 @@ class Stats{
 	    velocityStatsFilename = opt->velocityStatsFilename;
 	    thermoStatsFilename = opt->thermoStatsFilename;
 
+	    //Initialize the previous time to the current simulation time...
+	    prev_time = cs->time;
+
 	    //If from restart file
 	    if(opt->velocityStats){
 
