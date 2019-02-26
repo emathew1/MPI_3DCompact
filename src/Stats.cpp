@@ -2,6 +2,126 @@
 
 void Stats::dumpStatsFields(){
 
+    if(velocityStats){
+
+        //Convert over to X-major indexing
+	FOR_Z_YPEN{
+	    FOR_Y_YPEN{
+		FOR_X_YPEN{
+		    int ip = GETMAJIND_YPEN;
+		    int jp = GETIND_YPEN;
+
+		    cs->tempY1[jp] = UAVG[ip];
+		    cs->tempY2[jp] = VAVG[ip];
+		    cs->tempY3[jp] = WAVG[ip];
+		    cs->tempY4[jp] = URMS[ip];
+		    cs->tempY5[jp] = VRMS[ip];
+		    cs->tempY6[jp] = WRMS[ip];
+		    cs->tempY7[jp] = UVREY[ip];
+		    cs->tempY8[jp] = UWREY[ip];
+		    cs->tempY9[jp] = VWREY[ip];
+		}
+	    }
+	}
+
+	IF_RANK0{
+            cout << endl;
+            cout << " > ========================" << endl;
+            cout << " >  DUMPING VELOCITY STATS " << endl;
+            cout << " > ========================" << endl;
+	}
+
+	ofstream outfile;
+	outfile.precision(17);
+	string outputFilename;
+	outputFilename = "VelocityStats.";
+	ostringstream timeStepString;
+	timeStepString << cs->timeStep;
+
+	outputFilename.append(timeStepString.str());
+
+	MPI_File fh;
+	MPI_Offset disp, filesize;
+
+	MPI_File_open(MPI_COMM_WORLD, outputFilename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+	filesize = 0;
+	MPI_File_set_size(fh, filesize);
+
+	disp = 0;
+
+	cs->c2d->writeScalar(fh, disp, 1, &velocityStatsWeight);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY1);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY2);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY3);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY4);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY5);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY6);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY7);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY8);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY9);
+
+	MPI_File_close(&fh);
+
+    }
+
+    if(thermoStats){
+
+        //Convert over to X-major indexing
+	FOR_Z_YPEN{
+	    FOR_Y_YPEN{
+		FOR_X_YPEN{
+		    int ip = GETMAJIND_YPEN;
+		    int jp = GETIND_YPEN;
+
+		    cs->tempY1[jp] = RHOAVG[ip];
+		    cs->tempY2[jp] = RHORMS[ip];
+		    cs->tempY3[jp] = PAVG[ip];
+		    cs->tempY4[jp] = PRMS[ip];
+		    cs->tempY5[jp] = TAVG[ip];
+		    cs->tempY6[jp] = TRMS[ip];
+		}
+	    }
+	}
+
+	IF_RANK0{
+            cout << endl;
+            cout << " > ======================" << endl;
+            cout << " >  DUMPING THERMO STATS " << endl;
+            cout << " > ======================" << endl;
+	}
+
+	ofstream outfile;
+	outfile.precision(17);
+	string outputFilename;
+	outputFilename = "ThermoStats.";
+	ostringstream timeStepString;
+	timeStepString << cs->timeStep;
+
+	outputFilename.append(timeStepString.str());
+
+	MPI_File fh;
+	MPI_Offset disp, filesize;
+
+	MPI_File_open(MPI_COMM_WORLD, outputFilename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+	filesize = 0;
+	MPI_File_set_size(fh, filesize);
+
+	disp = 0;
+
+	cs->c2d->writeScalar(fh, disp, 1, &thermoStatsWeight);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY1);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY2);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY3);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY4);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY5);
+	cs->c2d->writeVar(fh, disp, 1, cs->tempY6);
+
+	MPI_File_close(&fh);
+
+    }
+
 };
 
 void Stats::updateStatsFields(){

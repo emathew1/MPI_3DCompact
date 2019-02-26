@@ -125,10 +125,10 @@ class Stats{
 				int jp = GETIND_YPEN;
 				
 				UAVG[ip] = cs->tempY1[jp];
-				URMS[ip] = cs->tempY2[jp];
-				VAVG[ip] = cs->tempY3[jp];
-				VRMS[ip] = cs->tempY4[jp];
-				WAVG[ip] = cs->tempY5[jp];
+				VAVG[ip] = cs->tempY2[jp];
+				WAVG[ip] = cs->tempY3[jp];
+				URMS[ip] = cs->tempY4[jp];
+				VRMS[ip] = cs->tempY5[jp];
 				WRMS[ip] = cs->tempY6[jp];
 				UVREY[ip] = cs->tempY7[jp];
 				UWREY[ip] = cs->tempY8[jp];
