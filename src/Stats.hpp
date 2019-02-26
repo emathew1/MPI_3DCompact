@@ -257,7 +257,7 @@ class Stats{
 
 	void dumpStatsFields();
 	void updateStatsFields();
-
+	void doAveraging(double *phi);
 };
 
 #endif
