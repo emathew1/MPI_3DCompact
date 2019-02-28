@@ -4,13 +4,13 @@
 #include "Macros.hpp"
 #include "Domain.hpp"
 #include "Options.hpp"
-#include "CurvilinearCSolver.hpp"
+#include "AbstractCSolver.hpp"
 
 class Stats{
 
     public:
 
-	CurvilinearCSolver *cs;
+	AbstractCSolver *cs;
 	Options *opt;
 
 	int mpiRank;
@@ -39,7 +39,7 @@ class Stats{
 	int stats_interval; 
 	double prev_time;
 
-	Stats(CurvilinearCSolver *cs, Options *opt){
+	Stats(AbstractCSolver *cs, Options *opt){
 
 	    this->cs  = cs;
 	    this->opt = opt;

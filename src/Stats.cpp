@@ -149,7 +149,15 @@ void Stats::updateStatsFields(){
 	}
 
 	//Do your averaging here...
-	//doAveraging();
+	doAveraging(URMS);
+	doAveraging(VRMS);
+	doAveraging(WRMS);
+	doAveraging(UVREY);
+	doAveraging(UWREY);
+	doAveraging(VWREY);
+	doAveraging(UAVG);
+	doAveraging(VAVG);
+	doAveraging(WAVG);
 
 	//Finish up the second order stuff...
 	FOR_XYZ_YPEN{	
@@ -161,6 +169,10 @@ void Stats::updateStatsFields(){
 	    UWREY[ip] = UWREY[ip] - UAVG[ip]*WAVG[ip];
 	    VWREY[ip] = VWREY[ip] - VAVG[ip]*WAVG[ip];
 	}	 	
+
+	IF_RANK0{
+	    cout << " > Updated velocity stats, current stats weight = " << totNewWeight << endl;
+	}
 
     }
 
@@ -183,7 +195,12 @@ void Stats::updateStatsFields(){
 	}
 
 	//Do the averaging here...
-	//doAveraging();
+	doAveraging(RHORMS);
+	doAveraging(PRMS);
+	doAveraging(TRMS);
+	doAveraging(RHOAVG);
+	doAveraging(PAVG);
+	doAveraging(PAVG);
 
 	//Finish up the second order stuff...
 	FOR_XYZ_YPEN{	
@@ -191,6 +208,10 @@ void Stats::updateStatsFields(){
 	    PRMS[ip]   = sqrt(fabs(PRMS[ip]   - PAVG[ip]*PAVG[ip]));
 	    TRMS[ip]   = sqrt(fabs(TRMS[ip]   - TAVG[ip]*TAVG[ip]));
 	}	
+
+	IF_RANK0{
+	    cout << " > Updated thermo stats, current stats weight = " << totNewWeight << endl;
+	}
 
     }
 

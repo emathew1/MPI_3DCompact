@@ -16,6 +16,7 @@
 #include "CD2.hpp"
 #include "Compact8Filter.hpp"
 #include "Compact10Filter.hpp"
+#include "Stats.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -35,22 +36,20 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	double t1, t2;
 
-
+	
 	
 	//Track the current time and timestep
-        int timeStep;
-        double time;
 	int filterTimeStep;
 
 	//Kill solver condition
         bool done;
 
 	//non-conserved data
-	double  *U_xp, *U, *U_zp, *Ucurv,
-		*V_xp, *V, *V_zp, *Vcurv,
-		*W_xp, *W, *W_zp, *Wcurv,
-	        *T_xp, *T, *T_zp, 
-		*p_xp, *p, *p_zp,
+	double  *U_xp, *U_zp, *Ucurv,
+		*V_xp, *V_zp, *Vcurv,
+		*W_xp, *W_zp, *Wcurv,
+	        *T_xp, *T_zp, 
+		*p_xp, *p_zp,
 	       *mu,
 	      *sos;
 
@@ -71,17 +70,10 @@ class CurvilinearCSolver: public AbstractCSolver{
 	double *mom3_1, *mom3_2, *mom3_3;
 	double *engy_1, *engy_2, *engy_3;
 
-	double *tempX1,  *tempX2,  *tempX3,  *tempX4, *tempX5;
-	double *tempX6,  *tempX7,  *tempX8,  *tempX9, *tempX10;
 	vector<double*> tempXVec;
 
-	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
-	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
-	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
 	vector<double*> tempYVec;
 
-	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
-	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;
 	vector<double*> tempZVec;
 
 	//Stuff for different styles of interprocessor computation...
@@ -108,6 +100,10 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	//For drawing images
 	list<PngWriter*> imageList;
+
+	//Statstics object
+	Stats *stats;
+	bool statsFlag;
 
 	//Alias'd derivative objects
 	AbstractDerivatives *derivXi1, *derivXi2, *derivXi3;
@@ -216,6 +212,14 @@ class CurvilinearCSolver: public AbstractCSolver{
  	    X0WallV = 0.0; X0WallW = 0.0; X1WallV = 0.0; X1WallW = 0.0;
 	    Y0WallU = 0.0; Y0WallW = 0.0; Y1WallU = 0.0; Y1WallW = 0.0;
 	    Z0WallU = 0.0; Z0WallV = 0.0; Z1WallU = 0.0; Z1WallV = 0.0;
+
+	    //Initialize the statistics object
+	    statsFlag = opt->velocityStats || opt->thermoStats;
+	    if(statsFlag){
+	        stats = new Stats(this, opt);
+	    }else{
+		stats = NULL;
+	    }
 
 	    t1 = MPI_Wtime();
 	}
@@ -333,8 +337,15 @@ class CurvilinearCSolver: public AbstractCSolver{
     	    //updateSponge();
     	    checkSolution();
 
-    	    if(timeStep%ts->dumpStep == 0)
+	    if(timeStep%opt->stats_interval == 0 && statsFlag){
+		stats->updateStatsFields();
+	    } 
+
+
+    	    if(timeStep%ts->dumpStep == 0){
         	dumpSolution();
+		stats->dumpStatsFields();
+	    }
 
        	    writeImages();
 
