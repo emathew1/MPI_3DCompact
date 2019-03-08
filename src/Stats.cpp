@@ -201,7 +201,7 @@ void Stats::updateStatsFields(){
 	doAveraging(TRMS);
 	doAveraging(RHOAVG);
 	doAveraging(PAVG);
-	doAveraging(PAVG);
+	doAveraging(TAVG);
 
 	//Finish up the second order stuff...
 	FOR_XYZ_YPEN{	

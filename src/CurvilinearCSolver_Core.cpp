@@ -1117,7 +1117,32 @@ void CurvilinearCSolver::checkSolution(){
         getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
         getRange(rhoE1, "RHOE", Nx, Ny, Nz, mpiRank);
         getRange(sos, "SOS", Nx, Ny, Nz, mpiRank);
-        IF_RANK0 cout << endl;
+
+	if(statsFlag){
+  	    if(stats->velocityStats){
+	        getRange(stats->UAVG, "UAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->URMS, "URMS", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->VAVG, "VAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->VRMS, "VRMS", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->WAVG, "WAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->WRMS, "WRMS", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->UVREY, "UVREY", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->UWREY, "UWREY", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->VWREY, "VWREY", Nx, Ny, Nz, mpiRank);
+	    }
+
+	    if(stats->thermoStats){
+	        getRange(stats->RHOAVG, "RHOAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->RHORMS, "RHORMS", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->PAVG, "PAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->PRMS, "PRMS", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->TAVG, "TAVG", Nx, Ny, Nz, mpiRank);
+	        getRange(stats->TRMS, "TRMS", Nx, Ny, Nz, mpiRank);
+	    }
+	}
+
+
+	IF_RANK0 cout << endl;
 
 	t1 = MPI_Wtime();
     }
