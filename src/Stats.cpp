@@ -174,6 +174,7 @@ void Stats::updateStatsFields(){
 	    cout << " > Updated velocity stats, current stats weight = " << totNewWeight << endl;
 	}
 
+        velocityStatsWeight += dt;
     }
 
 
@@ -213,8 +214,8 @@ void Stats::updateStatsFields(){
 	    cout << " > Updated thermo stats, current stats weight = " << totNewWeight << endl;
 	}
 
+        thermoStatsWeight += dt;
     }
-
 
     prev_time = cs->time;
 };
