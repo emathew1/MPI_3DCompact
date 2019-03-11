@@ -187,7 +187,7 @@ void Stats::updateStatsFields(){
 	    //Second order statistics...
 	    RHORMS[ip]  = (oldWeight*(RHORMS[ip]*RHORMS[ip] + RHOAVG[ip]*RHOAVG[ip]) + dt*rho[ip]*rho[ip])/totNewWeight; 
 	    PRMS[ip]    = (oldWeight*(PRMS[ip]*PRMS[ip] + PAVG[ip]*PAVG[ip]) + dt*p[ip]*p[ip])/totNewWeight; 
-	    TRMS[ip]    = (oldWeight*(TRMS[ip]*TRMS[ip] + WAVG[ip]*TAVG[ip]) + dt*T[ip]*T[ip])/totNewWeight; 
+	    TRMS[ip]    = (oldWeight*(TRMS[ip]*TRMS[ip] + TAVG[ip]*TAVG[ip]) + dt*T[ip]*T[ip])/totNewWeight; 
 
 	    //First order stats
 	    RHOAVG[ip]  = (oldWeight*RHOAVG[ip] + dt*rho[ip])/totNewWeight;
