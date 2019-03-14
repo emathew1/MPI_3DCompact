@@ -214,7 +214,7 @@ void AlgebraicSingleBlockMesh::generateCylinderGrid(double xi_in[3], int cylRInd
 
 
 	//radial distribution
-	double first_off = 0.005;
+	double first_off = 0.002;
 	double R = 0.5;
 
 	double inner_growth_rate = 1.045;
@@ -235,13 +235,18 @@ void AlgebraicSingleBlockMesh::generateCylinderGrid(double xi_in[3], int cylRInd
 
 	}
 
-	double outer_growth_rate = 1.035;
+	double outer_growth_rate = 1.022;
 	for(int ip = Nlayers; ip < RMAX; ip++){
 	    r[ip] = r[ip-1] + outer_growth_rate*(r[ip-1] - r[ip-2]);
 	}
 
-	//Theta distribution - just linear here 
-	double local_theta = 2.0*M_PI*((double)cylThetaIndex/(double)cylThetaMax);
+	//Theta distribution
+	double thetabase = (double)cylThetaIndex/(double)cylThetaMax;
+	double deltastretch = 2.75;
+	double thetastretch = 0.5*(1.0 + tanh(deltastretch*(thetabase - 0.5))/tanh(deltastretch/2.0));
+
+
+	double local_theta = 2.0*M_PI*thetastretch;
 
 	//Get x and y out of the r & theta coordinates
 
