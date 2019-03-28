@@ -51,7 +51,7 @@ Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domai
 Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp 
+CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Options.hpp

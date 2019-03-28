@@ -66,6 +66,9 @@ class Stats{
 	    velocityStatsFilename = opt->velocityStatsFilename;
 	    thermoStatsFilename = opt->thermoStatsFilename;
 
+	    //Get the averaging type..
+	    statsAvgType = opt->statsAvgType;
+
 	    //Initialize the previous time to the current simulation time...
 	    prev_time = cs->time;
 

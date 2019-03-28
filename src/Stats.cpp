@@ -128,7 +128,7 @@ void Stats::updateStatsFields(){
 
     double dt = cs->time-prev_time;
     
-    if(velocityStats){
+    if(velocityStats && dt != 0.0 ){
 
 	double oldWeight     = velocityStatsWeight;
 	double totNewWeight  = oldWeight + dt;
@@ -174,11 +174,11 @@ void Stats::updateStatsFields(){
 	    cout << " > Updated velocity stats, current stats weight = " << totNewWeight << endl;
 	}
 
-        velocityStatsWeight += dt;
+        velocityStatsWeight = totNewWeight;
     }
 
 
-    if(thermoStats){
+    if(thermoStats && dt != 0.0){
 
 	double oldWeight     = thermoStatsWeight;
 	double totNewWeight  = oldWeight + dt;
@@ -214,7 +214,7 @@ void Stats::updateStatsFields(){
 	    cout << " > Updated thermo stats, current stats weight = " << totNewWeight << endl;
 	}
 
-        thermoStatsWeight += dt;
+        thermoStatsWeight = totNewWeight;
     }
 
     prev_time = cs->time;
