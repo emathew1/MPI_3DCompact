@@ -25,6 +25,8 @@ using namespace std;
 
 #include "AbstractRK.hpp"
 #include "TVDRK3.hpp"
+#include "RK4.hpp"
+#include "KenRK4.hpp"
 
 #include "CurvilinearInterpolator.hpp"
 
@@ -157,7 +159,8 @@ int main(int argc, char *argv[]){
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
     ///////////////////////////////////////////
-    AbstractRK *rk = new TVDRK3(cs);
+    //AbstractRK *rk = new TVDRK3(cs);
+    AbstractRK *rk = new KenRK4(cs);
 
     ///////////////////////////////
     //Set flow initial conditions//
@@ -185,9 +188,9 @@ int main(int argc, char *argv[]){
 
 		    double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
 
-                    cs->rho0[ip] = 1.0;//0.4 + 3.0*(x/20.0);
+                    cs->rho0[ip] = 1.0;
                     cs->p0[ip]   = 1.0/cs->ig->gamma;
-                    cs->U0[ip]   = 0.3;
+                    cs->U0[ip]   = 0.2;
                     cs->V0[ip]   = 0.0;
                     cs->W0[ip]   = 0.0;
                 }
@@ -268,14 +271,22 @@ int main(int argc, char *argv[]){
     //solver pointer so we can access the add image function and the solver member we want to print out
 
     double bbox_min[3] = {-3.0, -5.0, M_PI/2.0};
-    double bbox_max[3] = {12.0,  5.0, M_PI/2.0};
+    double bbox_max[3] = {15.0,  5.0, M_PI/2.0};
+    double bbox_min2[3] = {-0.55, -0.55, M_PI/2.0};
+    double bbox_max2[3] = {0.55,  0.55, M_PI/2.0};
+
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->p, "P", 2, 0.5, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.35, 0.35, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.2, 0.65, PngWriter::RAINBOW));
+//    cs_downcast->addImageOutput(new PngWriter(5, 2048, 2048, cs_downcast->rho2, "RHOCLOSE", 2, 0.5, 0.92,1.0, bbox_min2, bbox_max2, PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.1, 0.1, bbox_min,bbox_max,PngWriter::BWR));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.1, 0.3, bbox_min, bbox_max, PngWriter::RAINBOW));
 //    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, 0.0, 5.0, bbox_min, bbox_max, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[4], "DIL", 2, 0.5, -0.7,0.1, PngWriter::GREYSCALE));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, 0.0, 5.0, bbox_min, bbox_max, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG2", 2, 0.5, 0.0, 3.0, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[4], "DIL", 2, 0.5, -0.007,0.001, PngWriter::GREYSCALE));
+
+//    cs_downcast->addImageOutput(new PngWriter(2500, 2048, 2048, cs_downcast->stats->UAVG, "UAVG", 2, 0.5, -0.1, 0.25, PngWriter::RAINBOW));
+//    cs_downcast->addImageOutput(new PngWriter(2500, 2048, 2048, cs_downcast->stats->URMS, "URMS", 2, 0.5, 0, 0.5, PngWriter::RAINBOW));
+
 
 
     ////////////////////////////////////////
@@ -325,7 +336,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     vort_mag = varData[3];
     dil      = varData[4];
 
-    if(timeStep%100 == 0){
+    if(timeStep%50 == 0){
 
     //Specifiy our input and output vectors for the computeGradient call
     double *vi[] = {U, V, W};
@@ -379,8 +390,131 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     getRange(vort_mag, "VORT_MAG", Nx, Ny, Nz, mpiRank);
     getRange(dil, "DIL", Nx, Ny, Nz, mpiRank);
 
+
+    //Get some data from the cylinder surface...
+    double *y0_surfaceP = new double[opt->Nx*opt->Nz]; 
+    double *y0_surfaceUX = new double[opt->Nx*opt->Nz]; 
+    double *y0_surfaceUY = new double[opt->Nx*opt->Nz]; 
+    double *y0_surfaceUZ = new double[opt->Nx*opt->Nz]; 
+	
+    for(int ip = 0; ip < opt->Nx*opt->Nz; ip++){
+	y0_surfaceP[ip]   = -100000.0;
+	y0_surfaceUX[ip]  = -100000.0;
+	y0_surfaceUY[ip]  = -100000.0;
+	y0_surfaceUZ[ip]  = -100000.0;
     }
 
+    FOR_Y0_YPEN_MAJ{
+	int iii = GETGLOBALXIND_YPEN;
+	int kkk = GETGLOBALZIND_YPEN;
+	
+	int local_ind = iii*opt->Nz + kkk;
+	y0_surfaceP[local_ind] = p[ip];
+	y0_surfaceUX[local_ind] = U[ip];
+	y0_surfaceUY[local_ind] = V[ip];
+	y0_surfaceUZ[local_ind] = W[ip];
+
+    }END_FORY0
+
+    double *compiledP;
+    double *compiledU;
+    double *compiledV;
+    double *compiledW;
+    IF_RANK0{
+	compiledP = new double[opt->Nx*opt->Nz];
+	compiledU = new double[opt->Nx*opt->Nz];
+	compiledV = new double[opt->Nx*opt->Nz];
+	compiledW = new double[opt->Nx*opt->Nz];
+    }
+
+    MPI_Reduce(y0_surfaceP,  compiledP, opt->Nx*opt->Nz, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(y0_surfaceUX, compiledU, opt->Nx*opt->Nz, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(y0_surfaceUY, compiledV, opt->Nx*opt->Nz, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(y0_surfaceUZ, compiledW, opt->Nx*opt->Nz, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    delete[] y0_surfaceP;
+    delete[] y0_surfaceUX;
+    delete[] y0_surfaceUY;
+    delete[] y0_surfaceUZ;
+
+    IF_RANK0{
+	double avgP[opt->Nx], avgU[opt->Nx], avgV[opt->Nx], avgW[opt->Nx];
+
+	for(int ip = 0; ip < opt->Nx; ip++){
+	    avgP[ip] = 0.0;
+	    avgU[ip] = 0.0;
+	    avgV[ip] = 0.0;
+	    avgW[ip] = 0.0;
+	    for(int kp = 0; kp < opt->Nz; kp++){
+		avgP[ip] += compiledP[ip*opt->Nz + kp]/(double)opt->Nz;
+		avgU[ip] += compiledU[ip*opt->Nz + kp]/(double)opt->Nz;
+		avgV[ip] += compiledV[ip*opt->Nz + kp]/(double)opt->Nz;
+		avgW[ip] += compiledW[ip*opt->Nz + kp]/(double)opt->Nz;
+	    }
+	}
+
+	FILE *pFile;
+	pFile = fopen("cylinderP.dat", "ab");
+	fwrite(&time, 1, sizeof(double), pFile);
+	fwrite(avgP, opt->Nx, sizeof(double), pFile);
+	fclose(pFile);
+
+	pFile = fopen("cylinderU.dat", "ab");
+	fwrite(&time, 1, sizeof(double), pFile);
+	fwrite(avgU, opt->Nx, sizeof(double), pFile);
+	fclose(pFile);
+
+	pFile = fopen("cylinderV.dat", "ab");
+	fwrite(&time, 1, sizeof(double), pFile);
+	fwrite(avgV, opt->Nx, sizeof(double), pFile);
+	fclose(pFile);
+
+	pFile = fopen("cylinderW.dat", "ab");
+	fwrite(&time, 1, sizeof(double), pFile);
+	fwrite(avgW, opt->Nx, sizeof(double), pFile);
+	fclose(pFile);
+
+	delete[] compiledP;
+	delete[] compiledU;
+	delete[] compiledV;
+	delete[] compiledW;
+    }
+
+    }
+
+    if(timeStep%1 == 0){
+	double zStrip[opt->Nz];
+        for(int ip = 0; ip < opt->Nz; ip++){
+	    zStrip[ip]= -100000.0;
+	}
+
+	FOR_Z_YPEN{
+	    FOR_Y_YPEN{
+		FOR_X_YPEN{
+		    int ip = GETMAJIND_YPEN;
+
+		    int ii = GETGLOBALXIND_YPEN;
+		    int jj = GETGLOBALYIND_YPEN;
+		    int kk = GETGLOBALZIND_YPEN;
+
+		    if(jj == 143 && ii == 0){
+			zStrip[kk] = V[ip]; 
+		    }
+		}
+	    }
+	}
+
+	double compiledStrip[opt->Nz];
+	MPI_Reduce(zStrip, compiledStrip, opt->Nz, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        
+	IF_RANK0{
+	    FILE *pFile;
+	    pFile = fopen("VWakeStrip.dat", "ab");
+	    fwrite(&time, 1, sizeof(double), pFile);
+	    fwrite(compiledStrip, opt->Nz, sizeof(double), pFile);
+	    fclose(pFile);
+	}	
+    }
 };
 
 
