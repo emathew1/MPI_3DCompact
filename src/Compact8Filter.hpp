@@ -20,7 +20,7 @@ class Compact8Filter: public AbstractFilter{
 	double c00, c01, c02, c03, c04;
 
 
-    Compact8Filter(double alphaF, Domain *dom, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
+    Compact8Filter(double alphaF, Domain *dom, BC *bc, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
 	this->Nx = dom->gNx;
@@ -28,6 +28,8 @@ class Compact8Filter: public AbstractFilter{
 	this->Nz = dom->gNz;
 
 	dom->getPencilDecompInfo(pxSize, pySize, pzSize, pxStart, pyStart, pzStart, pxEnd, pyEnd, pzEnd);
+
+	this->bc = bc;
 
 	this->currentDir = currentDir;
 

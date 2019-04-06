@@ -191,13 +191,13 @@ class CurvilinearCSolver: public AbstractCSolver{
 
 	    //Initialize the filters we're going to use for each direction
 	    if(opt->filterType == Options::COMPACT8){
-	        filtX  = new Compact8Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
-	        filtY  = new Compact8Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
-	        filtZ  = new Compact8Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	        filtX  = new Compact8Filter(alphaF, dom, bc, bc->bcXType, AbstractDerivatives::DIRX);
+	        filtY  = new Compact8Filter(alphaF, dom, bc, bc->bcYType, AbstractDerivatives::DIRY);
+	        filtZ  = new Compact8Filter(alphaF, dom, bc, bc->bcZType, AbstractDerivatives::DIRZ);
 	    }else if(opt->filterType == Options::COMPACT10){
-	        filtX  = new Compact10Filter(alphaF, dom, bc->bcXType, AbstractDerivatives::DIRX);
-	        filtY  = new Compact10Filter(alphaF, dom, bc->bcYType, AbstractDerivatives::DIRY);
-	        filtZ  = new Compact10Filter(alphaF, dom, bc->bcZType, AbstractDerivatives::DIRZ);
+	        filtX  = new Compact10Filter(alphaF, dom, bc, bc->bcXType, AbstractDerivatives::DIRX);
+	        filtY  = new Compact10Filter(alphaF, dom, bc, bc->bcYType, AbstractDerivatives::DIRY);
+	        filtZ  = new Compact10Filter(alphaF, dom, bc, bc->bcZType, AbstractDerivatives::DIRZ);
 
 	    }else{
 		cout << "Should never get here? unknown z-derivative" << endl;
@@ -322,11 +322,11 @@ class CurvilinearCSolver: public AbstractCSolver{
 	}
 
 	void updateData(){
-
-    	    if(rkLast){
-        	filterConservedData();
-    	    }
-    
+ 
+     	    if(rkLast || opt->subStepFiltering){
+	       	filterConservedData();
+   	    }
+ 
 	    updateNonConservedData();
 	}
 
@@ -344,7 +344,6 @@ class CurvilinearCSolver: public AbstractCSolver{
 
     	    if(timeStep%ts->dumpStep == 0){
         	dumpSolution();
-		stats->dumpStatsFields();
 	    }
 
        	    writeImages();

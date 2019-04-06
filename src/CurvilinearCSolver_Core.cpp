@@ -830,8 +830,44 @@ void CurvilinearCSolver::filterConservedData(){
 
     if(useTiming) ft1 = MPI_Wtime();
 
+    double *rhoP_in, *rhoP_out;
+    double *rhoUP_in, *rhoUP_out;
+    double *rhoVP_in, *rhoVP_out;
+    double *rhoWP_in, *rhoWP_out;
+    double *rhoEP_in, *rhoEP_out;
+    if(!rkLast){
+	//in
+        rhoP_in  = rhok;
+        rhoUP_in = rhoUk;
+        rhoVP_in = rhoVk;
+        rhoWP_in = rhoWk;
+        rhoEP_in = rhoEk;
+
+	//out
+        rhoP_out  = rhok;
+        rhoUP_out = rhoUk;
+        rhoVP_out = rhoVk;
+        rhoWP_out = rhoWk;
+        rhoEP_out = rhoEk;
+
+    }else{
+        rhoP_in  = rho2;
+        rhoUP_in = rhoU2;
+        rhoVP_in = rhoV2;
+        rhoWP_in = rhoW2;
+        rhoEP_in = rhoE2;
+
+	//out
+        rhoP_out  = rho1;
+        rhoUP_out = rhoU1;
+        rhoVP_out = rhoV1;
+        rhoWP_out = rhoW1;
+        rhoEP_out = rhoE1;
+    }
+
+
     //Need to do round robin of filtering directions...
-    if(timeStep%ts->filterStep == 0){
+    if(timeStep%ts->filterStep == 0 || opt->subStepFiltering){
 
         //Advance the filtering time step       
         filterTimeStep++;
@@ -840,12 +876,11 @@ void CurvilinearCSolver::filterConservedData(){
         if(filterTimeStep%3 == 1){
 
             //Here we'll do Y->Z->X     
-
-                    filtY->filterField(rho2,  tempY1);
-		    filtY->filterField(rhoU2, tempY2);
-		    filtY->filterField(rhoV2, tempY3);
-		    filtY->filterField(rhoW2, tempY4);
-		    filtY->filterField(rhoE2, tempY5);
+                    filtY->filterField(rhoP_in,  tempY1);
+		    filtY->filterField(rhoUP_in, tempY2);
+		    filtY->filterField(rhoVP_in, tempY3);
+		    filtY->filterField(rhoWP_in, tempY4);
+		    filtY->filterField(rhoEP_in, tempY5);
 
 		    c2d->transposeY2Z_MajorIndex(tempY1, tempZ1);
 		    c2d->transposeY2Z_MajorIndex(tempY2, tempZ2);
@@ -877,22 +912,22 @@ void CurvilinearCSolver::filterConservedData(){
 	            filtX->filterField(tempX4, tempX9);	
 	            filtX->filterField(tempX5, tempX10);	
 
-		    c2d->transposeX2Y_MajorIndex(tempX6,  rho1);
-		    c2d->transposeX2Y_MajorIndex(tempX7,  rhoU1);
-		    c2d->transposeX2Y_MajorIndex(tempX8,  rhoV1);
-		    c2d->transposeX2Y_MajorIndex(tempX9,  rhoW1);
-		    c2d->transposeX2Y_MajorIndex(tempX10, rhoE1);
+		    c2d->transposeX2Y_MajorIndex(tempX6,  rhoP_out);
+		    c2d->transposeX2Y_MajorIndex(tempX7,  rhoUP_out);
+		    c2d->transposeX2Y_MajorIndex(tempX8,  rhoVP_out);
+		    c2d->transposeX2Y_MajorIndex(tempX9,  rhoWP_out);
+		    c2d->transposeX2Y_MajorIndex(tempX10, rhoEP_out);
 
 
         }else if(filterTimeStep%3 == 2){
 
             //Here we'll do Z->X->Y     
 
-	    c2d->transposeY2Z_MajorIndex(rho2,  tempZ1);
-	    c2d->transposeY2Z_MajorIndex(rhoU2, tempZ2);
-	    c2d->transposeY2Z_MajorIndex(rhoV2, tempZ3);
-	    c2d->transposeY2Z_MajorIndex(rhoW2, tempZ4);
-	    c2d->transposeY2Z_MajorIndex(rhoE2, tempZ5);
+	    c2d->transposeY2Z_MajorIndex(rhoP_in,  tempZ1);
+	    c2d->transposeY2Z_MajorIndex(rhoUP_in, tempZ2);
+	    c2d->transposeY2Z_MajorIndex(rhoVP_in, tempZ3);
+	    c2d->transposeY2Z_MajorIndex(rhoWP_in, tempZ4);
+	    c2d->transposeY2Z_MajorIndex(rhoEP_in, tempZ5);
 
 	    filtZ->filterField(tempZ1, tempZ6);
 	    filtZ->filterField(tempZ2, tempZ7);
@@ -924,21 +959,21 @@ void CurvilinearCSolver::filterConservedData(){
 	    c2d->transposeX2Y_MajorIndex(tempX9,  tempY4);
 	    c2d->transposeX2Y_MajorIndex(tempX10, tempY5);
 
-	    filtY->filterField(tempY1,  rho1);
-	    filtY->filterField(tempY2, rhoU1);
-	    filtY->filterField(tempY3, rhoV1);
-	    filtY->filterField(tempY4, rhoW1);
-	    filtY->filterField(tempY5, rhoE1);
+	    filtY->filterField(tempY1,  rhoP_out);
+	    filtY->filterField(tempY2, rhoUP_out);
+	    filtY->filterField(tempY3, rhoVP_out);
+	    filtY->filterField(tempY4, rhoWP_out);
+	    filtY->filterField(tempY5, rhoEP_out);
 
         }else{
 
             //Here we'll do X->Y->Z     
 
-	    c2d->transposeY2X_MajorIndex(rho2,  tempX1);
-	    c2d->transposeY2X_MajorIndex(rhoU2, tempX2);
-	    c2d->transposeY2X_MajorIndex(rhoV2, tempX3);
-	    c2d->transposeY2X_MajorIndex(rhoW2, tempX4);
-	    c2d->transposeY2X_MajorIndex(rhoE2, tempX5);
+	    c2d->transposeY2X_MajorIndex(rhoP_in,  tempX1);
+	    c2d->transposeY2X_MajorIndex(rhoUP_in, tempX2);
+	    c2d->transposeY2X_MajorIndex(rhoVP_in, tempX3);
+	    c2d->transposeY2X_MajorIndex(rhoWP_in, tempX4);
+	    c2d->transposeY2X_MajorIndex(rhoEP_in, tempX5);
 
 	    filtX->filterField(tempX1, tempX6);
 	    filtX->filterField(tempX2, tempX7);
@@ -970,22 +1005,24 @@ void CurvilinearCSolver::filterConservedData(){
 	    filtZ->filterField(tempZ4, tempZ9);
 	    filtZ->filterField(tempZ5, tempZ10);
 
-	    c2d->transposeZ2Y_MajorIndex(tempZ6,  rho1);
-	    c2d->transposeZ2Y_MajorIndex(tempZ7,  rhoU1);
-	    c2d->transposeZ2Y_MajorIndex(tempZ8,  rhoV1);
-	    c2d->transposeZ2Y_MajorIndex(tempZ9,  rhoW1);
-	    c2d->transposeZ2Y_MajorIndex(tempZ10, rhoE1);
+	    c2d->transposeZ2Y_MajorIndex(tempZ6,  rhoP_out);
+	    c2d->transposeZ2Y_MajorIndex(tempZ7,  rhoUP_out);
+	    c2d->transposeZ2Y_MajorIndex(tempZ8,  rhoVP_out);
+	    c2d->transposeZ2Y_MajorIndex(tempZ9,  rhoWP_out);
+	    c2d->transposeZ2Y_MajorIndex(tempZ10, rhoEP_out);
 
         }
  
     //If not filtering, need to copy the solution over to the *1 variables
     }else{
+
+	if(rkLast){
 	    memcpy(rho1,  rho2,  sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
 	    memcpy(rhoU1, rhoU2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
 	    memcpy(rhoV1, rhoV2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
 	    memcpy(rhoW1, rhoW2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
 	    memcpy(rhoE1, rhoE2, sizeof(double)*pySize[0]*pySize[1]*pySize[2]);
-
+	}
     }
 
     if(useTiming){
@@ -1001,6 +1038,10 @@ void CurvilinearCSolver::filterConservedData(){
 void CurvilinearCSolver::updateNonConservedData(){
 
     if(useTiming) ft1 = MPI_Wtime();
+
+    int Nx = pySize[0];
+    int Ny = pySize[1];
+    int Nz = pySize[2];
 
 
     if(!rkLast){
@@ -1238,6 +1279,10 @@ void CurvilinearCSolver::dumpSolution(){
 
 	if(spongeFlag){
 	    spg->dumpSpongeAvg(timeStep);
+	}
+
+        if(statsFlag){
+	    stats->dumpStatsFields();
 	}
 
 	double time2 = MPI_Wtime();

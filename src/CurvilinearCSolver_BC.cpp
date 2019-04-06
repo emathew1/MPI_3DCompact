@@ -398,6 +398,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Xp1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
@@ -423,6 +424,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Xm1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
@@ -454,6 +456,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Yp1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
@@ -479,6 +482,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Ym1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
@@ -505,6 +509,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Zp1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;
@@ -529,6 +534,7 @@ void CurvilinearCSolver::preStepBCHandling(){
 	    U[ip]  = 0.0;
 	    V[ip]  = 0.0;
 	    W[ip]  = 0.0;
+	    //rhoP[ip] = rhoP[GETMAJIND_YPEN_Zm1];
 	    rhoUP[ip] = 0.0;
 	    rhoVP[ip] = 0.0;
 	    rhoWP[ip] = 0.0;

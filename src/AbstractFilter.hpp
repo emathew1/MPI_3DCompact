@@ -26,6 +26,8 @@ class AbstractFilter{
 	AbstractDerivatives::Direct currentDir;
 	Options::BCType bcType;
 
+	BC *bc;
+
 	//Functions that a filter object have to define
 	virtual void filterField(double *dataIn, double *dataOut) = 0;
 
