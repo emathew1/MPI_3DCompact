@@ -867,7 +867,7 @@ void CurvilinearCSolver::filterConservedData(){
 
 
     //Need to do round robin of filtering directions...
-    if(timeStep%ts->filterStep == 0 || opt->subStepFiltering){
+    if(timeStep%ts->filterStep == 0){
 
         //Advance the filtering time step       
         filterTimeStep++;
