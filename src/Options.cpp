@@ -22,7 +22,25 @@ void Options::parseStatsAvgTypeString(string vmKey, string inString, StatsAvgTyp
     }
 }
 
+void Options::parseRKTypeFromString(string vmKey, string inString, RKType &currentType){
 
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "TVDRK3")==0){
+            currentType = TVDRK3;
+        }else if(strcmp(inString.c_str(), "RK4")==0){
+            currentType = RK4;
+        }else if(strcmp(inString.c_str(), "KENRK4")==0){
+            currentType = KENRK4;
+	}else{
+            cout << " > UNKNOWN RUNGE-KUTTA TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+        cout << " > " << vmKey << " = " << inString << endl;
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
 
 void Options::parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType){
 

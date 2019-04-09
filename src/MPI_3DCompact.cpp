@@ -159,8 +159,17 @@ int main(int argc, char *argv[]){
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
     ///////////////////////////////////////////
-    //AbstractRK *rk = new TVDRK3(cs);
-    AbstractRK *rk = new KenRK4(cs);
+    AbstractRK *rk;
+    if(opt->rkType == Options::TVDRK3){
+        rk = new TVDRK3(cs);
+    }else if(opt->rkType == Options::RK4){
+	rk = new RK4(cs);
+    }else if(opt->rkType == Options::KENRK4){
+        rk = new KenRK4(cs);
+    }else{
+	cout << "SHOULD NEVER GET HERE!" << endl;
+	MPI_Abort(MPI_COMM_WORLD, -10);
+    }
 
     ///////////////////////////////
     //Set flow initial conditions//

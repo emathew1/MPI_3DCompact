@@ -32,6 +32,8 @@ class Options{
 
 	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG};
 
+	enum RKType {TVDRK3, RK4, KENRK4};
+
 	//Variable map...
 	po::variables_map vm;
 
@@ -76,6 +78,8 @@ class Options{
 	string xFDType_str, yFDType_str, zFDType_str;
 	FilterType filterType;
 	string filterType_str;
+	RKType rkType;
+	string rkType_str;	
 
 	//RESTART stuff
 	bool fromRestart;
@@ -170,6 +174,7 @@ class Options{
 	    ("SOLVER.YFDTYPE",		 po::value<string>(&yFDType_str), "Finite Differences Type in the Y-Direction")
 	    ("SOLVER.ZFDTYPE",		 po::value<string>(&zFDType_str), "Finite Differences Type in the Z-Direction")
 	    ("SOLVER.FILTERTYPE",	 po::value<string>(&filterType_str), "Filter type for all three directions")
+	    ("SOLVER.RKTYPE",		 po::value<string>(&rkType_str), "Type of Runge-Kutta time stepping")
 	    ("RESTART.FROMRESTART", 	 po::value<bool>(&fromRestart), "Do we start the simulation from a restart")
 	    ("RESTART.ONLYGRIDFROMRESTART", 	 po::value<bool>(&onlyGridFromRestart), "Only pull the grid from the restart file")
 	    ("RESTART.FILENAME",	 po::value<string>(&filename), "Filename of the restart file")
@@ -232,6 +237,7 @@ class Options{
 	parseFDTypeFromString("SOLVER.YFDTYPE", yFDType_str, yFDType);
 	parseFDTypeFromString("SOLVER.ZFDTYPE", zFDType_str, zFDType);
 	parseFilterTypeFromString("SOLVER.FILTERTYPE", filterType_str, filterType);
+	parseRKTypeFromString("SOLVER.RKTYPE", rkType_str, rkType);
 
 	//Parse from string...
 	parseBCTypeFromString("BC.BCXTYPE", bcXType_str, bcXType);
@@ -457,6 +463,8 @@ class Options{
       MPI_Bcast(&yFDType, 1, MPI_INT, root, MPI_COMM_WORLD);
       MPI_Bcast(&zFDType, 1, MPI_INT, root, MPI_COMM_WORLD);
       MPI_Bcast(&filterType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&rkType, 1, MPI_INT, root, MPI_COMM_WORLD);
+   
 
       //[RESTART]
       MPI_Bcast(&fromRestart, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
@@ -577,6 +585,7 @@ class Options{
     void parseStatsAvgTypeString(string vmKey, string inString, StatsAvgType &currentType);
     void parseFDTypeFromString(string vmKey, string inString, FDType &currentType);
     void parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType);
+    void parseRKTypeFromString(string vmKey, string inString, RKType &currentType);
     void parseTSTypeFromString(string vmKey, string inString, TimeSteppingType &currentType);
     void parseBCTypeFromString(string vmKey, string inString, BCType &currentType);
     void parseBCKindFromString(string vmKey, string inString, BCKind &currentType);
