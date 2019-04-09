@@ -254,22 +254,11 @@ class Compact10Filter: public AbstractFilter{
         }
         
 	if(bcType == Options::DIRICHLET_SOLVE){
-	    //explicitly filter the boundary points (Lele)
-	
 	    offlowerF[0] = 0.0;
-	    //offlowerF[1] = 0.0;
-	    //offlowerF[2] = 0.0;
 	    offupperF[0] = 0.0;
-	    //offupperF[1] = 0.0;
-	    //offupperF[2] = 0.0;
 
 	    offlowerF[N-1] = 0.0;
-	    //offlowerF[N-2] = 0.0;
-	    //offlowerF[N-3] = 0.0;
 	    offupperF[N-1] = 0.0;
-	    //offupperF[N-2] = 0.0;
-	    //offupperF[N-3] = 0.0;
-
   	}
 
     }
