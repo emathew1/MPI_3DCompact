@@ -31,6 +31,8 @@ void Options::parseRKTypeFromString(string vmKey, string inString, RKType &curre
             currentType = RK4;
         }else if(strcmp(inString.c_str(), "KENRK4")==0){
             currentType = KENRK4;
+        }else if(strcmp(inString.c_str(), "LSLDDRK4")==0){
+            currentType = LSLDDRK4;
 	}else{
             cout << " > UNKNOWN RUNGE-KUTTA TYPE SPECIFIED: " << inString << endl;
             MPI_Abort(MPI_COMM_WORLD, -10);

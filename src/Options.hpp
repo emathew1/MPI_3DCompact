@@ -32,7 +32,7 @@ class Options{
 
 	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG};
 
-	enum RKType {TVDRK3, RK4, KENRK4};
+	enum RKType {TVDRK3, RK4, KENRK4, LSLDDRK4};
 
 	//Variable map...
 	po::variables_map vm;

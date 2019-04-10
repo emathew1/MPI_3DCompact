@@ -24,7 +24,7 @@ MPI_3DCompact:
 MPI_3DCompact.exe: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ -I$(INC) $(OBJECTS) -L$(LIB) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
-MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp AbstractRK.hpp CurvilinearCSolver.hpp TVDRK3.hpp RK4.hpp KenRK4.hpp AbstractSingleBlockMesh.hpp AlgebraicSingleBlockMesh.hpp Options.hpp 
+MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp AbstractRK.hpp CurvilinearCSolver.hpp TVDRK3.hpp RK4.hpp KenRK4.hpp LSLDDRK4.hpp AbstractSingleBlockMesh.hpp AlgebraicSingleBlockMesh.hpp Options.hpp 
 	$(CC) $(CFLAGS) -c $<
 
 Utils.o: Utils.cpp Domain.hpp Utils.hpp

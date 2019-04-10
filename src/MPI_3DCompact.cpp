@@ -27,6 +27,7 @@ using namespace std;
 #include "TVDRK3.hpp"
 #include "RK4.hpp"
 #include "KenRK4.hpp"
+#include "LSLDDRK4.hpp"
 
 #include "CurvilinearInterpolator.hpp"
 
@@ -56,8 +57,7 @@ int main(int argc, char *argv[]){
     //Have the root rank parse the input file and broadcast it out...
     Options *opt = new Options(mpiRank);
 
-
-
+    
     ////////////////////////////////////
     //Time Stepping info intialization//
     ////////////////////////////////////
@@ -156,6 +156,8 @@ int main(int argc, char *argv[]){
     //Attach the mesh object to the solver...
     cs->msh = new AlgebraicSingleBlockMesh(c2d, cs, d, mpiRank);
 
+
+
     ///////////////////////////////////////////
     //Initialize Execution Loop and RK Method//
     ///////////////////////////////////////////
@@ -166,6 +168,8 @@ int main(int argc, char *argv[]){
 	rk = new RK4(cs);
     }else if(opt->rkType == Options::KENRK4){
         rk = new KenRK4(cs);
+    }else if(opt->rkType == Options::LSLDDRK4){
+        rk = new LSLDDRK4(cs);
     }else{
 	cout << "SHOULD NEVER GET HERE!" << endl;
 	MPI_Abort(MPI_COMM_WORLD, -10);
@@ -285,7 +289,8 @@ int main(int argc, char *argv[]){
     double bbox_max2[3] = {0.55,  0.55, M_PI/2.0};
 
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
-//    cs_downcast->addImageOutput(new PngWriter(5, 2048, 2048, cs_downcast->rho2, "RHOCLOSE", 2, 0.5, 0.92,1.0, bbox_min2, bbox_max2, PngWriter::BWR));
+
+    //    cs_downcast->addImageOutput(new PngWriter(5, 2048, 2048, cs_downcast->rho2, "RHOCLOSE", 2, 0.5, 0.92,1.0, bbox_min2, bbox_max2, PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.1, 0.1, bbox_min,bbox_max,PngWriter::BWR));
     cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.1, 0.3, bbox_min, bbox_max, PngWriter::RAINBOW));
 //    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
