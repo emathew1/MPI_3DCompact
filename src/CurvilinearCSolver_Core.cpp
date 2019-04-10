@@ -1623,9 +1623,42 @@ void CurvilinearCSolver::writePlaneImageForVariable(PngWriter *pw){
 
 }
 
+bool CurvilinearCSolver::checkForAndDeleteKillFile(string killFileName){
+
+    bool fileExists;
+
+    IF_RANK0{
+        if(FILE *file = fopen(killFileName.c_str(),"r")){
+            fclose(file);
+	    fileExists = true;
+        }else{
+	    fileExists = false;
+        }
+
+        if(fileExists){
+	    if(remove(killFileName.c_str()) != 0){
+	        cout << " > ERROR DELETING KILLFILE! " << endl;
+	    }
+        }
+
+    }
+    MPI_Bcast(&fileExists, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+
+    return fileExists;
+}
 
 void CurvilinearCSolver::checkEnd(){
 
+    if(checkForAndDeleteKillFile("killsolver")){
+
+   	IF_RANK0{
+	    cout << "===================" << endl;
+	    cout << " FOUND KILL SOLVER " << endl;
+	    cout << "===================" << endl;
+	}
+	
+	endFlag = true;
+    }
 
     if(time >= ts->maxTime){
 

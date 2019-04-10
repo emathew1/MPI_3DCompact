@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdio.h>
 #include "Macros.hpp"
 #include "Options.hpp"
 #include "Utils.hpp"
@@ -277,6 +278,8 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//Derivative calculation functions
 	void computeGradient(vector<double*> vecIn, vector<double*>vecOut);
 	void computeGradDotComponents(vector<double*> vecIn, vector<double*>vecOut);
+
+	bool checkForAndDeleteKillFile(string killFileName);
 
 	/////////////////////////////////////
 	//Our Generalized Solver Functions //
