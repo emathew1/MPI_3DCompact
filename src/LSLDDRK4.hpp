@@ -382,7 +382,10 @@ void LSLDDRK4::executeSolverLoop(){
 
 	cs->postStep();	
 
+	//Start the second RK step...
+
 	rkDualStepStep = 2;
+	cs->rkLast = false;
 	cs->preStep();
 
 	//Step 1
