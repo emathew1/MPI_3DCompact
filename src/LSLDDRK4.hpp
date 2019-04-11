@@ -382,6 +382,11 @@ void LSLDDRK4::executeSolverLoop(){
 
 	cs->postStep();	
 
+	//bust out early if we hit the end in the middle...
+	if(cs->endFlag){
+	    break;		
+	}
+
 	//Start the second RK step...
 
 	rkDualStepStep = 2;
