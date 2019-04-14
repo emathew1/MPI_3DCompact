@@ -1,5 +1,5 @@
 #ifndef _CLSLLDRK4H_
-#define _CLSLDDRK4H_
+#define _CLSLLDRK4H_
 
 #include "Utils.hpp"
 #include "AbstractRK.hpp"
