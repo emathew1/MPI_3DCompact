@@ -128,7 +128,7 @@ class CurvilinearInterpolator{
 		    d2[i] += (box_p[i][j]-p[j])*(box_p[i][j]-p[j]); 
 		}
 	    }
-
+	   /* INVERSE DISTANCE WEIGHTING...
 	    double total_weight = 0.0;
 	    for(int i = 0; i < 8; i++){
 		total_weight += 1.0/d2[i];
@@ -137,9 +137,9 @@ class CurvilinearInterpolator{
 	    for(int i = 0; i < 8; i++){
 		Ni[ii][i] = (1.0/d2[i])/total_weight;
 	    }
-	    
+	   */ 
 
-/* PARTIAL INCOMPLETE/INCORRECT IMPLEMENTATION OF LINEAR INTERPOLATION
+	    // TRILINEAR INTERPOLATION
 	    //reorder to make things easier to program
 	    double xp[8][3];
 	    FOR_I3{
@@ -170,22 +170,18 @@ class CurvilinearInterpolator{
 
 	    for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 3; j++){
-		    f[i][j] /= (1.0/8.0);
+		    f[i][j] *= (1.0/8.0);
 		}
 	    }
 
 	    bool done = false;
 	    int iter = 0;
 	    
-	    IF_RANK0{
-		cout << " p = " << pointListX[ii] << " " << pointListY[ii] << " " << pointListZ[ii] << endl;
-	        cout << " f = " << f[0][0] << endl;
-	    }
-
 	    double e1 = 0.0, e2 = 0.0, e3 = 0.0; 
 	    while(!done){
 
 		iter++;
+
 	        double error_tol = 1E-12;
 
 		double alpha = f[0][0] + f[1][0]*e1 + f[2][0]*e2 + f[3][0]*e3 + f[4][0]*e1*e2 + \
@@ -258,13 +254,21 @@ class CurvilinearInterpolator{
 		e2 = e2_new;
 		e3 = e3_new;
 
-		IF_RANK0{
-		   cout << "iter = " << iter << ", e_new = " << e1_new << ", " << e2_new << ", " << e3_new << endl;
-		}
 	    }
-*/
-	
+
+	    //Now we have to get and reorganize the weights to be in the right place
+	    Ni[ii][7] = (1.0/8.0)*(1.0+e1)*(1.0+e2)*(1.0+e3);
+	    Ni[ii][3] = (1.0/8.0)*(1.0-e1)*(1.0+e2)*(1.0+e3);
+	    Ni[ii][2] = (1.0/8.0)*(1.0-e1)*(1.0+e2)*(1.0-e3);
+	    Ni[ii][6] = (1.0/8.0)*(1.0+e1)*(1.0+e2)*(1.0-e3);
+	    Ni[ii][5] = (1.0/8.0)*(1.0+e1)*(1.0-e2)*(1.0+e3);
+	    Ni[ii][1] = (1.0/8.0)*(1.0-e1)*(1.0-e2)*(1.0+e3);
+	    Ni[ii][0] = (1.0/8.0)*(1.0-e1)*(1.0-e2)*(1.0-e3);
+	    Ni[ii][4] = (1.0/8.0)*(1.0+e1)*(1.0-e2)*(1.0-e3);
+
 	}
+
+
 
 	delete[] xHalo;
 	delete[] yHalo;
