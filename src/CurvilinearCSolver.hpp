@@ -18,6 +18,8 @@
 #include "Compact8Filter.hpp"
 #include "Compact10Filter.hpp"
 #include "Stats.hpp"
+#include "AbstractSGS.hpp"
+#include "VremanSGS.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 
@@ -105,6 +107,10 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//Statstics object
 	Stats *stats;
 	bool statsFlag;
+
+	//LES Object
+	AbstractSGS *les;
+	bool LESFlag;
 
 	//Alias'd derivative objects
 	AbstractDerivatives *derivXi1, *derivXi2, *derivXi3;
@@ -221,6 +227,15 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    }else{
 		stats = NULL;
 	    }
+
+	    //Initialize the LES stuff if we need to...
+	    if(opt->lesModel == Options::NOMODEL){
+		LESFlag = false;
+		les = NULL;
+	    }else if(opt->lesModel == Options::VREMAN){
+		LESFlag = true;
+		les = new VremanSGS(this);
+	    } 
 
 	    t1 = MPI_Wtime();
 	}
