@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o AbstractSGS.o
 
 default: MPI_3DCompact
 
@@ -24,7 +24,7 @@ MPI_3DCompact:
 MPI_3DCompact.exe: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ -I$(INC) $(OBJECTS) -L$(LIB) -L$(DECOMP_DIR) -lc2decomp $(LIBF) 
 
-MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp AbstractRK.hpp CurvilinearCSolver.hpp TVDRK3.hpp RK4.hpp KenRK4.hpp LSLDDRK4.hpp AbstractSingleBlockMesh.hpp AlgebraicSingleBlockMesh.hpp Options.hpp 
+MPI_3DCompact.o: MPI_3DCompact.cpp Domain.hpp BC.hpp Utils.hpp Macros.hpp TimeStepping.hpp AbstractCSolver.hpp AbstractRK.hpp CurvilinearCSolver.hpp TVDRK3.hpp RK4.hpp KenRK4.hpp LSLDDRK4.hpp AbstractSingleBlockMesh.hpp AlgebraicSingleBlockMesh.hpp Options.hpp CurvilinearInterpolator.hpp
 	$(CC) $(CFLAGS) -c $<
 
 Utils.o: Utils.cpp Domain.hpp Utils.hpp
@@ -51,10 +51,10 @@ Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domai
 Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
+CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Options.hpp
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Compact10Filter.hpp Options.hpp AbstractSGS.hpp VremanSGS.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp Options.hpp
@@ -65,6 +65,10 @@ Options.o: Options.cpp Options.hpp
 
 Stats.o: Stats.cpp Stats.hpp Macros.hpp Domain.hpp Options.hpp CurvilinearCSolver.hpp
 	$(CC) $(CFLAGS) -c $<
+
+AbstractSGS.o: AbstractSGS.cpp AbstractSGS.hpp Macros.hpp Options.hpp AbstractCSolver.hpp AbstractSingleBlockMesh.hpp  
+	$(CC) $(CFLAGS) -c $<
+
 
 
 clean: 

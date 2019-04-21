@@ -73,7 +73,7 @@ class Compact10Filter: public AbstractFilter{
 	FB1_j    = (   5.0 -   5.0*alphaF)/512.0;
 	FB1_k    = (  -1.0 +       alphaF)/1024.0;
 */
-
+/*
 	//F10_2
 	FB2_a    = (   1.0 +1022.0*alphaF)/1024.0;
 	FB2_b    = ( 507.0 +  10.0*alphaF)/512.0;
@@ -86,8 +86,8 @@ class Compact10Filter: public AbstractFilter{
 	FB2_i    = (  45.0 -  90.0*alphaF)/1024.0;
 	FB2_j    = (  -5.0 +  10.0*alphaF)/512.0;
 	FB2_k    = (   1.0 -   2.0*alphaF)/1024.0;
+*/
 
-/*
 	//F6_2
 	FB2_a    = ( 1.0/64.0  + 31.0*alphaF/32.0);
         FB2_b    = (29.0/32.0  +  3.0*alphaF/16.0);	
@@ -100,7 +100,7 @@ class Compact10Filter: public AbstractFilter{
 	FB2_i    = 0.0;
 	FB2_j    = 0.0;
 	FB2_k    = 0.0;
-*/
+
 /*
 	//Interior 2
 	FB2_a	 = 0.5*(0.5 + alphaF);
@@ -115,7 +115,7 @@ class Compact10Filter: public AbstractFilter{
 	FB2_j	 = 0.0;
 	FB2_k	 = 0.0;
 */
-
+/*
 	//F10_3
 	FB3_a    = (  -1.0 +   2.0*alphaF)/1024.0;
 	FB3_b    = (   5.0 + 502.0*alphaF)/512.0;
@@ -128,7 +128,7 @@ class Compact10Filter: public AbstractFilter{
 	FB3_i    = ( -45.0 +  90.0*alphaF)/1024.0;
 	FB3_j    = (   5.0 -  10.0*alphaF)/512.0;
 	FB3_k    = (  -1.0 +   2.0*alphaF)/1024.0;
-
+*/
 
 /*
 	//F8_3
@@ -144,7 +144,7 @@ class Compact10Filter: public AbstractFilter{
 	FB3_j	 = 0.0;
 	FB3_k	 = 0.0;
 */
-/*
+
 	//F6_3
 	FB3_a	 = (-1.0/64.0  +  1.0*alphaF/32.0);
 	FB3_b	 = ( 3.0/32.0  + 13.0*alphaF/16.0);
@@ -157,7 +157,7 @@ class Compact10Filter: public AbstractFilter{
 	FB3_i	 = 0.0;
 	FB3_j	 = 0.0;
 	FB3_k	 = 0.0;
-*/
+
 /*
 	//Interior 4
 	FB3_a	= 0.5*(-1.0/8.0 + 1.0*alphaF/4.0);
@@ -172,7 +172,7 @@ class Compact10Filter: public AbstractFilter{
 	FB3_j	= 0.0;
 	FB3_k	= 0.0;
 */
-
+/*
 	//F10_4
 	FB4_a    = (   1.0 -   2.0*alphaF)/1024.0;
 	FB4_b    = (  -5.0 +  10.0*alphaF)/512.0;
@@ -185,8 +185,8 @@ class Compact10Filter: public AbstractFilter{
 	FB4_i    = (  45.0 -  90.0*alphaF)/1024.0;
 	FB4_j    = (  -5.0 +  10.0*alphaF)/512.0;
 	FB4_k    = (   1.0 -   2.0*alphaF)/1024.0;
+*/
 
-/*
 	//Interior 6
 	FB4_a	 = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
 	FB4_b	 = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
@@ -199,8 +199,8 @@ class Compact10Filter: public AbstractFilter{
 	FB4_i    = 0.0;
 	FB4_j    = 0.0;
 	FB4_k    = 0.0;
-*/
 
+/*
 	//F10_5
 	FB5_a    = (  -1.0 +   2.0*alphaF)/1024.0;
 	FB5_b    = (   5.0 -  10.0*alphaF)/512.0;
@@ -213,8 +213,8 @@ class Compact10Filter: public AbstractFilter{
 	FB5_i    = ( -45.0 +  90.0*alphaF)/1024.0;
 	FB5_j    = (   5.0 -  10.0*alphaF)/512.0;
 	FB5_k    = (  -1.0 +   2.0*alphaF)/1024.0;
+*/
 
-/*
 	//Interior 8
 	FB5_a	 = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
 	FB5_b	 = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
@@ -227,7 +227,7 @@ class Compact10Filter: public AbstractFilter{
 	FB5_i	 = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
 	FB5_j    = 0.0;
 	FB5_k    = 0.0;
-*/
+
 	a00 = 15.0/16.0;	    
 	a01 =  4.0/16.0;
 	a02 = -6.0/16.0;

@@ -1,5 +1,23 @@
 #include "Options.hpp"
 
+void Options::parseLESModelString(string vmKey, string inString, LESModel &currentType){
+
+    if(vm.count(vmKey)){
+        if(strcmp(inString.c_str(), "NOMODEL")==0){
+            currentType = NOMODEL;
+        }else if(strcmp(inString.c_str(), "VREMAN")==0){
+            currentType = VREMAN;
+	}else{
+            cout << " > UNKNOWN LES MODEL TYPE SPECIFIED: " << inString << endl;
+            MPI_Abort(MPI_COMM_WORLD, -10);
+        }
+        cout << " > " << vmKey << " = " << inString << endl;
+    }else{
+        cout << " > " << vmKey << " = " << inString << " not specified " << endl;
+        MPI_Abort(MPI_COMM_WORLD, -10);
+    }
+}
+
 void Options::parseStatsAvgTypeString(string vmKey, string inString, StatsAvgType &currentType){
 
     if(vm.count(vmKey)){
@@ -11,8 +29,10 @@ void Options::parseStatsAvgTypeString(string vmKey, string inString, StatsAvgTyp
             currentType = XI2_AVG;
         }else if(strcmp(inString.c_str(), "XI3_AVG")==0){
             currentType = XI3_AVG;
+        }else if(strcmp(inString.c_str(), "LOCAL")==0){
+            currentType = LOCAL;
 	}else{
-            cout << " > UNKNOWN STATS AVERAGE TYPE SPECIFIED: " << inString << endl;
+            cout << " > UNKNOWN AVERAGING TYPE SPECIFIED: " << inString << endl;
             MPI_Abort(MPI_COMM_WORLD, -10);
         }
         cout << " > " << vmKey << " = " << inString << endl;

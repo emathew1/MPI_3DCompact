@@ -521,30 +521,31 @@ void CurvilinearCSolver::preStepDerivatives(){
     double b_1, b_2, b_3;
     double q_1, q_2, q_3;
 
+    //Do LES/Bulk viscosity model stuff here...
+
     //Now recalculate properties in the new space
     FOR_XYZ_YPEN{
 
+	//Calculate our velocity gradient tensor
+   	double dUdx = J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip];
+	double dUdy = J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip]; 
+	double dUdz = J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip]; 
+	double dVdx = J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
+	double dVdy = J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip];
+	double dVdz = J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip];
+	double dWdx = J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
+	double dWdy = J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
+	double dWdz = J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip];
+
+
 	//Viscous stress tensor
-	Tau11[ip] =  (4.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
+	Tau11[ip] =  (4.0/3.0)*dUdx - (2.0/3.0)*dVdy - (2.0/3.0)*dWdz;
+	Tau22[ip] = -(2.0/3.0)*dUdx + (4.0/3.0)*dVdy - (2.0/3.0)*dWdz;
+	Tau33[ip] = -(2.0/3.0)*dUdx - (2.0/3.0)*dVdy + (4.0/3.0)*dWdz;
 
-	Tau22[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		     (4.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
-
-	Tau33[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		     (4.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
-
-	Tau12[ip] =  J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip] + \
-		     J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
-
-	Tau13[ip] =  J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip] + \
-		     J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
-
-	Tau23[ip] =  J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip] + \
-		     J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
+	Tau12[ip] =  dUdy + dVdx;
+	Tau13[ip] =  dUdz + dWdx;
+	Tau23[ip] =  dVdz + dWdy;
 
 	Tau11[ip] *= mu[ip];
 	Tau22[ip] *= mu[ip];
@@ -552,6 +553,13 @@ void CurvilinearCSolver::preStepDerivatives(){
 	Tau12[ip] *= mu[ip];
 	Tau13[ip] *= mu[ip];
 	Tau23[ip] *= mu[ip];
+
+	//if Beta ~= 0, would need to add back in the bulk viscosity terms...
+	//Tau11[ip] += Beta*(dUdx + dVdy + dWdz);
+	//Tau22[ip] += Beta*(dUdx + dVdy + dWdz);
+	//Tau33[ip] += Beta*(dUdx + dVdy + dWdz);
+
+	//k_sgs = (ig->cp/Pr_t)*mu_sgs;
 
 	//Thermal conduction terms
 	q_1 = (ig->cp/ig->Pr)*mu[ip]*(J11[ip]*dT1[ip] + J21[ip]*dT2[ip] + J31[ip]*dT3[ip]);

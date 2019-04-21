@@ -30,7 +30,9 @@ class Options{
 	enum FDType {CD2, PADE6, PENTA10};
 	enum FilterType {COMPACT8, COMPACT10};
 
-	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG};
+	enum LESModel {NOMODEL, VREMAN};
+
+	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL};
 
 	enum RKType {TVDRK3, RK4, KENRK4, LSLDDRK4};
 
@@ -105,7 +107,11 @@ class Options{
 
 	int stats_interval;
 
-
+	//LES stuff
+	StatsAvgType musgsAvgType;
+	string musgsAvgType_str;
+	LESModel lesModel;
+	string lesModel_str;	
 
     Options(int mpiRank){
    
@@ -187,7 +193,9 @@ class Options{
 	    ("STATS.VELOCITYSTATSFILENAME",	 po::value<string>(&velocityStatsFilename), "Velocity statistics restart filename")
 	    ("STATS.THERMOSTATSFILENAME",	 po::value<string>(&thermoStatsFilename), "Thermo statistics restart filename")
 	    ("STATS.STATSAVGTYPE",	 po::value<string>(&statsAvgType_str), "Name of spacial averaging type for statistics")
-	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data");
+	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data")
+	    ("LES.LESMODEL",	 po::value<string>(&lesModel_str), "Name of the LES model")
+	    ("LES.LESAVERAGING", po::value<string>(&musgsAvgType_str), "Averaging of mu_sgs type");
 
 	
 	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
@@ -400,7 +408,13 @@ class Options{
 	//Is the restart redundant?	
 	checkValue<int>("STATS.INTERVAL", "stats_interval", stats_interval, 5);
 
+	
+	//LES model stuff
+	parseLESModelString("LES.LESMODEL", lesModel_str, lesModel);
+	parseStatsAvgTypeString("LES.LESAVERAGING", musgsAvgType_str, musgsAvgType);
+
       }
+
 
       //Now we'll have to broadcast all of that stuff out to the other ranks...
 
@@ -558,6 +572,12 @@ class Options{
 
       //Stats interval
       MPI_Bcast(&stats_interval, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //LES Model type
+      MPI_Bcast(&lesModel, 1, MPI_INT, root, MPI_COMM_WORLD);
+      //LES Model Averaging Type
+      MPI_Bcast(&musgsAvgType, 1, MPI_INT, root, MPI_COMM_WORLD);
+
    }	
 
     template<typename T>
@@ -582,6 +602,7 @@ class Options{
 	}
     }
 
+    void parseLESModelString(string vmKey, string inString, LESModel &currentType);
     void parseStatsAvgTypeString(string vmKey, string inString, StatsAvgType &currentType);
     void parseFDTypeFromString(string vmKey, string inString, FDType &currentType);
     void parseFilterTypeFromString(string vmKey, string inString, FilterType &currentType);

@@ -64,13 +64,16 @@ class Pade6: public AbstractDerivatives{
 		dd = dz; 
 	    }
 
+	    //Note: Apppears to be stable with 3-4-6-4-3 boundary scheme & 6-6-6-8-10 Filter Scheme for wall bounded
+	    //      flows on more complex geometries
+
 	    //1st Derivative coefficients
 	    alpha_1D = 1.0/3.0;
 	    a_1D     = 14.0/9.0;
 	    b_1D     = 1.0/9.0;
 
 	    //3rd at first node
-/*
+
 	    alpha11_1D = 2.0;
 	    a1_1D = -5.0/2.0;
 	    b1_1D =  2.0;
@@ -78,7 +81,7 @@ class Pade6: public AbstractDerivatives{
 	    d1_1D =  0.0;
 	    e1_1D =  0.0;
 	    f1_1D =  0.0;
-*/
+
 	    /*
 	    //Visbal C4
 	    alpha11_1D = 3.0;
@@ -89,7 +92,7 @@ class Pade6: public AbstractDerivatives{
 	    e1_1D = 0.0;
 	    f1_1D = 0.0;
 */
-
+/*
 	    alpha11_1D = 5.0;
 	    a1_1D = -197.0/60.0;
 	    b1_1D =   -5.0/12.0;
@@ -97,7 +100,7 @@ class Pade6: public AbstractDerivatives{
 	    d1_1D =   -5.0/3.0;
  	    e1_1D =    5.0/12.0;
 	    f1_1D =   -1.0/20.0;
-
+*/
 	   /*
 	    //Visbal AC5
 	    alpha21_1D = 3.0/14.0;
@@ -108,7 +111,7 @@ class Pade6: public AbstractDerivatives{
 	    d2_1D = -1.0/14.0;
 	    e2_1D = 1.0/84.0; 
 */
-/*
+
 	    //Visbal BC5
 	    alpha21_1D = 1.0/6.0;
 	    alpha22_1D = 1.0/2.0;
@@ -116,7 +119,7 @@ class Pade6: public AbstractDerivatives{
 	    b2_1D = -1.0/2.0;
 	    c2_1D =  1.0;
 	    d2_1D =  1.0/18.0;
-*/
+
 	   /*	    
 	    //Visbal CC5
 	    alpha21_1D = 0.0;
@@ -128,7 +131,7 @@ class Pade6: public AbstractDerivatives{
 	    e2_1D = -1.0/24.0;
 */
 
-
+/*
 	    alpha21_1D = 1.0/8.0;
 	    alpha22_1D = 3.0/4.0;
 	    a2_1D = -43.0/96.0;
@@ -136,7 +139,7 @@ class Pade6: public AbstractDerivatives{
 	    c2_1D =  9.0/8.0;
 	    d2_1D =  1.0/6.0;
 	    e2_1D = -1.0/96.0;
-
+*/
 
 	    //2nd Derivative coefficients
 	    alpha_2D = 2.0/11.0;
