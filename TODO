@@ -1,5 +1,4 @@
 Add an LES model
-   ->actually implement the mu_sgs into solver
    ->run some tests on hit to validate it
    ->implement dynamic SGS model
 

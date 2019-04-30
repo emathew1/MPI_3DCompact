@@ -38,7 +38,7 @@ class VremanSGS: public AbstractSGS{
 	filtZ = new Compact10Filter(0.0, cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
     }
    
-    void getSGSViscosity(double (*gradU)[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){
+    void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){
 
     	//From Vreman (2004)
 	FOR_XYZ_YPEN{
@@ -50,17 +50,17 @@ class VremanSGS: public AbstractSGS{
 	    double d2 = d1;
 	    double d3 = d1; 
 	
-	    double d1v1 = gradU[ip][0][0];
-	    double d2v1 = gradU[ip][0][1];
-	    double d3v1 = gradU[ip][0][2];
+	    double d1v1 = gradU[0][0][ip];
+	    double d2v1 = gradU[0][1][ip];
+	    double d3v1 = gradU[0][2][ip];
 
-	    double d1v2 = gradU[ip][1][0];
-	    double d2v2 = gradU[ip][1][1];
-	    double d3v2 = gradU[ip][1][2];
+	    double d1v2 = gradU[1][0][ip];
+	    double d2v2 = gradU[1][1][ip];
+	    double d3v2 = gradU[1][2][ip];
 
-	    double d1v3 = gradU[ip][2][0];
-	    double d2v3 = gradU[ip][2][1];
-	    double d3v3 = gradU[ip][2][2];
+	    double d1v3 = gradU[2][0][ip];
+	    double d2v3 = gradU[2][1][ip];
+	    double d3v3 = gradU[2][2][ip];
 
 	    double b11 = d1*d1v1*d1v1+d2*d2v1*d2v1+d3*d3v1*d3v1;
 	    double b12 = d1*d1v1*d1v2+d2*d2v1*d2v2+d3*d3v1*d3v2;
@@ -86,7 +86,7 @@ class VremanSGS: public AbstractSGS{
 	    mu_sgs[ip] = c*rho[ip]*ss;
 
 	    //Should we clip mu_sgs at the high end too?
-	    //mu_sgs[ip] = min(mu_sgs[ip], 0.05*d1*sqrt(2.0*abeta));
+	    mu_sgs[ip] = min(mu_sgs[ip], 0.05*d1*sqrt(2.0*abeta));
 	}
 
 	//Do some averaging of the mu_sgs if we want to...

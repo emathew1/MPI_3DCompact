@@ -111,6 +111,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	//LES Object
 	AbstractSGS *les;
 	bool LESFlag;
+	double Pr_t;
 
 	//Alias'd derivative objects
 	AbstractDerivatives *derivXi1, *derivXi2, *derivXi3;
@@ -229,6 +230,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    }
 
 	    //Initialize the LES stuff if we need to...
+	    Pr_t = 0.9;
 	    if(opt->lesModel == Options::NOMODEL){
 		LESFlag = false;
 		les = NULL;
