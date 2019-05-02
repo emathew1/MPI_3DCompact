@@ -1362,7 +1362,7 @@ void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 
     int N1 = pw->nx, N2 = pw->ny; 
     int plane    = pw->planeInd;
-    int fraction = pw->fraction;
+    double fraction = pw->fraction;
 
     double (*pointList)[3] = NULL;
 
@@ -1463,6 +1463,8 @@ void CurvilinearCSolver::generateImagePlane(PngWriter *pw){
 
 	    }
 	}
+
+	
 
     }else if(plane == 2){
  
