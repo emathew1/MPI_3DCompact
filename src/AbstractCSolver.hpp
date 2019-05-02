@@ -61,6 +61,8 @@ class AbstractCSolver{
 	double *tempY1,  *tempY2,  *tempY3,  *tempY4,  *tempY5;
 	double *tempY6,  *tempY7,  *tempY8,  *tempY9,  *tempY10;
 	double *tempY11, *tempY12, *tempY13, *tempY14, *tempY15;
+	double *tempY16, *tempY17, *tempY18, *tempY19, *tempY20;
+	double *tempY21, *tempY22, *tempY23, *tempY24;
 
 	double *tempZ1,  *tempZ2,  *tempZ3,  *tempZ4,  *tempZ5;
 	double *tempZ6,  *tempZ7,  *tempZ8,  *tempZ9,  *tempZ10;

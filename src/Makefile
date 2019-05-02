@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o AbstractSGS.o
 
 default: MPI_3DCompact
 
@@ -54,7 +54,7 @@ Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Do
 CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Compact10Filter.hpp Options.hpp
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Compact10Filter.hpp Options.hpp AbstractSGS.hpp VremanSGS.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp Options.hpp
@@ -65,6 +65,10 @@ Options.o: Options.cpp Options.hpp
 
 Stats.o: Stats.cpp Stats.hpp Macros.hpp Domain.hpp Options.hpp CurvilinearCSolver.hpp
 	$(CC) $(CFLAGS) -c $<
+
+AbstractSGS.o: AbstractSGS.cpp AbstractSGS.hpp Macros.hpp Options.hpp AbstractCSolver.hpp AbstractSingleBlockMesh.hpp  
+	$(CC) $(CFLAGS) -c $<
+
 
 
 clean: 

@@ -152,7 +152,17 @@ void CurvilinearCSolver::initializeSolverData(){
     c2d->allocY(tempY14); tempYVec.push_back(tempY14);
     c2d->allocY(tempY15); tempYVec.push_back(tempY15);
 
-    //104
+    c2d->allocY(tempY16); tempYVec.push_back(tempY16);
+    c2d->allocY(tempY17); tempYVec.push_back(tempY17);
+    c2d->allocY(tempY18); tempYVec.push_back(tempY18);
+    c2d->allocY(tempY19); tempYVec.push_back(tempY19);
+    c2d->allocY(tempY20); tempYVec.push_back(tempY20);
+    c2d->allocY(tempY21); tempYVec.push_back(tempY21);
+    c2d->allocY(tempY22); tempYVec.push_back(tempY22);
+    c2d->allocY(tempY23); tempYVec.push_back(tempY23);
+    c2d->allocY(tempY24); tempYVec.push_back(tempY24);
+ 
+   //104
     c2d->allocZ(tempZ1); tempZVec.push_back(tempZ1);
     c2d->allocZ(tempZ2); tempZVec.push_back(tempZ2);
     c2d->allocZ(tempZ3); tempZVec.push_back(tempZ3);
@@ -521,42 +531,89 @@ void CurvilinearCSolver::preStepDerivatives(){
     double b_1, b_2, b_3;
     double q_1, q_2, q_3;
 
+    //Do LES/Bulk viscosity model stuff here...
+    //we'll pre-calculate the velocity tensor...
+    double *gradU[3][3];
+    gradU[0][0] = tempY16; 
+    gradU[0][1] = tempY17; 
+    gradU[0][2] = tempY18; 
+    gradU[1][0] = tempY19; 
+    gradU[1][1] = tempY20; 
+    gradU[1][2] = tempY21; 
+    gradU[2][0] = tempY22; 
+    gradU[2][1] = tempY23; 
+    gradU[2][2] = tempY24; 
+
     //Now recalculate properties in the new space
     FOR_XYZ_YPEN{
 
+	//Calculate our velocity gradient tensor
+   	gradU[0][0][ip] = J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip];
+	gradU[0][1][ip] = J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip]; 
+	gradU[0][2][ip] = J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip]; 
+	gradU[1][0][ip] = J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
+	gradU[1][1][ip] = J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip];
+	gradU[1][2][ip] = J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip];
+	gradU[2][0][ip] = J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
+	gradU[2][1][ip] = J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
+	gradU[2][2][ip] = J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip];
+
+    }
+
+    //getSGSViscosity...
+    if(LESFlag){
+	les->getSGSViscosity(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
+    }
+
+
+    FOR_XYZ_YPEN{
+
+   	double dUdx = gradU[0][0][ip]; 
+	double dUdy = gradU[0][1][ip];
+	double dUdz = gradU[0][2][ip];
+	double dVdx = gradU[1][0][ip];
+	double dVdy = gradU[1][1][ip];
+	double dVdz = gradU[1][2][ip];
+	double dWdx = gradU[2][0][ip];
+	double dWdy = gradU[2][1][ip];
+	double dWdz = gradU[2][2][ip];
+
 	//Viscous stress tensor
-	Tau11[ip] =  (4.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
+	Tau11[ip] =  (4.0/3.0)*dUdx - (2.0/3.0)*dVdy - (2.0/3.0)*dWdz;
+	Tau22[ip] = -(2.0/3.0)*dUdx + (4.0/3.0)*dVdy - (2.0/3.0)*dWdz;
+	Tau33[ip] = -(2.0/3.0)*dUdx - (2.0/3.0)*dVdy + (4.0/3.0)*dWdz;
 
-	Tau22[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		     (4.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		    -(2.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
+	Tau12[ip] =  dUdy + dVdx;
+	Tau13[ip] =  dUdz + dWdx;
+	Tau23[ip] =  dVdz + dWdy;
 
-	Tau33[ip] = -(2.0/3.0)*(J11[ip]*dU1[ip] + J21[ip]*dU2[ip] + J31[ip]*dU3[ip]) + \
-		    -(2.0/3.0)*(J12[ip]*dV1[ip] + J22[ip]*dV2[ip] + J32[ip]*dV3[ip]) + \
-		     (4.0/3.0)*(J13[ip]*dW1[ip] + J23[ip]*dW2[ip] + J33[ip]*dW3[ip]);
+	double mu_eff = 0.0, k_eff = 0.0;
+	if(LESFlag){
+	    mu_eff = mu[ip] + les->mu_sgs[ip];
+	    k_eff  = ig->cp*(mu[ip]/ig->Pr + les->mu_sgs[ip]/Pr_t);
+	}else{
+	    mu_eff = mu[ip];
+	    k_eff  = (ig->cp/ig->Pr)*mu[ip];
+	}
 
-	Tau12[ip] =  J12[ip]*dU1[ip] + J22[ip]*dU2[ip] + J32[ip]*dU3[ip] + \
-		     J11[ip]*dV1[ip] + J21[ip]*dV2[ip] + J31[ip]*dV3[ip];
+	Tau11[ip] *= mu_eff;
+	Tau22[ip] *= mu_eff;
+	Tau33[ip] *= mu_eff;
+	Tau12[ip] *= mu_eff;
+	Tau13[ip] *= mu_eff;
+	Tau23[ip] *= mu_eff;
 
-	Tau13[ip] =  J13[ip]*dU1[ip] + J23[ip]*dU2[ip] + J33[ip]*dU3[ip] + \
-		     J11[ip]*dW1[ip] + J21[ip]*dW2[ip] + J31[ip]*dW3[ip];
+	//if Beta ~= 0, would need to add back in the bulk viscosity terms...
+	//Tau11[ip] += Beta*(dUdx + dVdy + dWdz);
+	//Tau22[ip] += Beta*(dUdx + dVdy + dWdz);
+	//Tau33[ip] += Beta*(dUdx + dVdy + dWdz);
 
-	Tau23[ip] =  J13[ip]*dV1[ip] + J23[ip]*dV2[ip] + J33[ip]*dV3[ip] + \
-		     J12[ip]*dW1[ip] + J22[ip]*dW2[ip] + J32[ip]*dW3[ip];
-
-	Tau11[ip] *= mu[ip];
-	Tau22[ip] *= mu[ip];
-	Tau33[ip] *= mu[ip];
-	Tau12[ip] *= mu[ip];
-	Tau13[ip] *= mu[ip];
-	Tau23[ip] *= mu[ip];
+	//k_sgs = (ig->cp/Pr_t)*mu_sgs;
 
 	//Thermal conduction terms
-	q_1 = (ig->cp/ig->Pr)*mu[ip]*(J11[ip]*dT1[ip] + J21[ip]*dT2[ip] + J31[ip]*dT3[ip]);
-	q_2 = (ig->cp/ig->Pr)*mu[ip]*(J12[ip]*dT1[ip] + J22[ip]*dT2[ip] + J32[ip]*dT3[ip]);
-	q_3 = (ig->cp/ig->Pr)*mu[ip]*(J13[ip]*dT1[ip] + J23[ip]*dT2[ip] + J33[ip]*dT3[ip]);
+	q_1 = k_eff*(J11[ip]*dT1[ip] + J21[ip]*dT2[ip] + J31[ip]*dT3[ip]);
+	q_2 = k_eff*(J12[ip]*dT1[ip] + J22[ip]*dT2[ip] + J32[ip]*dT3[ip]);
+	q_3 = k_eff*(J13[ip]*dT1[ip] + J23[ip]*dT2[ip] + J33[ip]*dT3[ip]);
 
 	//Viscous work + thermal conduction terms
 	b_1 = U[ip]*Tau11[ip] + V[ip]*Tau12[ip] + W[ip]*Tau13[ip] + q_1;
@@ -1158,6 +1215,10 @@ void CurvilinearCSolver::checkSolution(){
         getRange(mu, "mu", Nx, Ny, Nz, mpiRank);
         getRange(rhoE1, "RHOE", Nx, Ny, Nz, mpiRank);
         getRange(sos, "SOS", Nx, Ny, Nz, mpiRank);
+
+	if(LESFlag){
+	    getRange(les->mu_sgs, "MU SGS", Nx, Ny, Nz, mpiRank);
+	}
 
 	if(statsFlag){
   	    if(stats->velocityStats){

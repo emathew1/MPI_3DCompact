@@ -1,4 +1,9 @@
 Add an LES model
+   ->run some tests on hit to validate it
+   ->implement dynamic SGS model
+
+Keep working on getting complex geometry validation case going
+   ->Do a simpler case to validate the order of accuracy/curvilinear implementation?
 
 Implement non-reflecting inlet conditions and reflecting inlet conditions(?)
 

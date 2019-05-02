@@ -179,8 +179,47 @@ int main(int argc, char *argv[]){
     //Set flow initial conditions//
     ///////////////////////////////
 
-    bool fromRestart = opt->fromRestart;;
+    //Lets read in from the input files...
+    double *u_temp_x, *v_temp_x, *w_temp_x;
+    cs->c2d->allocX(u_temp_x);
+    cs->c2d->allocX(v_temp_x);
+    cs->c2d->allocX(w_temp_x);
 
+    MPI_File fh;
+    MPI_Offset disp2 = 0, filesize;
+    
+    string filename1 = "U_Mt0p3_N128_k8.bin";
+    string filename2 = "V_Mt0p3_N128_k8.bin";
+    string filename3 = "W_Mt0p3_N128_k8.bin";
+
+    MPI_File_open(MPI_COMM_WORLD, filename1.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+    cs->c2d->readVar(fh, disp2, 0, u_temp_x);
+    MPI_File_close(&fh);
+
+    disp2 = 0;
+    MPI_File_open(MPI_COMM_WORLD, filename2.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+    cs->c2d->readVar(fh, disp2, 0, v_temp_x);
+    MPI_File_close(&fh);
+
+    disp2 = 0;
+    MPI_File_open(MPI_COMM_WORLD, filename3.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+    cs->c2d->readVar(fh, disp2, 0, w_temp_x);
+    MPI_File_close(&fh);
+
+    double *u_temp, *v_temp, *w_temp;
+    cs->c2d->allocY(u_temp);
+    cs->c2d->allocY(v_temp);
+    cs->c2d->allocY(w_temp);
+
+    cs->c2d->transposeX2Y_MajorIndex(u_temp_x, u_temp);
+    cs->c2d->transposeX2Y_MajorIndex(v_temp_x, v_temp);
+    cs->c2d->transposeX2Y_MajorIndex(w_temp_x, w_temp);
+
+    cs->c2d->deallocXYZ(u_temp_x);
+    cs->c2d->deallocXYZ(v_temp_x);
+    cs->c2d->deallocXYZ(w_temp_x);
+
+    bool fromRestart = opt->fromRestart;
     if(!fromRestart){
         FOR_Z_YPEN{
             FOR_Y_YPEN{
@@ -188,24 +227,11 @@ int main(int argc, char *argv[]){
 
                     int ip = GETMAJIND_YPEN;
 
-		    int ii = GETGLOBALXIND_YPEN;		
-		    int jj = GETGLOBALYIND_YPEN;		
-		    int kk = GETGLOBALZIND_YPEN;
-
-		    double x  = cs->msh->x[ip];
-		    double x0 = 2.0*cs->msh->x_max[0]/8.0; 		
-		    double y  = cs->msh->y[ip]; 		
-		    double y0 = 1.2*cs->msh->x_max[1]/2.0; 		
-		    double z  = cs->msh->z[ip]; 		
-		    double z0 = cs->msh->x_max[2]/2.0; 		
-
-		    double r2 = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
-
                     cs->rho0[ip] = 1.0;
-                    cs->p0[ip]   = 1.0/cs->ig->gamma;
-                    cs->U0[ip]   = 0.2;
-                    cs->V0[ip]   = 0.0;
-                    cs->W0[ip]   = 0.0;
+                    cs->p0[ip]   = 11.11111111/cs->ig->gamma;
+                    cs->U0[ip]   = u_temp[ip];
+                    cs->V0[ip]   = v_temp[ip];
+                    cs->W0[ip]   = w_temp[ip];
                 }
             }
         }
@@ -270,6 +296,10 @@ int main(int argc, char *argv[]){
 
     }
 
+    //Deallocate the memory we used to read in the data
+    cs->c2d->deallocXYZ(u_temp);
+    cs->c2d->deallocXYZ(v_temp);
+    cs->c2d->deallocXYZ(w_temp);
 
     cs->setInitialConditions();
 
@@ -291,11 +321,11 @@ int main(int argc, char *argv[]){
     CurvilinearCSolver *cs_downcast = static_cast<CurvilinearCSolver*>(cs);
 
     //    cs_downcast->addImageOutput(new PngWriter(5, 2048, 2048, cs_downcast->rho2, "RHOCLOSE", 2, 0.5, 0.92,1.0, bbox_min2, bbox_max2, PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.1, 0.1, bbox_min,bbox_max,PngWriter::BWR));
-    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.1, 0.3, bbox_min, bbox_max, PngWriter::RAINBOW));
+    //cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->V, "V", 2, 0.5, -0.1, 0.1, bbox_min,bbox_max,PngWriter::BWR));
+    //cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs_downcast->U, "U", 2, 0.5, -0.1, 0.3, bbox_min, bbox_max, PngWriter::RAINBOW));
 //    cs_downcast->addImageOutput(new PngWriter(100, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, 0.0, 5.0, bbox_min, bbox_max, PngWriter::RAINBOW));
-    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG2", 2, 0.5, 0.0, 3.0, PngWriter::RAINBOW));
+    //cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG", 2, 0.5, 0.0, 5.0, bbox_min, bbox_max, PngWriter::RAINBOW));
+    cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[3], "VORTMAG2", 2, 0.5, PngWriter::RAINBOW));
     cs_downcast->addImageOutput(new PngWriter(250, 2048, 2048, cs->varData[4], "DIL", 2, 0.5, -0.007,0.001, PngWriter::GREYSCALE));
 
 //    cs_downcast->addImageOutput(new PngWriter(2500, 2048, 2048, cs_downcast->stats->UAVG, "UAVG", 2, 0.5, -0.1, 0.25, PngWriter::RAINBOW));
@@ -350,7 +380,7 @@ void CurvilinearCSolver::fullStepTemporalHook(){
     vort_mag = varData[3];
     dil      = varData[4];
 
-    if(timeStep%50 == 0){
+    if(timeStep%25 == 0){
 
     //Specifiy our input and output vectors for the computeGradient call
     double *vi[] = {U, V, W};
