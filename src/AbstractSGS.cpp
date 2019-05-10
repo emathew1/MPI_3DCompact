@@ -122,13 +122,17 @@ void AbstractSGS::doAveraging(){
 
     }else if(musgsAvgType == Options::LOCAL){
 
+	//Should just impletement a legit filter
 	filtY->filterField(mu_sgs, cs->tempY1);
-	cs->c2d->transposeY2Z_MajorIndex(cs->tempY1, cs->tempZ1);
+	filtY->filterField(cs->tempY1, cs->tempY2);
+	cs->c2d->transposeY2Z_MajorIndex(cs->tempY2, cs->tempZ1);
 	filtZ->filterField(cs->tempZ1, cs->tempZ2);
-	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ2, cs->tempY1);
+	filtZ->filterField(cs->tempZ2, cs->tempZ3);
+	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ3, cs->tempY1);
 	cs->c2d->transposeY2X_MajorIndex(cs->tempY1, cs->tempX1);
 	filtX->filterField(cs->tempX1, cs->tempX2);
-	cs->c2d->transposeX2Y_MajorIndex(cs->tempX2, mu_sgs);
+	filtX->filterField(cs->tempX2, cs->tempX3);
+	cs->c2d->transposeX2Y_MajorIndex(cs->tempX3, mu_sgs);
 
     }else if(musgsAvgType == Options::NONE){
 	//just chill...

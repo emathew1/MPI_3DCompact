@@ -26,16 +26,18 @@ class VremanSGS: public AbstractSGS{
 	musgsAvgType = cs->opt->musgsAvgType;
 
 	//Vreman SGS Coefficient...
-	c = 0.07;
+	//Smag constant...
+	double csma = 0.1; //0.17
+	c = 2.5*csma*csma;
 
 	//initialize mu_sgs
 	cs->c2d->allocY(mu_sgs);
 
 	//Do some explicit filtering, just need to do something to smooth out the mu_sgs field
 	//Could probably do some less complicated filtering or averaging if need be
-	filtX = new Compact10Filter(0.0, cs->dom, cs->bc, cs->bc->bcXType, AbstractDerivatives::DIRX);
-	filtY = new Compact10Filter(0.0, cs->dom, cs->bc, cs->bc->bcYType, AbstractDerivatives::DIRY);
-	filtZ = new Compact10Filter(0.0, cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
+	filtX = new Compact10Filter(-0.49, cs->dom, cs->bc, cs->bc->bcXType, AbstractDerivatives::DIRX);
+	filtY = new Compact10Filter(-0.49, cs->dom, cs->bc, cs->bc->bcYType, AbstractDerivatives::DIRY);
+	filtZ = new Compact10Filter(-0.49, cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
     }
    
     void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){

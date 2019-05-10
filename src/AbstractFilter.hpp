@@ -23,6 +23,8 @@ class AbstractFilter{
 
 	double *diagF, *offlowerF, *offupperF;
 
+	double *offlowerF2, *offupperF2;
+
 	AbstractDerivatives::Direct currentDir;
 	Options::BCType bcType;
 

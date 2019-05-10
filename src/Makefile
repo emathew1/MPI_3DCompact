@@ -2,7 +2,7 @@
 include Makefile.in
 CFLAGS += -I$(DECOMP_DIR)
 
-OBJECTS  = Compact8Filter.o Compact10Filter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o AbstractSGS.o
+OBJECTS  = Compact8Filter.o Compact10Filter.o CommN5ExpTestFilter.o CommN5PadeTestFilter.o MPI_3DCompact.o Utils.o Pade6.o Penta10.o CD2.o SpongeBC.o CurvilinearCSolver_Core.o CurvilinearCSolver_BC.o CurvilinearInterpolator.o AbstractSingleBlockMesh.o Options.o Stats.o AbstractSGS.o
 
 default: MPI_3DCompact
 
@@ -49,6 +49,12 @@ Compact8Filter.o: Compact8Filter.cpp Compact8Filter.hpp AbstractFilter.hpp Domai
 	$(CC) $(CFLAGS) -c $<
 
 Compact10Filter.o: Compact10Filter.cpp Compact10Filter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
+	$(CC) $(CFLAGS) -c $<
+
+CommN5ExpTestFilter.o: CommN5ExpTestFilter.cpp CommN5ExpTestFilter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
+	$(CC) $(CFLAGS) -c $<
+
+CommN5PadeTestFilter.o: CommN5PadeTestFilter.cpp CommN5PadeTestFilter.hpp AbstractFilter.hpp Domain.hpp BC.hpp Utils.hpp Macros.hpp Options.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
