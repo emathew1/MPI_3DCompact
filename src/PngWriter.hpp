@@ -165,6 +165,7 @@ class PngWriter {
     this->planeInd = planeInd;
     this->fraction = fraction;
 
+
     this->cm = cm;
 
     interpolatorFlag = false;
@@ -184,6 +185,7 @@ class PngWriter {
     }
 
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
+
   }
 
 
