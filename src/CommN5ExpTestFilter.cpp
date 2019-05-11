@@ -14,19 +14,24 @@ void CommN5ExpTestFilter::FilterPeriodic(double *phi, double *phiF){
     phiF[2] = w3*phi[N-1] + w2*phi[0]   + w1*phi[1]   + w0*phi[2] +
 	      w1*phi[3]   + w2*phi[4]   + w3*phi[5];
 
+
+
     for(int ip = 3; ip < N-3; ip++){ 
 	phiF[ip] = w3*phi[ip-3] + w2*phi[ip-2] + w1*phi[ip-1] + w0*phi[ip] +
 		   w1*phi[ip+1] + w2*phi[ip+2] + w3*phi[ip+3];
     }
 
-    phi[N-1] = w3*phi[N-4] + w2*phi[N-3] + w1*phi[N-2] + w0*phi[N-1] + 
+    phiF[N-1] = w3*phi[N-4] + w2*phi[N-3] + w1*phi[N-2] + w0*phi[N-1] + 
 	       w1*phi[0]   + w2*phi[1]   + w3*phi[2];
 
-    phi[N-2] = w3*phi[N-5] + w2*phi[N-4] + w1*phi[N-3] + w0*phi[N-2] +
+    phiF[N-2] = w3*phi[N-5] + w2*phi[N-4] + w1*phi[N-3] + w0*phi[N-2] +
 	       w1*phi[N-1] + w2*phi[0]   + w3*phi[1];
 
-    phi[N-3] = w3*phi[N-6] + w2*phi[N-5] + w1*phi[N-4] + w0*phi[N-3] + 
+    phiF[N-3] = w3*phi[N-6] + w2*phi[N-5] + w1*phi[N-4] + w0*phi[N-3] + 
 	       w1*phi[N-2] + w2*phi[N-1] + w3*phi[0];
+
+
+    cout << "HERE" << endl;
 }
 
 void CommN5ExpTestFilter::FilterDirichlet(double *phi, double *phiF){

@@ -24,7 +24,7 @@ class CommN5PadeTestFilter: public AbstractFilter{
 
 	double cpvec[6];
 
-    CommN5PadeTestFilter(double alphaF, Domain *dom, BC *bc, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
+    CommN5PadeTestFilter(Domain *dom, BC *bc, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
 	this->alphaF = alphaF;
 	this->Nx = dom->gNx;
