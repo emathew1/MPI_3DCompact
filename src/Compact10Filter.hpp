@@ -25,6 +25,7 @@ class Compact10Filter: public AbstractFilter{
 	double b00, b01, b02, b03, b04;
 	double c00, c01, c02, c03, c04;
 
+	int boundaryScheme;
 
     Compact10Filter(double alphaF, Domain *dom, BC *bc, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
@@ -52,6 +53,7 @@ class Compact10Filter: public AbstractFilter{
 	diagF = new double[N];
 	offlowerF = new double[N];
 	offupperF = new double[N];
+	
 
 	a0_10    = (193.0 + 126.0*alphaF)/256.0;
 	a1_10    = (105.0 + 302.0*alphaF)/256.0;
@@ -59,174 +61,205 @@ class Compact10Filter: public AbstractFilter{
 	a3_10    = ( 45.0 -  90.0*alphaF)/512.0;
 	a4_10    = ( -5.0 +  10.0*alphaF)/256.0;
 	a5_10    = (  1.0 -   2.0*alphaF)/512.0;
-/*
-	//F10_1
-	FB1_a    = (1023.0 +       alphaF)/1024.0;
-	FB1_b    = (   5.0 + 507.0*alphaF)/512.0;
-	FB1_c    = ( -45.0 +  45.0*alphaF)/1024.0;
-	FB1_d    = (  15.0 -  15.0*alphaF)/128.0;
-	FB1_e    = (-105.0 + 105.0*alphaF)/512.0;
-	FB1_f    = (  63.0 -  63.0*alphaF)/256.0;
-	FB1_g    = (-105.0 + 105.0*alphaF)/512.0;
-	FB1_h    = (  15.0 -  15.0*alphaF)/128.0;
-	FB1_i    = ( -45.0 +  45.0*alphaF)/1024.0;
-	FB1_j    = (   5.0 -   5.0*alphaF)/512.0;
-	FB1_k    = (  -1.0 +       alphaF)/1024.0;
-*/
-/*
-	//F10_2
-	FB2_a    = (   1.0 +1022.0*alphaF)/1024.0;
-	FB2_b    = ( 507.0 +  10.0*alphaF)/512.0;
-	FB2_c    = (  45.0 + 934.0*alphaF)/1024.0;
-	FB2_d    = ( -15.0 +  30.0*alphaF)/128.0;
-	FB2_e    = ( 105.0 - 210.0*alphaF)/512.0;
-	FB2_f    = ( -63.0 + 126.0*alphaF)/256.0;
-	FB2_g    = ( 105.0 - 210.0*alphaF)/512.0;
-	FB2_h    = ( -15.0 +  30.0*alphaF)/128.0;
-	FB2_i    = (  45.0 -  90.0*alphaF)/1024.0;
-	FB2_j    = (  -5.0 +  10.0*alphaF)/512.0;
-	FB2_k    = (   1.0 -   2.0*alphaF)/1024.0;
-*/
 
-	//F6_2
-	FB2_a    = ( 1.0/64.0  + 31.0*alphaF/32.0);
-        FB2_b    = (29.0/32.0  +  3.0*alphaF/16.0);	
-	FB2_c    = (15.0/64.0  + 17.0*alphaF/32.0);
-	FB2_d    = (-5.0/16.0  +  5.0*alphaF/8.0);
-	FB2_e	 = (15.0/64.0  - 15.0*alphaF/32.0);
-	FB2_f	 = (-3.0/32.0  +  3.0*alphaF/16.0);
-	FB2_g	 = ( 1.0/64.0  -  1.0*alphaF/32.0);
-	FB2_h    = 0.0;
-	FB2_i    = 0.0;
-	FB2_j    = 0.0;
-	FB2_k    = 0.0;
+	boundaryScheme = 1;
+	if(boundaryScheme == 1){ //Scheme 1: Full 10th order boundary treatment
 
-/*
-	//Interior 2
-	FB2_a	 = 0.5*(0.5 + alphaF);
-	FB2_b	 =     (0.5 + alphaF);
-	FB2_c	 = 0.5*(0.5 + alphaF);
-	FB2_d	 = 0.0;
-	FB2_e	 = 0.0;
-	FB2_f	 = 0.0;
-	FB2_g	 = 0.0;
-	FB2_h	 = 0.0;
-	FB2_i	 = 0.0;
-	FB2_j	 = 0.0;
-	FB2_k	 = 0.0;
-*/
-/*
-	//F10_3
-	FB3_a    = (  -1.0 +   2.0*alphaF)/1024.0;
-	FB3_b    = (   5.0 + 502.0*alphaF)/512.0;
-	FB3_c    = ( 979.0 +  90.0*alphaF)/1024.0;
-	FB3_d    = (  15.0 +  98.0*alphaF)/128.0;
-	FB3_e    = (-105.0 + 210.0*alphaF)/512.0;
-	FB3_f    = (  63.0 - 126.0*alphaF)/256.0;
-	FB3_g    = (-105.0 + 210.0*alphaF)/512.0;
-	FB3_h    = (  15.0 -  30.0*alphaF)/128.0;
-	FB3_i    = ( -45.0 +  90.0*alphaF)/1024.0;
-	FB3_j    = (   5.0 -  10.0*alphaF)/512.0;
-	FB3_k    = (  -1.0 +   2.0*alphaF)/1024.0;
-*/
+	    /* We don't filter the first point since it's a Bc
+	    //F10_1
+	    FB1_a    = (1023.0 +       alphaF)/1024.0;
+	    FB1_b    = (   5.0 + 507.0*alphaF)/512.0;
+	    FB1_c    = ( -45.0 +  45.0*alphaF)/1024.0;
+	    FB1_d    = (  15.0 -  15.0*alphaF)/128.0;
+	    FB1_e    = (-105.0 + 105.0*alphaF)/512.0;
+	    FB1_f    = (  63.0 -  63.0*alphaF)/256.0;
+	    FB1_g    = (-105.0 + 105.0*alphaF)/512.0;
+	    FB1_h    = (  15.0 -  15.0*alphaF)/128.0;
+	    FB1_i    = ( -45.0 +  45.0*alphaF)/1024.0;
+	    FB1_j    = (   5.0 -   5.0*alphaF)/512.0;
+	    FB1_k    = (  -1.0 +       alphaF)/1024.0;
+  	    */
 
-/*
-	//F8_3
-	FB3_a    = (-1.0/256.0 +   1.0*alphaF/128.0);
-	FB3_b    = ( 1.0/32.0  +  15.0*alphaF/16.0);
-	FB3_c    = (57.0/64.0  +   7.0*alphaF/32.0);
-	FB3_d    = ( 7.0/32.0  +   9.0*alphaF/16.0);
-	FB3_e 	 =(-35.0/128.0 +  10.0*alphaF/128.0);
-	FB3_f	 = ( 7.0/32.0  -   7.0*alphaF/16.0);
-	FB3_g	 = (-7.0/64.0  +   7.0*alphaF/32.0);
-	FB3_h	 = ( 1.0/32.0  -   1.0*alphaF/16.0);
-	FB3_i	 = (-1.0/256.0 +   1.0*alphaF/128.0);
-	FB3_j	 = 0.0;
-	FB3_k	 = 0.0;
-*/
+	    //F10_2
+	    FB2_a    = (   1.0 +1022.0*alphaF)/1024.0;
+	    FB2_b    = ( 507.0 +  10.0*alphaF)/512.0;
+	    FB2_c    = (  45.0 + 934.0*alphaF)/1024.0;
+	    FB2_d    = ( -15.0 +  30.0*alphaF)/128.0;
+	    FB2_e    = ( 105.0 - 210.0*alphaF)/512.0;
+	    FB2_f    = ( -63.0 + 126.0*alphaF)/256.0;
+	    FB2_g    = ( 105.0 - 210.0*alphaF)/512.0;
+	    FB2_h    = ( -15.0 +  30.0*alphaF)/128.0;
+	    FB2_i    = (  45.0 -  90.0*alphaF)/1024.0;
+	    FB2_j    = (  -5.0 +  10.0*alphaF)/512.0;
+	    FB2_k    = (   1.0 -   2.0*alphaF)/1024.0;
 
-	//F6_3
-	FB3_a	 = (-1.0/64.0  +  1.0*alphaF/32.0);
-	FB3_b	 = ( 3.0/32.0  + 13.0*alphaF/16.0);
-	FB3_c	 = (49.0/64.0  + 15.0*alphaF/32.0);
-	FB3_d	 = ( 5.0/16.0  +  3.0*alphaF/8.0);
-	FB3_e	 =(-15.0/64.0  + 15.0*alphaF/32.0);
-	FB3_f	 = ( 3.0/32.0  -  3.0*alphaF/16.0);
-	FB3_g	 = (-1.0/64.0  +  1.0*alphaF/32.0);	
-	FB3_h	 = 0.0;
-	FB3_i	 = 0.0;
-	FB3_j	 = 0.0;
-	FB3_k	 = 0.0;
+	    //F10_3
+	    FB3_a    = (  -1.0 +   2.0*alphaF)/1024.0;
+	    FB3_b    = (   5.0 + 502.0*alphaF)/512.0;
+	    FB3_c    = ( 979.0 +  90.0*alphaF)/1024.0;
+	    FB3_d    = (  15.0 +  98.0*alphaF)/128.0;
+	    FB3_e    = (-105.0 + 210.0*alphaF)/512.0;
+	    FB3_f    = (  63.0 - 126.0*alphaF)/256.0;
+	    FB3_g    = (-105.0 + 210.0*alphaF)/512.0;
+	    FB3_h    = (  15.0 -  30.0*alphaF)/128.0;
+	    FB3_i    = ( -45.0 +  90.0*alphaF)/1024.0;
+	    FB3_j    = (   5.0 -  10.0*alphaF)/512.0;
+	    FB3_k    = (  -1.0 +   2.0*alphaF)/1024.0;
 
-/*
-	//Interior 4
-	FB3_a	= 0.5*(-1.0/8.0 + 1.0*alphaF/4.0);
-	FB3_b	= 0.5*( 1.0/2.0 + 1.0*alphaF/1.0);
-	FB3_c	= 5.0/8.0 + 3.0*alphaF/4.0;
-	FB3_d	= 0.5*( 1.0/2.0 + 1.0*alphaF/1.0);
-	FB3_e	= 0.5*(-1.0/8.0 + 1.0*alphaF/4.0);
-	FB3_f	= 0.0;
-	FB3_g	= 0.0;
-	FB3_h	= 0.0;
-	FB3_i	= 0.0;
-	FB3_j	= 0.0;
-	FB3_k	= 0.0;
-*/
-/*
-	//F10_4
-	FB4_a    = (   1.0 -   2.0*alphaF)/1024.0;
-	FB4_b    = (  -5.0 +  10.0*alphaF)/512.0;
-	FB4_c    = (  45.0 + 934.0*alphaF)/1024.0;
-	FB4_d    = ( 113.0 +  30.0*alphaF)/128.0;
-	FB4_e    = ( 105.0 + 302.0*alphaF)/512.0;
-	FB4_f    = ( -63.0 + 126.0*alphaF)/256.0;
-	FB4_g    = ( 105.0 - 210.0*alphaF)/512.0;
-	FB4_h    = ( -15.0 +  30.0*alphaF)/128.0;
-	FB4_i    = (  45.0 -  90.0*alphaF)/1024.0;
-	FB4_j    = (  -5.0 +  10.0*alphaF)/512.0;
-	FB4_k    = (   1.0 -   2.0*alphaF)/1024.0;
-*/
+	    //F10_4
+	    FB4_a    = (   1.0 -   2.0*alphaF)/1024.0;
+	    FB4_b    = (  -5.0 +  10.0*alphaF)/512.0;
+	    FB4_c    = (  45.0 + 934.0*alphaF)/1024.0;
+	    FB4_d    = ( 113.0 +  30.0*alphaF)/128.0;
+	    FB4_e    = ( 105.0 + 302.0*alphaF)/512.0;
+	    FB4_f    = ( -63.0 + 126.0*alphaF)/256.0;
+	    FB4_g    = ( 105.0 - 210.0*alphaF)/512.0;
+	    FB4_h    = ( -15.0 +  30.0*alphaF)/128.0;
+	    FB4_i    = (  45.0 -  90.0*alphaF)/1024.0;
+	    FB4_j    = (  -5.0 +  10.0*alphaF)/512.0;
+	    FB4_k    = (   1.0 -   2.0*alphaF)/1024.0;
 
-	//Interior 6
-	FB4_a	 = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
-	FB4_b	 = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
-	FB4_c	 = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
-	FB4_d	 = 11.0/16.0 + 5.0*alphaF/8.0;
-	FB4_e	 = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
-	FB4_f	 = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
-	FB4_g	 = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
-	FB4_h    = 0.0;
-	FB4_i    = 0.0;
-	FB4_j    = 0.0;
-	FB4_k    = 0.0;
+	    //F10_5
+	    FB5_a    = (  -1.0 +   2.0*alphaF)/1024.0;
+	    FB5_b    = (   5.0 -  10.0*alphaF)/512.0;
+	    FB5_c    = ( -45.0 +  90.0*alphaF)/1024.0;
+	    FB5_d    = (  15.0 +  98.0*alphaF)/128.0;
+	    FB5_e    = ( 407.0 + 210.0*alphaF)/512.0;
+	    FB5_f    = (  63.0 + 130.0*alphaF)/256.0;
+ 	    FB5_g    = (-105.0 + 210.0*alphaF)/512.0;
+	    FB5_h    = (  15.0 -  30.0*alphaF)/128.0;
+	    FB5_i    = ( -45.0 +  90.0*alphaF)/1024.0;
+	    FB5_j    = (   5.0 -  10.0*alphaF)/512.0;
+	    FB5_k    = (  -1.0 +   2.0*alphaF)/1024.0;
 
-/*
-	//F10_5
-	FB5_a    = (  -1.0 +   2.0*alphaF)/1024.0;
-	FB5_b    = (   5.0 -  10.0*alphaF)/512.0;
-	FB5_c    = ( -45.0 +  90.0*alphaF)/1024.0;
-	FB5_d    = (  15.0 +  98.0*alphaF)/128.0;
-	FB5_e    = ( 407.0 + 210.0*alphaF)/512.0;
-	FB5_f    = (  63.0 + 130.0*alphaF)/256.0;
-	FB5_g    = (-105.0 + 210.0*alphaF)/512.0;
-	FB5_h    = (  15.0 -  30.0*alphaF)/128.0;
-	FB5_i    = ( -45.0 +  90.0*alphaF)/1024.0;
-	FB5_j    = (   5.0 -  10.0*alphaF)/512.0;
-	FB5_k    = (  -1.0 +   2.0*alphaF)/1024.0;
-*/
 
-	//Interior 8
-	FB5_a	 = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
-	FB5_b	 = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
-	FB5_c	 = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
-	FB5_d	 = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
-	FB5_e	 = 93.0/128.0 + 70.0*alphaF/128.0;
-	FB5_f	 = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
-	FB5_g	 = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
-	FB5_h	 = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
-	FB5_i	 = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
-	FB5_j    = 0.0;
-	FB5_k    = 0.0;
+	}else if(boundaryScheme == 2){//Scheme 2: Some Higher-Order Boundary Schemes, < 10th order
+
+	    //F6_2
+	    FB2_a    = ( 1.0/64.0  + 31.0*alphaF/32.0);
+            FB2_b    = (29.0/32.0  +  3.0*alphaF/16.0);	
+	    FB2_c    = (15.0/64.0  + 17.0*alphaF/32.0);
+	    FB2_d    = (-5.0/16.0  +  5.0*alphaF/8.0);
+	    FB2_e    = (15.0/64.0  - 15.0*alphaF/32.0);
+	    FB2_f    = (-3.0/32.0  +  3.0*alphaF/16.0);
+	    FB2_g    = ( 1.0/64.0  -  1.0*alphaF/32.0);
+	    FB2_h    = 0.0;
+	    FB2_i    = 0.0;
+	    FB2_j    = 0.0;
+	    FB2_k    = 0.0;
+
+	    //F6_3
+	    FB3_a    = (-1.0/64.0  +  1.0*alphaF/32.0);
+	    FB3_b    = ( 3.0/32.0  + 13.0*alphaF/16.0);
+	    FB3_c    = (49.0/64.0  + 15.0*alphaF/32.0);
+	    FB3_d    = ( 5.0/16.0  +  3.0*alphaF/8.0);
+	    FB3_e    =(-15.0/64.0  + 15.0*alphaF/32.0);
+	    FB3_f    = ( 3.0/32.0  -  3.0*alphaF/16.0);
+	    FB3_g    = (-1.0/64.0  +  1.0*alphaF/32.0);	
+	    FB3_h    = 0.0;
+	    FB3_i    = 0.0;
+	    FB3_j    = 0.0;
+	    FB3_k    = 0.0;
+
+	    /*
+   	    //F8_3
+	    FB3_a    = (-1.0/256.0 +   1.0*alphaF/128.0);
+	    FB3_b    = ( 1.0/32.0  +  15.0*alphaF/16.0);
+	    FB3_c    = (57.0/64.0  +   7.0*alphaF/32.0);
+	    FB3_d    = ( 7.0/32.0  +   9.0*alphaF/16.0);
+	    FB3_e    =(-35.0/128.0 +  10.0*alphaF/128.0);
+	    FB3_f    = ( 7.0/32.0  -   7.0*alphaF/16.0);
+	    FB3_g    = (-7.0/64.0  +   7.0*alphaF/32.0);
+	    FB3_h    = ( 1.0/32.0  -   1.0*alphaF/16.0);
+	    FB3_i    = (-1.0/256.0 +   1.0*alphaF/128.0);
+	    FB3_j    = 0.0;
+	    FB3_k    = 0.0;
+	    */
+
+	    //Interior 6
+	    FB4_a    = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
+	    FB4_b    = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
+	    FB4_c    = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
+	    FB4_d    = 11.0/16.0 + 5.0*alphaF/8.0;
+	    FB4_e    = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
+	    FB4_f    = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
+	    FB4_g    = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
+	    FB4_h    = 0.0;
+	    FB4_i    = 0.0;
+	    FB4_j    = 0.0;
+	    FB4_k    = 0.0;
+
+	    //Interior 8
+	    FB5_a    = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
+	    FB5_b    = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
+	    FB5_c    = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
+	    FB5_d    = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
+	    FB5_e    = 93.0/128.0 + 70.0*alphaF/128.0;
+	    FB5_f    = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
+	    FB5_g    = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
+	    FB5_h    = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
+	    FB5_i    = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
+	    FB5_j    = 0.0;
+	    FB5_k    = 0.0;
+
+	}else if(boundaryScheme == 3){//Scheme 3: LOC (Low-Ordered Centered) Boundary Scheme
+
+	    //Interior 2
+	    FB2_a    = 0.5*(0.5 + alphaF);
+	    FB2_b    =     (0.5 + alphaF);
+	    FB2_c    = 0.5*(0.5 + alphaF);
+	    FB2_d    = 0.0;
+	    FB2_e    = 0.0;
+	    FB2_f    = 0.0;
+	    FB2_g    = 0.0;
+	    FB2_h    = 0.0;
+	    FB2_i    = 0.0;
+	    FB2_j    = 0.0;
+	    FB2_k    = 0.0;
+
+	    //Interior 4
+	    FB3_a    = 0.5*(-1.0/8.0 + 1.0*alphaF/4.0);
+	    FB3_b    = 0.5*( 1.0/2.0 + 1.0*alphaF/1.0);
+	    FB3_c    = 5.0/8.0 + 3.0*alphaF/4.0;
+	    FB3_d    = 0.5*( 1.0/2.0 + 1.0*alphaF/1.0);
+	    FB3_e    = 0.5*(-1.0/8.0 + 1.0*alphaF/4.0);
+	    FB3_f    = 0.0;
+	    FB3_g    = 0.0;
+	    FB3_h    = 0.0;
+	    FB3_i    = 0.0;
+	    FB3_j    = 0.0;
+	    FB3_k    = 0.0;
+
+	    //Interior 6
+	    FB4_a    = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
+	    FB4_b    = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
+	    FB4_c    = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
+	    FB4_d    = 11.0/16.0 + 5.0*alphaF/8.0;
+	    FB4_e    = 0.5*(15.0/32.0 + 17.0*alphaF/16.0);
+	    FB4_f    = 0.5*(-3.0/16.0 +  3.0*alphaF/8.0);
+	    FB4_g    = 0.5*( 1.0/32.0 -  1.0*alphaF/16.0);
+	    FB4_h    = 0.0;
+	    FB4_i    = 0.0;
+	    FB4_j    = 0.0;
+	    FB4_k    = 0.0;
+
+	    //Interior 8
+	    FB5_a    = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
+	    FB5_b    = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
+	    FB5_c    = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
+	    FB5_d    = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
+	    FB5_e    = 93.0/128.0 + 70.0*alphaF/128.0;
+	    FB5_f    = 0.5*( 7.0/16.0  + 18.0*alphaF/16.0);
+	    FB5_g    = 0.5*(-7.0/32.0  + 14.0*alphaF/32.0);
+	    FB5_h    = 0.5*( 1.0/16.0  -  1.0*alphaF/8.0);
+	    FB5_i    = 0.5*(-1.0/128.0 +  1.0*alphaF/64.0);
+	    FB5_j    = 0.0;
+	    FB5_k    = 0.0;
+
+
+	}else{
+	    cout << "UNKNOWN BOUNDARY SCHEME FOR COMPACT10" << endl;
+	}
 
 	a00 = 15.0/16.0;	    
 	a01 =  4.0/16.0;

@@ -33,6 +33,8 @@ class Pade6: public AbstractDerivatives{
 	double a1_2D, b1_2D, c1_2D, d1_2D, e1_2D;
 	double a2_2D, b2_2D, c2_2D, d2_2D, e2_2D, f2_2D; 
 
+	int boundaryScheme;
+
 	//Constructor
         Pade6(Domain *dom, Options::BCType bcType, Direct currentDir){
 
@@ -72,73 +74,94 @@ class Pade6: public AbstractDerivatives{
 	    a_1D     = 14.0/9.0;
 	    b_1D     = 1.0/9.0;
 
-	    //3rd at first node
 
-	    alpha11_1D = 2.0;
-	    a1_1D = -5.0/2.0;
-	    b1_1D =  2.0;
-	    c1_1D =  1.0/2.0;
-	    d1_1D =  0.0;
-	    e1_1D =  0.0;
-	    f1_1D =  0.0;
+	    boundaryScheme = 1;
 
-	    /*
-	    //Visbal C4
-	    alpha11_1D = 3.0;
-	    a1_1D = -17.0/6.0;
-	    b1_1D =  3.0/2.0;
-	    c1_1D =  3.0/2.0;
-	    d1_1D = -1.0/6.0;
-	    e1_1D = 0.0;
-	    f1_1D = 0.0;
+	    if(boundaryScheme == 1){//Lower-Order @ Node 1
+
+		//Node 1 formulations
+
+	        //3rd @ Node 1
+	        alpha11_1D = 2.0;
+	        a1_1D = -5.0/2.0;
+	        b1_1D =  2.0;
+	        c1_1D =  1.0/2.0;
+	        d1_1D =  0.0;
+	        e1_1D =  0.0;
+	        f1_1D =  0.0;
+
+	        /*
+	        //Visbal C4 @ Node 1
+	        alpha11_1D = 3.0;
+	        a1_1D = -17.0/6.0;
+	        b1_1D =  3.0/2.0;
+	        c1_1D =  3.0/2.0;
+	        d1_1D = -1.0/6.0;
+	        e1_1D = 0.0;
+	        f1_1D = 0.0;
+		*/
+
+	 	//Node 2 Formulations
+
+	        //Visbal BC5 @ Node 2
+	        alpha21_1D = 1.0/6.0;
+	        alpha22_1D = 1.0/2.0;
+	        a2_1D = -5.0/9.0;
+	        b2_1D = -1.0/2.0;
+	        c2_1D =  1.0;
+	        d2_1D =  1.0/18.0;
+
+	        /*
+	        //Visbal AC5
+	        alpha21_1D = 3.0/14.0;
+	        alpha22_1D = 3.0/14.0;
+	        a2_1D = -19.0/28.0;
+	        b2_1D = -5.0/42.0;
+	        c2_1D = 6.0/7.0;
+	        d2_1D = -1.0/14.0;
+	        e2_1D = 1.0/84.0; 
+		*/
+
+
+	   	/*	    
+	        //Visbal CC5
+	        alpha21_1D = 0.0;
+	        alpha22_1D = 3.0/2.0;
+	        a2_1D = -1.0/8.0;
+	        b2_1D = -11.0/6.0;
+	        c2_1D = 3.0/2.0;
+	        d2_1D = 1.0/2.0;
+	        e2_1D = -1.0/24.0;
+		*/
+
+
+	    }else if(boundaryScheme == 2){//Full Sixth-Order Boundary Treatment
+
+	        alpha11_1D = 5.0;
+	        a1_1D = -197.0/60.0;
+	        b1_1D =   -5.0/12.0;
+	        c1_1D =    5.0;
+	        d1_1D =   -5.0/3.0;
+ 	        e1_1D =    5.0/12.0;
+	        f1_1D =   -1.0/20.0;
+
+	        alpha21_1D = 1.0/8.0;
+	        alpha22_1D = 3.0/4.0;
+	        a2_1D = -43.0/96.0;
+	        b2_1D = -5.0/6.0;
+	        c2_1D =  9.0/8.0;
+	        d2_1D =  1.0/6.0;
+	        e2_1D = -1.0/96.0;
+
+
+	    }else{
+		cout << "UNKNOWN BOUNDARY SCHEME PADE6" << endl;
+	    }
+
+
+/*
 */
 /*
-	    alpha11_1D = 5.0;
-	    a1_1D = -197.0/60.0;
-	    b1_1D =   -5.0/12.0;
-	    c1_1D =    5.0;
-	    d1_1D =   -5.0/3.0;
- 	    e1_1D =    5.0/12.0;
-	    f1_1D =   -1.0/20.0;
-*/
-	   /*
-	    //Visbal AC5
-	    alpha21_1D = 3.0/14.0;
-	    alpha22_1D = 3.0/14.0;
-	    a2_1D = -19.0/28.0;
-	    b2_1D = -5.0/42.0;
-	    c2_1D = 6.0/7.0;
-	    d2_1D = -1.0/14.0;
-	    e2_1D = 1.0/84.0; 
-*/
-
-	    //Visbal BC5
-	    alpha21_1D = 1.0/6.0;
-	    alpha22_1D = 1.0/2.0;
-	    a2_1D = -5.0/9.0;
-	    b2_1D = -1.0/2.0;
-	    c2_1D =  1.0;
-	    d2_1D =  1.0/18.0;
-
-	   /*	    
-	    //Visbal CC5
-	    alpha21_1D = 0.0;
-	    alpha22_1D = 3.0/2.0;
-	    a2_1D = -1.0/8.0;
-	    b2_1D = -11.0/6.0;
-	    c2_1D = 3.0/2.0;
-	    d2_1D = 1.0/2.0;
-	    e2_1D = -1.0/24.0;
-*/
-
-/*
-	    alpha21_1D = 1.0/8.0;
-	    alpha22_1D = 3.0/4.0;
-	    a2_1D = -43.0/96.0;
-	    b2_1D = -5.0/6.0;
-	    c2_1D =  9.0/8.0;
-	    d2_1D =  1.0/6.0;
-	    e2_1D = -1.0/96.0;
 */
 
 	    //2nd Derivative coefficients
