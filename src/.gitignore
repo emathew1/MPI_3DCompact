@@ -2,5 +2,7 @@
 *.o
 *.exe
 *.png
+*.dat
+*.bin
 hostfile
 movies/

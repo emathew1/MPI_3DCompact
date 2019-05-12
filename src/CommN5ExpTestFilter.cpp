@@ -30,8 +30,6 @@ void CommN5ExpTestFilter::FilterPeriodic(double *phi, double *phiF){
     phiF[N-3] = w3*phi[N-6] + w2*phi[N-5] + w1*phi[N-4] + w0*phi[N-3] + 
 	       w1*phi[N-2] + w2*phi[N-1] + w3*phi[0];
 
-
-    cout << "HERE" << endl;
 }
 
 void CommN5ExpTestFilter::FilterDirichlet(double *phi, double *phiF){

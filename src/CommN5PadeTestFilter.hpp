@@ -26,7 +26,6 @@ class CommN5PadeTestFilter: public AbstractFilter{
 
     CommN5PadeTestFilter(Domain *dom, BC *bc, Options::BCType bcType, AbstractDerivatives::Direct currentDir){
 
-	this->alphaF = alphaF;
 	this->Nx = dom->gNx;
 	this->Ny = dom->gNy;
 	this->Nz = dom->gNz;
@@ -80,14 +79,14 @@ class CommN5PadeTestFilter: public AbstractFilter{
 	w3 =   1.0/64.0;
 
 	v0 = 7.0/12.0;
-	v1 = 0.0/0.0;
+	v1 = 0.0;
 	v2 = 5.0/24.0;
 
 	wi0 =   7.0/24.0;
 	wi1 = 175.0/768.0;
 	wi2 =   5.0/48.0;
 	wi3 =  35.0/1536.0;
-	wi4 =   0.0/0.0;
+	wi4 =   0.0;
 	wi5 =  -1.0/1536.0;
  
         for(int ip = 0; ip < N; ip++){
@@ -119,7 +118,7 @@ class CommN5PadeTestFilter: public AbstractFilter{
 	    offlowerF[1]  = 0.0;
 	    diagF[2]	  = 1.0;
 	    offupperF[2]  = 0.0;
-	    offupperF[2]  = 0.0;
+	    offupperF2[2]  = 0.0;
 	
 	    //Node4 - LHS
 	    //|. 0 0 1 0 0 ...

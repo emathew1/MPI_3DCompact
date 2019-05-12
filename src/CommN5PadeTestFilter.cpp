@@ -69,7 +69,7 @@ void CommN5PadeTestFilter::multRHSPeriodicFilter(double *phi, double *RHSvec){
                          cc1*phi[ip+1] + cc2*phi[ip+2] + cc3*phi[ip+3] +
                          cc4*phi[ip+4] + cc5*phi[ip+5];
         }                
-        
+       
     }
 }
 
@@ -119,7 +119,6 @@ void CommN5PadeTestFilter::multRHSDirichletFilter(double *phi, double *RHSvec){
     RHSvec[N-5] = w3*phi[N-2] + w2*phi[N-3] + w1*phi[N-4] + w0*phi[N-5] +
 		  w1*phi[N-6] + w2*phi[N-7] + w3*phi[N-8];
  
-
 }
 
 void CommN5PadeTestFilter::FilterPeriodic(double *phi, double *phiF){

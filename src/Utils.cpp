@@ -76,6 +76,7 @@ void solvePenta(double e[], double a[], double d[], double c[], double f[], doub
     x[size-1] = (B[size-1] - xmult*B[size-2])/D[size-1];
     x[size-2] = (B[size-2] - C[size-2]*x[size-1])/D[size-2];
 
+
     for(int ip = size-3; ip >= 0; ip--){
 	x[ip] = (B[ip] - f[ip]*x[ip+2] - C[ip]*x[ip+1])/D[ip];
     }
