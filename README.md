@@ -1,6 +1,6 @@
 # MPI_3DCompact
 
-CFD framework for compressible flow solvers using compact finite differences and Runge-Kutta timestepping methods. Parallelized using MPI and 2-D pencil domain decomposition.  
+CFD framework for compressible flow solvers using compact finite differences and Runge-Kutta timestepping methods. Parallelized using MPI and 2-D pencil domain decomposition that uses a C++ translation of the 2Decomp library.  
 
 Current default (and only up to date) solver is the `CurvilinearCSolver`, solves compressible Navier-Stokes equations on a single, generalized curvlinear block using the formulation of Visbal & Gaitonde (2002, JCP). There's also a uniform grid, compressible solver with fully-expanded viscous terms that needs to be brought up to speed in `DepreciatedSolvers.` 
 
