@@ -1,10 +1,20 @@
 #include "AbstractSGS.hpp"
 
+//The default is the assume we're doing mu_sgs averaging with the default filters...
 void AbstractSGS::doAveraging(){
+    doAveraging(mu_sgs, mu_sgs, filtX, filtY, filtZ);
+}
+
+//Next is just to assume we're using the default filters...
+void AbstractSGS::doAveraging(double *phi, double *phiF){
+    doAveraging(phi, phiF, filtX, filtY, filtZ);
+}
+
+void AbstractSGS::doAveraging(double *phi, double *phiF, AbstractFilter *fx, AbstractFilter *fy, AbstractFilter *fz){
 
     if(musgsAvgType == Options::XI1_AVG){
 
-	cs->c2d->transposeY2X_MajorIndex(mu_sgs, cs->tempX1);
+	cs->c2d->transposeY2X_MajorIndex(phi, cs->tempX1);
 
 	double *XI1_Avg = new double[pxSize[1]*pxSize[2]];
 
@@ -40,7 +50,7 @@ void AbstractSGS::doAveraging(){
 
 	delete[] XI1_Avg;
 
-	cs->c2d->transposeX2Y_MajorIndex(cs->tempX1, mu_sgs);
+	cs->c2d->transposeX2Y_MajorIndex(cs->tempX1, phiF);
 				
 
     }else if(musgsAvgType == Options::XI2_AVG){
@@ -59,7 +69,7 @@ void AbstractSGS::doAveraging(){
 		    int ip = GETMAJIND_YPEN;
 		    int jp = k*pySize[0] + i;
  
-	            XI2_Avg[jp] += cs->tempY1[ip]/(double)pySize[1];
+	            XI2_Avg[jp] += phi[ip]/(double)pySize[1];
 		}
 	    }
 	}
@@ -72,7 +82,7 @@ void AbstractSGS::doAveraging(){
 		    int ip = GETMAJIND_YPEN;
 		    int jp = k*pySize[0] + i;
  		    
-		    cs->tempY1[ip] = XI2_Avg[jp];
+		    phiF[ip] = XI2_Avg[jp];
 		}
 	    }
 	}
@@ -82,7 +92,7 @@ void AbstractSGS::doAveraging(){
 
     }else if(musgsAvgType == Options::XI3_AVG){
 
-	cs->c2d->transposeY2Z_MajorIndex(mu_sgs, cs->tempZ1);
+	cs->c2d->transposeY2Z_MajorIndex(phi, cs->tempZ1);
 
 	double *XI3_Avg = new double[pzSize[0]*pzSize[1]];
 
@@ -118,21 +128,22 @@ void AbstractSGS::doAveraging(){
 
 	delete[] XI3_Avg;
 
-	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ1, mu_sgs);
+	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ1, phiF);
+
+    }else if(musgsAvgType == Options::GLOBAL){
+
+        cout << "NEED TO IMPLEMENT GLOBAL MUSGS AVERAGING" << endl;
 
     }else if(musgsAvgType == Options::LOCAL){
 
 	//Should just impletement a legit filter
-	filtY->filterField(mu_sgs, cs->tempY1);
-	filtY->filterField(cs->tempY1, cs->tempY2);
-	cs->c2d->transposeY2Z_MajorIndex(cs->tempY2, cs->tempZ1);
-	filtZ->filterField(cs->tempZ1, cs->tempZ2);
-	filtZ->filterField(cs->tempZ2, cs->tempZ3);
-	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ3, cs->tempY1);
+	fy->filterField(phi, cs->tempY1);
+	cs->c2d->transposeY2Z_MajorIndex(cs->tempY1, cs->tempZ1);
+	fz->filterField(cs->tempZ1, cs->tempZ2);
+	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ2, cs->tempY1);
 	cs->c2d->transposeY2X_MajorIndex(cs->tempY1, cs->tempX1);
-	filtX->filterField(cs->tempX1, cs->tempX2);
-	filtX->filterField(cs->tempX2, cs->tempX3);
-	cs->c2d->transposeX2Y_MajorIndex(cs->tempX3, mu_sgs);
+	fx->filterField(cs->tempX1, cs->tempX2);
+	cs->c2d->transposeX2Y_MajorIndex(cs->tempX2, phiF);
 
     }else if(musgsAvgType == Options::NONE){
 	//just chill...

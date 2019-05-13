@@ -31,6 +31,8 @@ void Options::parseStatsAvgTypeString(string vmKey, string inString, StatsAvgTyp
             currentType = XI3_AVG;
         }else if(strcmp(inString.c_str(), "LOCAL")==0){
             currentType = LOCAL;
+        }else if(strcmp(inString.c_str(), "GLOBAL")==0){
+            currentType = GLOBAL;
 	}else{
             cout << " > UNKNOWN AVERAGING TYPE SPECIFIED: " << inString << endl;
             MPI_Abort(MPI_COMM_WORLD, -10);

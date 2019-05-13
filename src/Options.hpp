@@ -32,7 +32,7 @@ class Options{
 
 	enum LESModel {NOMODEL, VREMAN};
 
-	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL};
+	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL, GLOBAL};
 
 	enum RKType {TVDRK3, RK4, KENRK4, LSLDDRK4};
 
