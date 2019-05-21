@@ -497,10 +497,10 @@ void CurvilinearCSolver::preStepDerivatives(){
     // Calculate the Gradients //
     /////////////////////////////
 
-    double *vi[] = {U, V, W, T};
+    double *vi[] = {U, V, W};
     vector<double*> vecIn(vi, vi+sizeof(vi)/sizeof(vi[0]));
     
-    double *vo[] = {dU1, dU2, dU3, dV1, dV2, dV3, dW1, dW2, dW3, dT1, dT2, dT3};
+    double *vo[] = {dU1, dU2, dU3, dV1, dV2, dV3, dW1, dW2, dW3};
     vector<double*> vecOut(vo, vo+sizeof(vo)/sizeof(vo[0]));
 
     computeGradient(vecIn, vecOut);
@@ -562,8 +562,51 @@ void CurvilinearCSolver::preStepDerivatives(){
 
     //getSGSViscosity...
     if(LESFlag){
-	les->getSGSViscosity(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
+	if(opt->lesModel == Options::VREMAN){
+	    les->getSGSViscosity(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
+	}else if(opt->lesModel = Options::DSM){
+	    les->calcMuSGSTaukk(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
+
+	    //include taukk into pressure
+	    FOR_XYZ_YPEN{
+		//pressure w/ diagonal term
+	        p[ip] -= 0.5*les->taukk[ip];
+
+		//Update temperature w/ new pressure
+		T[ip] = solveT(rhoP[ip], p[ip]);
+
+		//update viscosity & SOS w/ new temperature
+	        mu[ip]  = solveMu(T[ip]);
+		sos[ip] = solveSOS(rhoP[ip], p[ip]) 	
+	    }
+	}
     }
+
+    double *vi2[] = {T};
+    vector<double*> vecIn2(vi2, vi2+sizeof(vi2)/sizeof(vi2[0]));
+    
+    double *vo2[] = {dT1, dT2, dT3};
+    vector<double*> vecOut2(vo2, vo2+sizeof(vo2)/sizeof(vo2[0]));
+
+    computeGradient(vecIn2, vecOut2);
+
+    if(LESFlag){
+	if(opt->lesModel == Options::DSM){
+	
+	    double *gradT[3];
+	    c2d->allocY(gradT[0]);
+	    c2d->allocY(gradT[1]);
+	    c2d->allocY(gradT[2]);
+
+	    FOR_XYZ_YPEN{
+		gradT[0][ip] = J11[ip]*dT1[ip] + J21[ip]*dT2[ip] + J31[ip]*dT3[ip];  
+		gradT[1][ip] = J12[ip]*dT1[ip] + J22[ip]*dT2[ip] + J32[ip]*dT3[ip];  
+		gradT[2][ip] = J13[ip]*dT1[ip] + J23[ip]*dT2[ip] + J33[ip]*dT3[ip];  
+	    }
+
+	    les->calcPrtSGS(gradT, rhoP, rhoUP, rhoVP, rhoWP, T);
+	}
+    } 
 
 
     FOR_XYZ_YPEN{

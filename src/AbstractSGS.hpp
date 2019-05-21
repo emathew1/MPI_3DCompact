@@ -29,7 +29,7 @@ class AbstractSGS{
 	double *taukk;
 	double *Prt_sgs;	
 
-	virtual void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE) = 0;
+	//virtual void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE) = 0;
 
 	void doAveraging(double *phi, double *phiF, AbstractFilter *fx, AbstractFilter *fy, AbstractFilter *fz);
 	void doAveraging(double *phi, double *phiF);

@@ -11,6 +11,15 @@ class DSMSGS: public AbstractSGS{
 
   public:
 
+    double *S00, *S01, *S02;
+    double       *S11, *S12;
+    double 	       *S22; 
+    double *Smag;	    
+    double *rho_hat;
+    double *Smag_hat;
+
+    double *rhoU_hat, *rhoV_hat, *rhoW_hat;
+
     DSMSGS(AbstractCSolver *cs){
 	
 	this->mpiRank = cs->mpiRank;
@@ -43,6 +52,20 @@ class DSMSGS: public AbstractSGS{
 	    filtZ = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
 	}
 
+        cs->c2d->allocY(S00);
+        cs->c2d->allocY(S01);
+	cs->c2d->allocY(S02);
+	cs->c2d->allocY(S11);
+	cs->c2d->allocY(S12);
+	cs->c2d->allocY(S22);
+	cs->c2d->allocY(Smag);
+	cs->c2d->allocY(rho_hat);
+	cs->c2d->allocY(Smag_hat);	
+
+  	cs->c2d->allocY(rhoU_hat);	   
+  	cs->c2d->allocY(rhoV_hat);	   
+  	cs->c2d->allocY(rhoW_hat);	   
+
     }
 
     void filterQuantity(double *phi, double *phiF){
@@ -56,21 +79,8 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->transposeX2Y_MajorIndex(cs->tempX2, phiF);
     }
    
-    void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){
+    void calcMuSGSTaukk(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){
 
-
-	    double *S00, *S01, *S02;
-	    double       *S11, *S12;
-	    double 	       *S22; 
-	    double *Smag;	    
-
-	    cs->c2d->allocY(S00);
-	    cs->c2d->allocY(S01);
-	    cs->c2d->allocY(S02);
-	    cs->c2d->allocY(S11);
-	    cs->c2d->allocY(S12);
-	    cs->c2d->allocY(S22);
-	    cs->c2d->allocY(Smag);
 
 	    FOR_XYZ_YPEN{
 		S00[ip] = gradU[0][0][ip];
@@ -124,20 +134,16 @@ class DSMSGS: public AbstractSGS{
 	    filterQuantity(M22_2, M22);
 
 	    //Filter the M1 field components
-	    double *rho_hat;
 	    double *S00_hat, *S01_hat, *S02_hat;
 	    double 	     *S11_hat, *S12_hat;
 	    double 		       *S22_hat;
-	    double *Smag_hat;
 
-	    cs->c2d->allocY(rho_hat);
 	    cs->c2d->allocY(S00_hat);
 	    cs->c2d->allocY(S01_hat);
 	    cs->c2d->allocY(S02_hat);
 	    cs->c2d->allocY(S11_hat);
 	    cs->c2d->allocY(S12_hat);
 	    cs->c2d->allocY(S22_hat);
-	    cs->c2d->allocY(Smag_hat);	
 
 	    filterQuantity(rho, rho_hat);
 	    filterQuantity(S00, S00_hat);
@@ -197,7 +203,6 @@ class DSMSGS: public AbstractSGS{
 	    filterQuantity(L12_t, L12);
 	    filterQuantity(L22_t, L22);
 
-	    double *rhoU_hat, *rhoV_hat, *rhoW_hat;
 
 	    filterQuantity(rhoU, rhoU_hat);
 	    filterQuantity(rhoV, rhoV_hat);
@@ -272,7 +277,9 @@ class DSMSGS: public AbstractSGS{
 		taukk[ip]  = rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
 	    }
 
-	    //Now need to do all the stuff to calculate Pr_t
+    }
+
+    void calcPrtSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
 
     } 
 };
