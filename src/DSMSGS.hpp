@@ -36,7 +36,7 @@ class DSMSGS: public AbstractSGS{
 	//initialize mu_sgs
 	cs->c2d->allocY(mu_sgs);
 	cs->c2d->allocY(taukk);
-	cs->c2d->allocY(Prt_sgs);
+	cs->c2d->allocY(k_sgs);
 
 	//This should be an input option...
 	int filterType = 1;
@@ -277,9 +277,102 @@ class DSMSGS: public AbstractSGS{
 		taukk[ip]  = rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
 	    }
 
+
+	    //TODO TODO TODO
+	    //Need to clean up allocation of memory and delete here!!!
+
     }
 
-    void calcPrtSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
+    void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
+
+	double *N_0, *N_1, *N_2;	
+	double *NRHS_0, *NRHS_1, *NRHS_2;	
+
+  	cs->c2d->allocY(N_0);	   
+  	cs->c2d->allocY(N_1);	   
+  	cs->c2d->allocY(N_2);	   
+  	cs->c2d->allocY(NRHS_0);	   
+  	cs->c2d->allocY(NRHS_1);	   
+  	cs->c2d->allocY(NRHS_2);	   
+
+	double *K_0, *K_1, *K_2;	
+	double *KRHS_0, *KRHS_1, *KRHS_2;	
+
+  	cs->c2d->allocY(K_0);	   
+  	cs->c2d->allocY(K_1);	   
+  	cs->c2d->allocY(K_2);	   
+  	cs->c2d->allocY(KRHS_0);	   
+  	cs->c2d->allocY(KRHS_1);	   
+  	cs->c2d->allocY(KRHS_2);	   
+
+	double *gradT0_hat, *gradT1_hat, *gradT2_hat; 
+  	cs->c2d->allocY(gradT0_hat);	   
+  	cs->c2d->allocY(gradT1_hat);	   
+  	cs->c2d->allocY(gradT2_hat);	   
+	double *rhoT, *rhoT_hat;
+  	cs->c2d->allocY(rhoT);	   
+  	cs->c2d->allocY(rhoT_hat);	   
+
+	FOR_XYZ_YPEN{
+	    //We'll store the NRHS stuff in N_i until we filter...
+	    N_0[ip] = rho[ip]*Smag[ip]*gradT[0][ip];
+	    N_1[ip] = rho[ip]*Smag[ip]*gradT[1][ip];
+	    N_2[ip] = rho[ip]*Smag[ip]*gradT[2][ip];
+
+	    K_0[ip] = rhoU[ip]*T[ip];
+	    K_1[ip] = rhoV[ip]*T[ip];
+	    K_2[ip] = rhoW[ip]*T[ip];
+	    rhoT[ip] = rho[ip]*T[ip];
+	}
+
+	filterQuantity(N_0, NRHS_0);		
+	filterQuantity(N_1, NRHS_1);		
+	filterQuantity(N_2, NRHS_2);		
+
+	filterQuantity(K_0, KRHS_0);
+	filterQuantity(K_1, KRHS_1);
+	filterQuantity(K_2, KRHS_2);
+
+	filterQuantity(rhoT, rhoT_hat);
+
+	filterQuantity(gradT[0], gradT0_hat);
+	filterQuantity(gradT[1], gradT1_hat);
+	filterQuantity(gradT[2], gradT2_hat);
+
+	FOR_XYZ_YPEN{
+	    N_0[ip] = testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*gradT0_hat[ip] - NRHS_0[ip]; 
+	    N_1[ip] = testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*gradT1_hat[ip] - NRHS_1[ip]; 
+	    N_2[ip] = testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*gradT2_hat[ip] - NRHS_2[ip]; 
+
+	    K_0[ip] = -rhoU_hat[ip]*rhoT_hat[ip]/rho[ip] + KRHS_0[ip];
+	    K_1[ip] = -rhoV_hat[ip]*rhoT_hat[ip]/rho[ip] + KRHS_1[ip];
+	    K_2[ip] = -rhoW_hat[ip]*rhoT_hat[ip]/rho[ip] + KRHS_2[ip];
+	}
+
+	double *NiNi, *NiKi;
+  	cs->c2d->allocY(NiNi);	   
+  	cs->c2d->allocY(NiKi);	   
+
+	FOR_XYZ_YPEN{
+	    NiNi[ip] = N_0[ip]*N_0[ip] + N_1[ip]*N_1[ip] + N_2[ip]*N_2[ip];
+	    NiKi[ip] = K_0[ip]*N_0[ip] + K_1[ip]*N_1[ip] + K_2[ip]*N_2[ip];
+	}
+
+	double *NiNi_avg, *KiNi_avg;
+	cs->c2d->allocY(NiNi_avg);
+	cs->c2d->allocY(KiNi_avg);
+
+	doAveraging(NiNi, NiNi_avg);
+	doAveraging(KiNi, KiNi_avg);
+
+	//Calculate -C/Pr_t = KjNj/NiNi
+	FOR_XYZ_YPEN{
+	    double C_over_Prt = KiNi[ip]/NiNi[ip];
+	    //Should this be negative? Don't think so...
+	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
+	}
+
+	//Need to deallocate some memory!!	
 
     } 
 };

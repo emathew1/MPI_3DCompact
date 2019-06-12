@@ -27,7 +27,7 @@ class AbstractSGS{
 
 	double *mu_sgs;	
 	double *taukk;
-	double *Prt_sgs;	
+	double *k_sgs;	
 
 	//virtual void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE) = 0;
 
