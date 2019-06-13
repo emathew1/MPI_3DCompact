@@ -234,7 +234,7 @@ class DSMSGS: public AbstractSGS{
 
 	    //Then actually calculate the denomenator 
 	    FOR_XYZ_YPEN{
-		CIdenom[ip] = 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*Smag_hat[ip];
+		CIdenom[ip] = 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*Smag_hat[ip] - alpha_hat[ip];
 	    }
 
 	    //Need to do some quantity averaging now in whatever kind of averaging we have planned...
@@ -274,13 +274,58 @@ class DSMSGS: public AbstractSGS{
 
 	    FOR_XYZ_YPEN{
 		mu_sgs[ip] = rho[ip]*Smag[ip]*LijMij_avg[ip]/MijMij_avg[ip];
-		taukk[ip]  = rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
+		taukk[ip]  = 2.0*rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
 	    }
 
-
-	    //TODO TODO TODO
+	    //Need to make sure theres no memory leaks...
+	    //Maybe preallocate arrays so not allocating every time its called
 	    //Need to clean up allocation of memory and delete here!!!
+	    cs->c2d->deallocXYZ(M00_2);
+	    cs->c2d->deallocXYZ(M01_2);
+	    cs->c2d->deallocXYZ(M02_2);
+	    cs->c2d->deallocXYZ(M11_2);
+	    cs->c2d->deallocXYZ(M12_2);
+	    cs->c2d->deallocXYZ(M22_2);
 
+	    cs->c2d->deallocXYZ(M00);
+	    cs->c2d->deallocXYZ(M01);
+	    cs->c2d->deallocXYZ(M02);
+	    cs->c2d->deallocXYZ(M11);
+	    cs->c2d->deallocXYZ(M12);
+	    cs->c2d->deallocXYZ(M22);
+
+	    cs->c2d->deallocXYZ(S00_hat);
+	    cs->c2d->deallocXYZ(S01_hat);
+	    cs->c2d->deallocXYZ(S02_hat);
+	    cs->c2d->deallocXYZ(S11_hat);
+	    cs->c2d->deallocXYZ(S12_hat);
+	    cs->c2d->deallocXYZ(S22_hat);
+
+	    cs->c2d->deallocXYZ(L00_t); 
+	    cs->c2d->deallocXYZ(L01_t); 
+	    cs->c2d->deallocXYZ(L02_t); 
+	    cs->c2d->deallocXYZ(L11_t); 
+	    cs->c2d->deallocXYZ(L12_t); 
+	    cs->c2d->deallocXYZ(L22_t); 
+
+	    cs->c2d->deallocXYZ(L00); 
+	    cs->c2d->deallocXYZ(L01); 
+	    cs->c2d->deallocXYZ(L02); 
+	    cs->c2d->deallocXYZ(L11); 
+	    cs->c2d->deallocXYZ(L12); 
+	    cs->c2d->deallocXYZ(L22);
+
+	    cs->c2d->allocXYZ(CIdenom); 
+	    cs->c2d->allocXYZ(alpha_hat);
+
+	    cs->c2d->allocXYZ(Lkk);
+	    cs->c2d->allocXYZ(Lkk_avg);
+
+	    cs->c2d->allocXYZ(CIdenom_avg);
+	    cs->c2d->allocXYZ(LijMij); 
+	    cs->c2d->allocXYZ(LijMij_avg); 
+	    cs->c2d->allocXYZ(MijMij); 
+	    cs->c2d->allocXYZ(MijMij_avg); 
     }
 
     void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
@@ -372,8 +417,34 @@ class DSMSGS: public AbstractSGS{
 	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
 	}
 
+	//Need to check for memory leaks...
 	//Need to deallocate some memory!!	
+	cs->c2d->deallocXYZ(N_0);
+	cs->c2d->deallocXYZ(N_1);
+	cs->c2d->deallocXYZ(N_2);
+	cs->c2d->deallocXYZ(NRHS_0);
+	cs->c2d->deallocXYZ(NRHS_1);
+	cs->c2d->deallocXYZ(NRHS_2);
 
+	cs->c2d->deallocXYZ(K_0);
+	cs->c2d->deallocXYZ(K_1);
+	cs->c2d->deallocXYZ(K_2);
+	cs->c2d->deallocXYZ(KRHS_0);
+	cs->c2d->deallocXYZ(KRHS_1);
+	cs->c2d->deallocXYZ(KRHS_2);
+	
+	cs->c2d->deallocXYZ(gradT0_hat);
+	cs->c2d->deallocXYZ(gradT1_hat);
+	cs->c2d->deallocXYZ(gradT2_hat);
+
+	cs->c2d->deallocXYZ(rhoT);
+	cs->c2d->deallocXYZ(rhoT_hat);
+
+	cs->c2d->deallocXYZ(NiNi);
+	cs->c2d->deallocXYZ(NiKi);
+
+	cs->c2d->deallocXYZ(NiNi_avg);
+	cs->c2d->deallocXYZ(KiNi_avg);
     } 
 };
 

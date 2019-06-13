@@ -237,6 +237,9 @@ class CurvilinearCSolver: public AbstractCSolver{
 	    }else if(opt->lesModel == Options::VREMAN){
 		LESFlag = true;
 		les = new VremanSGS(this);
+	    }else if(opt->lesModel == Options::DSM){
+		LESFlag = true;
+		les = new DSMSGS(this);
 	    } 
 
 	    t1 = MPI_Wtime();

@@ -563,8 +563,11 @@ void CurvilinearCSolver::preStepDerivatives(){
     //getSGSViscosity...
     if(LESFlag){
 	if(opt->lesModel == Options::VREMAN){
+
 	    les->getSGSViscosity(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
+
 	}else if(opt->lesModel = Options::DSM){
+
 	    les->calcMuSGSTaukk(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
 
 	    //include taukk into pressure
@@ -604,7 +607,7 @@ void CurvilinearCSolver::preStepDerivatives(){
 		gradT[2][ip] = J13[ip]*dT1[ip] + J23[ip]*dT2[ip] + J33[ip]*dT3[ip];  
 	    }
 
-	    les->calcPrtSGS(gradT, rhoP, rhoUP, rhoVP, rhoWP, T);
+	    les->calcKSGS(gradT, rhoP, rhoUP, rhoVP, rhoWP, T);
 	}
     } 
 
@@ -632,8 +635,15 @@ void CurvilinearCSolver::preStepDerivatives(){
 
 	double mu_eff = 0.0, k_eff = 0.0;
 	if(LESFlag){
+
 	    mu_eff = mu[ip] + les->mu_sgs[ip];
-	    k_eff  = ig->cp*(mu[ip]/ig->Pr + les->mu_sgs[ip]/Pr_t);
+
+	    if(opt->lesModel == Options::DSM){
+		 k_eff  = ig->cp*mu[ip]/ig->Pr  + k_sgs[ip];   
+	    }else{
+	         k_eff  = ig->cp*(mu[ip]/ig->Pr + les->mu_sgs[ip]/Pr_t);
+	    }
+
 	}else{
 	    mu_eff = mu[ip];
 	    k_eff  = (ig->cp/ig->Pr)*mu[ip];
