@@ -229,7 +229,7 @@ class DSMSGS: public AbstractSGS{
 
 	    FOR_XYZ_YPEN{
 		//going to store the alpha info in beta first...
-		CIdenom[ip] = 2.0*rho[ip]*Smag[ip];
+		CIdenom[ip] = 2.0*rho[ip]*Smag[ip]*Smag[ip];
 	    }
 
 	    //Do the filtering...
@@ -279,6 +279,8 @@ class DSMSGS: public AbstractSGS{
 		mu_sgs[ip] = rho[ip]*Smag[ip]*LijMij_avg[ip]/MijMij_avg[ip];
 		taukk[ip]  = 2.0*rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
 	    }
+
+	    //do something here to calculate the actual C & CI and dump it out...
 
 	    //Need to make sure theres no memory leaks...
 	    //Maybe preallocate arrays so not allocating every time its called
