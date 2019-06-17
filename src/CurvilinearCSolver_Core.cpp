@@ -566,7 +566,7 @@ void CurvilinearCSolver::preStepDerivatives(){
 
 	    les->getSGSViscosity(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
 
-	}else if(opt->lesModel = Options::DSM){
+	}else if(opt->lesModel == Options::DSM){
 
 	    les->calcMuSGSTaukk(gradU, rhoP, rhoUP, rhoVP, rhoWP, rhoEP);
 
@@ -576,22 +576,22 @@ void CurvilinearCSolver::preStepDerivatives(){
 	        p[ip] -= 0.5*les->taukk[ip];
 
 		//Update temperature w/ new pressure
-		T[ip] = solveT(rhoP[ip], p[ip]);
+		T[ip] = ig->solveT(rhoP[ip], p[ip]);
 
 		//update viscosity & SOS w/ new temperature
-	        mu[ip]  = solveMu(T[ip]);
-		sos[ip] = solveSOS(rhoP[ip], p[ip]) 	
+	        mu[ip]  = ig->solveMu(T[ip]);
+		sos[ip] = ig->solveSOS(rhoP[ip], p[ip]); 	
 	    }
 	}
     }
 
-    double *vi2[] = {T};
-    vector<double*> vecIn2(vi2, vi2+sizeof(vi2)/sizeof(vi2[0]));
+    double *viT2[] = {T};
+    vector<double*> vecInT(viT2, viT2+sizeof(viT2)/sizeof(viT2[0]));
     
-    double *vo2[] = {dT1, dT2, dT3};
-    vector<double*> vecOut2(vo2, vo2+sizeof(vo2)/sizeof(vo2[0]));
+    double *voT2[] = {dT1, dT2, dT3};
+    vector<double*> vecOutT(voT2, voT2+sizeof(voT2)/sizeof(voT2[0]));
 
-    computeGradient(vecIn2, vecOut2);
+    computeGradient(vecInT, vecOutT);
 
     if(LESFlag){
 	if(opt->lesModel == Options::DSM){
@@ -639,10 +639,20 @@ void CurvilinearCSolver::preStepDerivatives(){
 	    mu_eff = mu[ip] + les->mu_sgs[ip];
 
 	    if(opt->lesModel == Options::DSM){
-		 k_eff  = ig->cp*mu[ip]/ig->Pr  + k_sgs[ip];   
+		 k_eff  = ig->cp*mu[ip]/ig->Pr  + les->k_sgs[ip];   
 	    }else{
 	         k_eff  = ig->cp*(mu[ip]/ig->Pr + les->mu_sgs[ip]/Pr_t);
 	    }
+
+	    //Apply clipping to mu_eff and k_eff
+	    if(mu_eff < 0.0){
+		mu_eff = 0.0;
+	    }
+
+	    if(k_eff < 0.0){
+		k_eff = 0.0;
+	    }
+
 
 	}else{
 	    mu_eff = mu[ip];

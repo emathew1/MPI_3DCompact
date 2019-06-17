@@ -2,6 +2,7 @@
 #define _CDSMSGSH_
 
 #include "Macros.hpp"
+#include "AbstractSGS.hpp"
 #include "AbstractFilter.hpp"
 #include "AbstractDerivatives.hpp"
 #include "CommN5ExpTestFilter.hpp"
@@ -19,6 +20,8 @@ class DSMSGS: public AbstractSGS{
     double *Smag_hat;
 
     double *rhoU_hat, *rhoV_hat, *rhoW_hat;
+
+    double testFilterRatioSquare;
 
     DSMSGS(AbstractCSolver *cs){
 	
@@ -40,13 +43,13 @@ class DSMSGS: public AbstractSGS{
 
 	//This should be an input option...
 	int filterType = 1;
-	double testFilterRatioSquare = 2.0*2.0;
+	testFilterRatioSquare = 2.0*2.0;
 
         if(filterType == 1){
 	    filtX = new CommN5PadeTestFilter(cs->dom, cs->bc, cs->bc->bcXType, AbstractDerivatives::DIRX);
 	    filtY = new CommN5PadeTestFilter(cs->dom, cs->bc, cs->bc->bcYType, AbstractDerivatives::DIRY);
 	    filtZ = new CommN5PadeTestFilter(cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
-	}else if(filterType == 2{
+	}else if(filterType == 2){
 	    filtX = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcXType, AbstractDerivatives::DIRX);
 	    filtY = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcYType, AbstractDerivatives::DIRY);
 	    filtZ = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
@@ -70,12 +73,12 @@ class DSMSGS: public AbstractSGS{
 
     void filterQuantity(double *phi, double *phiF){
 
-	fy->filterField(phi, cs->tempY1);
+	filtY->filterField(phi, cs->tempY1);
 	cs->c2d->transposeY2Z_MajorIndex(cs->tempY1, cs->tempZ1);
-	fz->filterField(cs->tempZ1, cs->tempZ2);
+	filtZ->filterField(cs->tempZ1, cs->tempZ2);
 	cs->c2d->transposeZ2Y_MajorIndex(cs->tempZ2, cs->tempY1);
 	cs->c2d->transposeY2X_MajorIndex(cs->tempY1, cs->tempX1);
-	fx->filterField(cs->tempX1, cs->tempX2);
+	filtX->filterField(cs->tempX1, cs->tempX2);
 	cs->c2d->transposeX2Y_MajorIndex(cs->tempX2, phiF);
     }
    
@@ -105,9 +108,9 @@ class DSMSGS: public AbstractSGS{
 	    cs->c2d->allocY(M22_2);
 
 	    FOR_XYZ_YPEN{
-		M00_2[ip] = 2.0*rho[ip]*Smag[ip]*(S00[ip] - (1.0/3.0)*(S00[p] + S11[ip] + S22[ip]));
-		M11_2[ip] = 2.0*rho[ip]*Smag[ip]*(S11[ip] - (1.0/3.0)*(S00[p] + S11[ip] + S22[ip]));
-		M22_2[ip] = 2.0*rho[ip]*Smag[ip]*(S22[ip] - (1.0/3.0)*(S00[p] + S11[ip] + S22[ip]));
+		M00_2[ip] = 2.0*rho[ip]*Smag[ip]*(S00[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
+		M11_2[ip] = 2.0*rho[ip]*Smag[ip]*(S11[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
+		M22_2[ip] = 2.0*rho[ip]*Smag[ip]*(S22[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
 
 		M01_2[ip] = 2.0*rho[ip]*Smag[ip]*S01[ip];
 		M02_2[ip] = 2.0*rho[ip]*Smag[ip]*S02[ip];
@@ -270,7 +273,7 @@ class DSMSGS: public AbstractSGS{
 	    doAveraging(LijMij, LijMij_avg);
 
 	    cs->c2d->allocY(MijMij_avg);
-	    doAveraging(MijMij_avg);
+	    doAveraging(MijMij, MijMij_avg);
 
 	    FOR_XYZ_YPEN{
 		mu_sgs[ip] = rho[ip]*Smag[ip]*LijMij_avg[ip]/MijMij_avg[ip];
@@ -315,17 +318,17 @@ class DSMSGS: public AbstractSGS{
 	    cs->c2d->deallocXYZ(L12); 
 	    cs->c2d->deallocXYZ(L22);
 
-	    cs->c2d->allocXYZ(CIdenom); 
-	    cs->c2d->allocXYZ(alpha_hat);
+	    cs->c2d->deallocXYZ(CIdenom); 
+	    cs->c2d->deallocXYZ(alpha_hat);
 
-	    cs->c2d->allocXYZ(Lkk);
-	    cs->c2d->allocXYZ(Lkk_avg);
+	    cs->c2d->deallocXYZ(Lkk);
+	    cs->c2d->deallocXYZ(Lkk_avg);
 
-	    cs->c2d->allocXYZ(CIdenom_avg);
-	    cs->c2d->allocXYZ(LijMij); 
-	    cs->c2d->allocXYZ(LijMij_avg); 
-	    cs->c2d->allocXYZ(MijMij); 
-	    cs->c2d->allocXYZ(MijMij_avg); 
+	    cs->c2d->deallocXYZ(CIdenom_avg);
+	    cs->c2d->deallocXYZ(LijMij); 
+	    cs->c2d->deallocXYZ(LijMij_avg); 
+	    cs->c2d->deallocXYZ(MijMij); 
+	    cs->c2d->deallocXYZ(MijMij_avg); 
     }
 
     void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
@@ -403,16 +406,16 @@ class DSMSGS: public AbstractSGS{
 	    NiKi[ip] = K_0[ip]*N_0[ip] + K_1[ip]*N_1[ip] + K_2[ip]*N_2[ip];
 	}
 
-	double *NiNi_avg, *KiNi_avg;
+	double *NiNi_avg, *NiKi_avg;
 	cs->c2d->allocY(NiNi_avg);
-	cs->c2d->allocY(KiNi_avg);
+	cs->c2d->allocY(NiKi_avg);
 
 	doAveraging(NiNi, NiNi_avg);
-	doAveraging(KiNi, KiNi_avg);
+	doAveraging(NiKi, NiKi_avg);
 
 	//Calculate -C/Pr_t = KjNj/NiNi
 	FOR_XYZ_YPEN{
-	    double C_over_Prt = KiNi[ip]/NiNi[ip];
+	    double C_over_Prt = NiKi[ip]/NiNi[ip];
 	    //Should this be negative? Don't think so...
 	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
 	}
@@ -444,8 +447,10 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->deallocXYZ(NiKi);
 
 	cs->c2d->deallocXYZ(NiNi_avg);
-	cs->c2d->deallocXYZ(KiNi_avg);
+	cs->c2d->deallocXYZ(NiKi_avg);
     } 
+
+    void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){};
 };
 
 

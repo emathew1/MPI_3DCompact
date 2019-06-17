@@ -30,7 +30,7 @@ class Options{
 	enum FDType {CD2, PADE6, PENTA10};
 	enum FilterType {COMPACT8, COMPACT10};
 
-	enum LESModel {NOMODEL, VREMAN};
+	enum LESModel {NOMODEL, VREMAN, DSM};
 
 	enum StatsAvgType {NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL, GLOBAL};
 

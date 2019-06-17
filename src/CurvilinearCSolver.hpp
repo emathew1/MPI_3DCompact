@@ -20,6 +20,7 @@
 #include "Stats.hpp"
 #include "AbstractSGS.hpp"
 #include "VremanSGS.hpp"
+#include "DSMSGS.hpp"
 
 class CurvilinearCSolver: public AbstractCSolver{
 

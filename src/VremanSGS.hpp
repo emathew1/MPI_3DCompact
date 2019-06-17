@@ -94,6 +94,10 @@ class VremanSGS: public AbstractSGS{
 	//Do some averaging of the mu_sgs if we want to...
 	doAveraging();
     } 
+
+    void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){};
+    void calcMuSGSTaukk(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){};
+
 };
 
 

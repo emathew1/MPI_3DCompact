@@ -7,6 +7,8 @@ void Options::parseLESModelString(string vmKey, string inString, LESModel &curre
             currentType = NOMODEL;
         }else if(strcmp(inString.c_str(), "VREMAN")==0){
             currentType = VREMAN;
+        }else if(strcmp(inString.c_str(), "DSM")==0){
+            currentType = DSM;
 	}else{
             cout << " > UNKNOWN LES MODEL TYPE SPECIFIED: " << inString << endl;
             MPI_Abort(MPI_COMM_WORLD, -10);
