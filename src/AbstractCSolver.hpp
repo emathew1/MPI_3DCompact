@@ -18,7 +18,8 @@ class AbstractCSolver{
     public:
 
 	int mpiRank;
-	
+	int totRank;	
+
 	int rkStep;
 	bool rkLast;
 	bool endFlag;

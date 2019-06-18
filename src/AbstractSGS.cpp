@@ -132,8 +132,20 @@ void AbstractSGS::doAveraging(double *phi, double *phiF, AbstractFilter *fx, Abs
 
     }else if(musgsAvgType == Options::GLOBAL){
 
-        cout << "NEED TO IMPLEMENT GLOBAL MUSGS AVERAGING" << endl;
+	double local_mean = 0.0;
+	FOR_XYZ_YPEN{
+	    local_mean += phi[ip];
+	}
+	local_mean /= ((double)(pySize[0]*pySize[1]*pySize[2]));
 
+	double global_mean = 0.0;
+	MPI_Allreduce(&local_mean, &global_mean, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+	global_mean /= ((double)cs->totRank); 
+	FOR_XYZ_YPEN{
+	    phiF[ip] = global_mean;
+	}
+	
     }else if(musgsAvgType == Options::LOCAL){
 
 	//Should just impletement a legit filter

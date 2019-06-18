@@ -1281,6 +1281,11 @@ void CurvilinearCSolver::checkSolution(){
 
 	if(LESFlag){
 	    getRange(les->mu_sgs, "MU SGS", Nx, Ny, Nz, mpiRank);
+	    if(opt->lesModel == Options::DSM){
+	    getRange(les->taukk, "TAUKK ", Nx, Ny, Nz, mpiRank);
+	    getRange(les->k_sgs, "K SGS", Nx, Ny, Nz, mpiRank);
+		
+	    }
 	}
 
 	if(statsFlag){
