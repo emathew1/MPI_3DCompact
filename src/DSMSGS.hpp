@@ -19,6 +19,10 @@ class DSMSGS: public AbstractSGS{
     double *rho_hat;
     double *Smag_hat;
 
+    double *work1,  *work2,  *work3,  *work4,  *work5, *work6;
+    double *work7,  *work8,  *work9,  *work10, *work11, *work12;
+    double *work13, *work14, *work15, *work16, *work17, *work18;
+
     double *rhoU_hat, *rhoV_hat, *rhoW_hat;
 
     double testFilterRatioSquare;
@@ -42,7 +46,7 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->allocY(k_sgs);
 
 	//This should be an input option...
-	int filterType = 1;
+	int filterType = 2;
 	testFilterRatioSquare = 2.0*2.0;
 
         if(filterType == 1){
@@ -69,7 +73,28 @@ class DSMSGS: public AbstractSGS{
   	cs->c2d->allocY(rhoV_hat);	   
   	cs->c2d->allocY(rhoW_hat);	   
 
-    }
+  	cs->c2d->allocY(work1);	   
+  	cs->c2d->allocY(work2);	   
+  	cs->c2d->allocY(work3);	   
+  	cs->c2d->allocY(work4);	   
+  	cs->c2d->allocY(work5);	   
+  	cs->c2d->allocY(work6);
+	   
+  	cs->c2d->allocY(work7);	   
+  	cs->c2d->allocY(work8);	   
+  	cs->c2d->allocY(work9);	   
+  	cs->c2d->allocY(work10);	   
+  	cs->c2d->allocY(work11);	   
+  	cs->c2d->allocY(work12);	   
+  	
+	cs->c2d->allocY(work13);	   
+	cs->c2d->allocY(work14);	   
+	cs->c2d->allocY(work15);	   
+	cs->c2d->allocY(work16);	   
+	cs->c2d->allocY(work17);	   
+	cs->c2d->allocY(work18);	   
+ 
+   }
 
     void filterQuantity(double *phi, double *phiF){
 
@@ -99,13 +124,14 @@ class DSMSGS: public AbstractSGS{
 	    double *M00_2, *M01_2, *M02_2;
 	    double         *M11_2, *M12_2;
 	    double 	           *M22_2; 
+	
+	    M00_2 = work1;
+	    M01_2 = work2;
+	    M02_2 = work3;
+	    M11_2 = work4;
+	    M12_2 = work5;
+	    M22_2 = work6;
 
-	    cs->c2d->allocY(M00_2);
-	    cs->c2d->allocY(M01_2);
-	    cs->c2d->allocY(M02_2);
-	    cs->c2d->allocY(M11_2);
-	    cs->c2d->allocY(M12_2);
-	    cs->c2d->allocY(M22_2);
 
 	    FOR_XYZ_YPEN{
 		M00_2[ip] = 2.0*rho[ip]*Smag[ip]*(S00[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
@@ -122,12 +148,12 @@ class DSMSGS: public AbstractSGS{
 	    double 	 *M11, *M12; 	
 	    double 	       *M22; 	
 
-	    cs->c2d->allocY(M00);
-	    cs->c2d->allocY(M01);
-	    cs->c2d->allocY(M02);
-	    cs->c2d->allocY(M11);
-	    cs->c2d->allocY(M12);
-	    cs->c2d->allocY(M22);
+	    M00 = work7;
+	    M01 = work8;
+	    M02 = work9;
+	    M11 = work10;
+	    M12 = work11;
+	    M22 = work12;
 
 	    filterQuantity(M00_2, M00);
 	    filterQuantity(M01_2, M01);
@@ -141,12 +167,12 @@ class DSMSGS: public AbstractSGS{
 	    double 	     *S11_hat, *S12_hat;
 	    double 		       *S22_hat;
 
-	    cs->c2d->allocY(S00_hat);
-	    cs->c2d->allocY(S01_hat);
-	    cs->c2d->allocY(S02_hat);
-	    cs->c2d->allocY(S11_hat);
-	    cs->c2d->allocY(S12_hat);
-	    cs->c2d->allocY(S22_hat);
+	    S00_hat = work1;
+	    S01_hat = work2;
+	    S02_hat = work3;
+	    S11_hat = work4;
+	    S12_hat = work5;
+	    S22_hat = work6;
 
 	    filterQuantity(rho, rho_hat);
 	    filterQuantity(S00, S00_hat);
@@ -171,13 +197,13 @@ class DSMSGS: public AbstractSGS{
 	    double *L00_t, *L01_t, *L02_t;
 	    double 	   *L11_t, *L12_t;
 	    double		   *L22_t;
-	    
-  	    cs->c2d->allocY(L00_t);	   
-  	    cs->c2d->allocY(L01_t);	   
-  	    cs->c2d->allocY(L02_t);	   
-  	    cs->c2d->allocY(L11_t);	   
-  	    cs->c2d->allocY(L12_t);	   
-  	    cs->c2d->allocY(L22_t);	   
+
+	    L00_t = work1;	    
+	    L01_t = work2;	    
+	    L02_t = work3;	    
+	    L11_t = work4;	    
+	    L12_t = work5;	    
+	    L22_t = work6;	    
 	
 	    FOR_XYZ_YPEN{
 		L00_t[ip] = rhoU[ip]*rhoU[ip]/rho[ip];
@@ -192,12 +218,12 @@ class DSMSGS: public AbstractSGS{
 	    double 	 *L11, *L12;
 	    double	       *L22;
 	     
-	    cs->c2d->allocY(L00);	   
-  	    cs->c2d->allocY(L01);	   
-  	    cs->c2d->allocY(L02);	   
-  	    cs->c2d->allocY(L11);	   
-  	    cs->c2d->allocY(L12);	   
-  	    cs->c2d->allocY(L22);	   
+	    L00 = work13;	   
+  	    L01 = work14;	   
+  	    L02 = work15;	   
+  	    L11 = work16;	   
+  	    L12 = work17;	   
+  	    L22 = work18;	   
 	    
 	    filterQuantity(L00_t, L00);
 	    filterQuantity(L01_t, L01);
@@ -224,8 +250,8 @@ class DSMSGS: public AbstractSGS{
 	    //Get together components for C_I
 	    double *CIdenom, *alpha_hat;
 
-	    cs->c2d->allocY(CIdenom);
-	    cs->c2d->allocY(alpha_hat);
+	    CIdenom   = work1;
+	    alpha_hat = work2;
 
 	    FOR_XYZ_YPEN{
 		//going to store the alpha info in beta first...
@@ -243,10 +269,10 @@ class DSMSGS: public AbstractSGS{
 	    //Need to do some quantity averaging now in whatever kind of averaging we have planned...
 	    double *Lkk, *Lkk_avg, *CIdenom_avg;
 	    double *LijMij, *LijMij_avg, *MijMij, *MijMij_avg;
-	    cs->c2d->allocY(Lkk); 
-	    cs->c2d->allocY(CIdenom_avg);
-	    cs->c2d->allocY(LijMij); 
-	    cs->c2d->allocY(MijMij); 
+	    Lkk = work3; 
+	    CIdenom_avg = work4;
+	    LijMij = work5; 
+	    MijMij = work6; 
 
 	    FOR_XYZ_YPEN{
 		Lkk[ip] = L00[ip] + L11[ip] + L22[ip];
@@ -263,16 +289,16 @@ class DSMSGS: public AbstractSGS{
 			     2.0*M12[ip]*M12[ip]; 
 	    }
 
-	    cs->c2d->allocY(Lkk_avg);
+	    Lkk_avg = work7;
 	    doAveraging(Lkk, Lkk_avg);
 
-	    cs->c2d->allocY(CIdenom_avg);
+	    CIdenom_avg = work8;
 	    doAveraging(CIdenom, CIdenom_avg);
 
-	    cs->c2d->allocY(LijMij_avg);
+	    LijMij_avg = work9;
 	    doAveraging(LijMij, LijMij_avg);
 
-	    cs->c2d->allocY(MijMij_avg);
+	    MijMij_avg = work10;
 	    doAveraging(MijMij, MijMij_avg);
 
 	    FOR_XYZ_YPEN{
@@ -282,55 +308,6 @@ class DSMSGS: public AbstractSGS{
 
 	    //do something here to calculate the actual C & CI and dump it out...
 
-	    //Need to make sure theres no memory leaks...
-	    //Maybe preallocate arrays so not allocating every time its called
-	    //Need to clean up allocation of memory and delete here!!!
-	    cs->c2d->deallocXYZ(M00_2);
-	    cs->c2d->deallocXYZ(M01_2);
-	    cs->c2d->deallocXYZ(M02_2);
-	    cs->c2d->deallocXYZ(M11_2);
-	    cs->c2d->deallocXYZ(M12_2);
-	    cs->c2d->deallocXYZ(M22_2);
-
-	    cs->c2d->deallocXYZ(M00);
-	    cs->c2d->deallocXYZ(M01);
-	    cs->c2d->deallocXYZ(M02);
-	    cs->c2d->deallocXYZ(M11);
-	    cs->c2d->deallocXYZ(M12);
-	    cs->c2d->deallocXYZ(M22);
-
-	    cs->c2d->deallocXYZ(S00_hat);
-	    cs->c2d->deallocXYZ(S01_hat);
-	    cs->c2d->deallocXYZ(S02_hat);
-	    cs->c2d->deallocXYZ(S11_hat);
-	    cs->c2d->deallocXYZ(S12_hat);
-	    cs->c2d->deallocXYZ(S22_hat);
-
-	    cs->c2d->deallocXYZ(L00_t); 
-	    cs->c2d->deallocXYZ(L01_t); 
-	    cs->c2d->deallocXYZ(L02_t); 
-	    cs->c2d->deallocXYZ(L11_t); 
-	    cs->c2d->deallocXYZ(L12_t); 
-	    cs->c2d->deallocXYZ(L22_t); 
-
-	    cs->c2d->deallocXYZ(L00); 
-	    cs->c2d->deallocXYZ(L01); 
-	    cs->c2d->deallocXYZ(L02); 
-	    cs->c2d->deallocXYZ(L11); 
-	    cs->c2d->deallocXYZ(L12); 
-	    cs->c2d->deallocXYZ(L22);
-
-	    cs->c2d->deallocXYZ(CIdenom); 
-	    cs->c2d->deallocXYZ(alpha_hat);
-
-	    cs->c2d->deallocXYZ(Lkk);
-	    cs->c2d->deallocXYZ(Lkk_avg);
-
-	    cs->c2d->deallocXYZ(CIdenom_avg);
-	    cs->c2d->deallocXYZ(LijMij); 
-	    cs->c2d->deallocXYZ(LijMij_avg); 
-	    cs->c2d->deallocXYZ(MijMij); 
-	    cs->c2d->deallocXYZ(MijMij_avg); 
     }
 
     void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T){
@@ -338,30 +315,30 @@ class DSMSGS: public AbstractSGS{
 	double *N_0, *N_1, *N_2;	
 	double *NRHS_0, *NRHS_1, *NRHS_2;	
 
-  	cs->c2d->allocY(N_0);	   
-  	cs->c2d->allocY(N_1);	   
-  	cs->c2d->allocY(N_2);	   
-  	cs->c2d->allocY(NRHS_0);	   
-  	cs->c2d->allocY(NRHS_1);	   
-  	cs->c2d->allocY(NRHS_2);	   
+  	N_0 = work1;	   
+  	N_1 = work2;	   
+  	N_2 = work3;	   
+  	NRHS_0  = work4;	   
+  	NRHS_1  = work5;	   
+  	NRHS_2  = work6;	   
 
 	double *K_0, *K_1, *K_2;	
 	double *KRHS_0, *KRHS_1, *KRHS_2;	
 
-  	cs->c2d->allocY(K_0);	   
-  	cs->c2d->allocY(K_1);	   
-  	cs->c2d->allocY(K_2);	   
-  	cs->c2d->allocY(KRHS_0);	   
-  	cs->c2d->allocY(KRHS_1);	   
-  	cs->c2d->allocY(KRHS_2);	   
+	K_0 = work7;
+	K_1 = work8;
+	K_2 = work9;
+	KRHS_0 = work10; 
+	KRHS_1 = work11; 
+	KRHS_2 = work12; 
 
 	double *gradT0_hat, *gradT1_hat, *gradT2_hat; 
-  	cs->c2d->allocY(gradT0_hat);	   
-  	cs->c2d->allocY(gradT1_hat);	   
-  	cs->c2d->allocY(gradT2_hat);	   
+  	gradT0_hat = work13;	   
+  	gradT1_hat = work14;	   
+  	gradT2_hat = work15;	   
 	double *rhoT, *rhoT_hat;
-  	cs->c2d->allocY(rhoT);	   
-  	cs->c2d->allocY(rhoT_hat);	   
+  	rhoT = work16;	   
+  	rhoT_hat = work17;	   
 
 	FOR_XYZ_YPEN{
 	    //We'll store the NRHS stuff in N_i until we filter...
@@ -400,8 +377,8 @@ class DSMSGS: public AbstractSGS{
 	}
 
 	double *NiNi, *NiKi;
-  	cs->c2d->allocY(NiNi);	   
-  	cs->c2d->allocY(NiKi);	   
+  	NiNi = work4;	   
+  	NiKi = work5;	   
 
 	FOR_XYZ_YPEN{
 	    NiNi[ip] = N_0[ip]*N_0[ip] + N_1[ip]*N_1[ip] + N_2[ip]*N_2[ip];
@@ -409,8 +386,8 @@ class DSMSGS: public AbstractSGS{
 	}
 
 	double *NiNi_avg, *NiKi_avg;
-	cs->c2d->allocY(NiNi_avg);
-	cs->c2d->allocY(NiKi_avg);
+	NiNi_avg = work6;
+	NiKi_avg = work10;
 
 	doAveraging(NiNi, NiNi_avg);
 	doAveraging(NiKi, NiKi_avg);
@@ -422,34 +399,6 @@ class DSMSGS: public AbstractSGS{
 	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
 	}
 
-	//Need to check for memory leaks...
-	//Need to deallocate some memory!!	
-	cs->c2d->deallocXYZ(N_0);
-	cs->c2d->deallocXYZ(N_1);
-	cs->c2d->deallocXYZ(N_2);
-	cs->c2d->deallocXYZ(NRHS_0);
-	cs->c2d->deallocXYZ(NRHS_1);
-	cs->c2d->deallocXYZ(NRHS_2);
-
-	cs->c2d->deallocXYZ(K_0);
-	cs->c2d->deallocXYZ(K_1);
-	cs->c2d->deallocXYZ(K_2);
-	cs->c2d->deallocXYZ(KRHS_0);
-	cs->c2d->deallocXYZ(KRHS_1);
-	cs->c2d->deallocXYZ(KRHS_2);
-	
-	cs->c2d->deallocXYZ(gradT0_hat);
-	cs->c2d->deallocXYZ(gradT1_hat);
-	cs->c2d->deallocXYZ(gradT2_hat);
-
-	cs->c2d->deallocXYZ(rhoT);
-	cs->c2d->deallocXYZ(rhoT_hat);
-
-	cs->c2d->deallocXYZ(NiNi);
-	cs->c2d->deallocXYZ(NiKi);
-
-	cs->c2d->deallocXYZ(NiNi_avg);
-	cs->c2d->deallocXYZ(NiKi_avg);
     } 
 
     void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){};

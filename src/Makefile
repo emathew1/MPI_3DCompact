@@ -60,7 +60,7 @@ CommN5PadeTestFilter.o: CommN5PadeTestFilter.cpp CommN5PadeTestFilter.hpp Abstra
 CurvilinearCSolver_BC.o: CurvilinearCSolver_BC.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp Options.hpp Stats.hpp 
 	$(CC) $(CFLAGS) -c $<
 
-CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Compact10Filter.hpp Options.hpp AbstractSGS.hpp VremanSGS.hpp
+CurvilinearCSolver_Core.o: CurvilinearCSolver_Core.cpp CurvilinearCSolver.hpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp SpongeBC.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp PngWriter.hpp Adt.hpp CD2.hpp Penta10.hpp Pade6.hpp Compact8Filter.hpp Compact10Filter.hpp Options.hpp AbstractSGS.hpp VremanSGS.hpp DSMSGS.hpp
 	$(CC) $(CFLAGS) -c $<
 
 CurvilinearInterpolator.o: CurvilinearInterpolator.cpp CurvilinearInterpolator.hpp Macros.hpp Utils.hpp AbstractCSolver.hpp AlgebraicSingleBlockMesh.hpp BC.hpp Domain.hpp Options.hpp
