@@ -12,6 +12,8 @@ class DSMSGS: public AbstractSGS{
 
   public:
 
+    double *C, *CI, *Prt;
+
     double *S00, *S01, *S02;
     double       *S11, *S12;
     double 	       *S22; 
@@ -26,6 +28,8 @@ class DSMSGS: public AbstractSGS{
     double *rhoU_hat, *rhoV_hat, *rhoW_hat;
 
     double testFilterRatioSquare;
+
+    bool coeffRangeFlag;
 
     DSMSGS(AbstractCSolver *cs){
 	
@@ -46,7 +50,7 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->allocY(k_sgs);
 
 	//This should be an input option...
-	int filterType = 2;
+	int filterType = 1;
 	testFilterRatioSquare = 2.0*2.0;
 
         if(filterType == 1){
@@ -93,6 +97,14 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->allocY(work16);	   
 	cs->c2d->allocY(work17);	   
 	cs->c2d->allocY(work18);	   
+
+	//If we want to dump smag coeff ranges...
+	coeffRangeFlag = true;
+	if(coeffRangeFlag){
+	    cs->c2d->allocY(C);
+	    cs->c2d->allocY(CI);
+	    cs->c2d->allocY(Prt);
+	}
  
    }
 
@@ -110,17 +122,6 @@ class DSMSGS: public AbstractSGS{
     void calcMuSGSTaukk(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE){
 
 
-	    FOR_XYZ_YPEN{
-		S00[ip] = gradU[0][0][ip];
-		S11[ip] = gradU[1][1][ip];
-		S22[ip] = gradU[2][2][ip];
-		S01[ip] = 0.5*(gradU[0][1][ip] + gradU[1][0][ip]); 	
-		S02[ip] = 0.5*(gradU[0][2][ip] + gradU[2][0][ip]); 	
-		S12[ip] = 0.5*(gradU[1][2][ip] + gradU[2][1][ip]); 
-		Smag[ip] = sqrt(2.0*(S00[ip]*S00[ip] + S11[ip]*S11[ip] + S22[ip]*S22[ip]) +
-			        4.0*(S01[ip]*S01[ip] + S02[ip]*S02[ip] + S12[ip]*S12[ip])); 	
-	    }
-
 	    double *M00_2, *M01_2, *M02_2;
 	    double         *M11_2, *M12_2;
 	    double 	           *M22_2; 
@@ -134,6 +135,15 @@ class DSMSGS: public AbstractSGS{
 
 
 	    FOR_XYZ_YPEN{
+		S00[ip] = gradU[0][0][ip];
+		S11[ip] = gradU[1][1][ip];
+		S22[ip] = gradU[2][2][ip];
+		S01[ip] = 0.5*(gradU[0][1][ip] + gradU[1][0][ip]); 	
+		S02[ip] = 0.5*(gradU[0][2][ip] + gradU[2][0][ip]); 	
+		S12[ip] = 0.5*(gradU[1][2][ip] + gradU[2][1][ip]); 
+		Smag[ip] = sqrt(2.0*(S00[ip]*S00[ip] + S11[ip]*S11[ip] + S22[ip]*S22[ip]) +
+			        4.0*(S01[ip]*S01[ip] + S02[ip]*S02[ip] + S12[ip]*S12[ip])); 	
+
 		M00_2[ip] = 2.0*rho[ip]*Smag[ip]*(S00[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
 		M11_2[ip] = 2.0*rho[ip]*Smag[ip]*(S11[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
 		M22_2[ip] = 2.0*rho[ip]*Smag[ip]*(S22[ip] - (1.0/3.0)*(S00[ip] + S11[ip] + S22[ip]));
@@ -183,6 +193,19 @@ class DSMSGS: public AbstractSGS{
 	    filterQuantity(S22, S22_hat);
 	    filterQuantity(Smag, Smag_hat);
 
+	    //Calculate the stuff for the Leonard stress terms
+	    double *L00_t, *L01_t, *L02_t;
+	    double 	   *L11_t, *L12_t;
+	    double		   *L22_t;
+
+	    L00_t = work13;	    
+	    L01_t = work14;	    
+	    L02_t = work15;	    
+	    L11_t = work16;	    
+	    L12_t = work17;	    
+	    L22_t = work18;	    
+	
+
 	    //Finish calculating the Mij tensor
 	    FOR_XYZ_YPEN{
 		M00[ip] -= 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*(S00_hat[ip] - (1.0/3.0)*(S00_hat[ip] + S11_hat[ip] + S22_hat[ip])); 
@@ -191,39 +214,26 @@ class DSMSGS: public AbstractSGS{
 	        M01[ip] -= 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*S01_hat[ip];
 	        M02[ip] -= 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*S02_hat[ip];
 	        M12[ip] -= 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*S12_hat[ip];
-	    } 
 
-	    //Calculate the stuff for the Leonard stress terms
-	    double *L00_t, *L01_t, *L02_t;
-	    double 	   *L11_t, *L12_t;
-	    double		   *L22_t;
-
-	    L00_t = work1;	    
-	    L01_t = work2;	    
-	    L02_t = work3;	    
-	    L11_t = work4;	    
-	    L12_t = work5;	    
-	    L22_t = work6;	    
-	
-	    FOR_XYZ_YPEN{
 		L00_t[ip] = rhoU[ip]*rhoU[ip]/rho[ip];
 		L01_t[ip] = rhoU[ip]*rhoV[ip]/rho[ip];
 		L02_t[ip] = rhoU[ip]*rhoW[ip]/rho[ip];
 		L11_t[ip] = rhoV[ip]*rhoV[ip]/rho[ip];
 		L12_t[ip] = rhoV[ip]*rhoW[ip]/rho[ip];
 		L22_t[ip] = rhoW[ip]*rhoW[ip]/rho[ip];
-	    }
+	    } 
+
 
 	    double *L00, *L01, *L02;
 	    double 	 *L11, *L12;
 	    double	       *L22;
 	     
-	    L00 = work13;	   
-  	    L01 = work14;	   
-  	    L02 = work15;	   
-  	    L11 = work16;	   
-  	    L12 = work17;	   
-  	    L22 = work18;	   
+	    L00 = work1;	   
+  	    L01 = work2;	   
+  	    L02 = work3;	   
+  	    L11 = work4;	   
+  	    L12 = work5;	   
+  	    L22 = work6;	   
 	    
 	    filterQuantity(L00_t, L00);
 	    filterQuantity(L01_t, L01);
@@ -231,7 +241,6 @@ class DSMSGS: public AbstractSGS{
 	    filterQuantity(L11_t, L11);
 	    filterQuantity(L12_t, L12);
 	    filterQuantity(L22_t, L22);
-
 
 	    filterQuantity(rhoU, rhoU_hat);
 	    filterQuantity(rhoV, rhoV_hat);
@@ -250,8 +259,8 @@ class DSMSGS: public AbstractSGS{
 	    //Get together components for C_I
 	    double *CIdenom, *alpha_hat;
 
-	    CIdenom   = work1;
-	    alpha_hat = work2;
+	    CIdenom   = work13;
+	    alpha_hat = work14;
 
 	    FOR_XYZ_YPEN{
 		//going to store the alpha info in beta first...
@@ -269,10 +278,10 @@ class DSMSGS: public AbstractSGS{
 	    //Need to do some quantity averaging now in whatever kind of averaging we have planned...
 	    double *Lkk, *Lkk_avg, *CIdenom_avg;
 	    double *LijMij, *LijMij_avg, *MijMij, *MijMij_avg;
-	    Lkk = work3; 
-	    CIdenom_avg = work4;
-	    LijMij = work5; 
-	    MijMij = work6; 
+	    Lkk = work15; 
+	    CIdenom_avg = work16;
+	    LijMij = work17; 
+	    MijMij = work18; 
 
 	    FOR_XYZ_YPEN{
 		Lkk[ip] = L00[ip] + L11[ip] + L22[ip];
@@ -307,6 +316,15 @@ class DSMSGS: public AbstractSGS{
 	    }
 
 	    //do something here to calculate the actual C & CI and dump it out...
+
+	    if(coeffRangeFlag){	
+		FOR_XYZ_YPEN{
+	            double vol = cs->dom->dx*cs->dom->dy*cs->dom->dz/cs->msh->J[ip];
+   	            double del = pow(vol, 1.0/3.0);
+		    C[ip]  = LijMij_avg[ip]/(del*del*MijMij_avg[ip]);
+		    CI[ip] = Lkk_avg[ip]/(del*del*CIdenom_avg[ip]);
+		}
+	    }
 
     }
 
@@ -394,9 +412,19 @@ class DSMSGS: public AbstractSGS{
 
 	//Calculate -C/Pr_t = KjNj/NiNi
 	FOR_XYZ_YPEN{
-	    double C_over_Prt = NiKi[ip]/NiNi[ip];
+	    double C_over_Prt = NiKi_avg[ip]/NiNi_avg[ip];
 	    //Should this be negative? Don't think so...
 	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
+	}
+
+	
+	if(coeffRangeFlag){	
+	    FOR_XYZ_YPEN{
+	        double vol = cs->dom->dx*cs->dom->dy*cs->dom->dz/cs->msh->J[ip];
+   	        double del = pow(vol, 1.0/3.0);
+
+		Prt[ip] = -C[ip]*del*del*NiNi_avg[ip]/NiKi_avg[ip];
+	    }
 	}
 
     } 

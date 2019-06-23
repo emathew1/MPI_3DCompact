@@ -29,6 +29,9 @@ class AbstractSGS{
 	double *taukk;
 	double *k_sgs;	
 
+	bool coeffRangeFlag;
+	double *C, *CI, *Prt;
+
 	virtual void getSGSViscosity(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE) = 0;
 	virtual void calcMuSGSTaukk(double *gradU[3][3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *rhoE) = 0;
 	virtual void calcKSGS(double *gradT[3], double *rho, double *rhoU, double *rhoV, double *rhoW, double *T) = 0;
