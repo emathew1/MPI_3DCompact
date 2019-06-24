@@ -58,11 +58,11 @@ Current default (and only up to date) solver is the `CurvilinearCSolver`, solves
 
 `LOCAL` - Using a filter function to do a local filtering/averaging of quantities
 
-###Dynamic Smagorinsky Options
+### Dynamic Smagorinsky Options
 
 `DSMTESTFILTER` = Options for test filter for dynamic procedure
 
-   `1` = Explicit Commutative Test Filter (Vasilyev, 1999) (Five Vanishing Moments, Case 10, Table I)
+   `1` = Explicit Commutative Test Filter (Vasilyev, 1999) (Five Vanishing Moments, Case 10, Table I)   
    `2` = Pade-Type Commutative Test Filter (Vasilyev, 1999) (Five Vanishing Moments, Case 2, Table III - Much Sharper Filter)
 
 `DSMUSETAUKK` = Whether or not to use the model for sgs energy, usually small for low turb Mach and gets added to pressure
