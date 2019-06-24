@@ -50,9 +50,22 @@ Current default (and only up to date) solver is the `CurvilinearCSolver`, solves
 
 `VREMAN` = Standard Vreman SGS (Vreman, 2004)
 
+`DSM` = Compressible Dynamic Smagorinsky (Flavor thats in Nagarajan et al., 2003 with some differences from Martin et al., 1999)
+
 `LESAVERAGING` = `NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL`
 
 `XI1_AVG, XI2_AVG, XI3_AVG` - Averaging along cartesian (pre-transformed) directions
 
 `LOCAL` - Using a filter function to do a local filtering/averaging of quantities
+
+###Dynamic Smagorinsky Options
+
+`DSMTESTFILTER` = Options for test filter for dynamic procedure
+
+   `1` = Explicit Commutative Test Filter (Vasilyev, 1999) (Five Vanishing Moments, Case 10, Table I)
+   `2` = Pade-Type Commutative Test Filter (Vasilyev, 1999) (Five Vanishing Moments, Case 2, Table III - Much Sharper Filter)
+
+`DSMUSETAUKK` = Whether or not to use the model for sgs energy, usually small for low turb Mach and gets added to pressure
+
+`DSMCOEFFRANGE` = Whether or not to dump the range of the Smag. constant, CI, and turbulent Prandtl number to output
 

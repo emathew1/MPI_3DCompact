@@ -113,6 +113,11 @@ class Options{
 	LESModel lesModel;
 	string lesModel_str;	
 
+	//DSM LES Model Stuff
+	bool dumpCoeffRange;
+	bool useTaukk;
+	int testFilterType;
+
     Options(int mpiRank){
    
 
@@ -195,7 +200,10 @@ class Options{
 	    ("STATS.STATSAVGTYPE",	 po::value<string>(&statsAvgType_str), "Name of spacial averaging type for statistics")
 	    ("STATS.INTERVAL",	 po::value<int>(&stats_interval), "How often (in terms of timesteps) do we update the statistics data")
 	    ("LES.LESMODEL",	 po::value<string>(&lesModel_str), "Name of the LES model")
-	    ("LES.LESAVERAGING", po::value<string>(&musgsAvgType_str), "Averaging of mu_sgs type");
+	    ("LES.LESAVERAGING", po::value<string>(&musgsAvgType_str), "Averaging of mu_sgs type")
+	    ("LES.DSMTESTFILTER", po::value<int>(&testFilterType), "Type of test filter used in dynamic coefficient calculation")
+	    ("LES.DSMUSETAUKK", po::value<bool>(&useTaukk), "Whether or not to use taukk component in pressure calculation")
+	    ("LES.DSMCOEFFRANGE", po::value<bool>(&dumpCoeffRange), "Whether or not to dump the Smag. Coeff, CI, and Prt.");
 
 	
 	    //Potentially include the style of computation options from CurvilinearCsolver? OCC vs. VANILLA etc.	
@@ -413,6 +421,10 @@ class Options{
 	parseLESModelString("LES.LESMODEL", lesModel_str, lesModel);
 	parseStatsAvgTypeString("LES.LESAVERAGING", musgsAvgType_str, musgsAvgType);
 
+	checkValue<int>("LES.DSMTESTFILTER", "testFilterType", testFilterType, 1);
+	checkValue<bool>("LES.DSMUSETAUKK", "useTaukk", useTaukk, true);
+	checkValue<bool>("LES.DSMCOEFFRANGE", "dumpCoeffRange", dumpCoeffRange, false);
+
       }
 
 
@@ -577,6 +589,11 @@ class Options{
       MPI_Bcast(&lesModel, 1, MPI_INT, root, MPI_COMM_WORLD);
       //LES Model Averaging Type
       MPI_Bcast(&musgsAvgType, 1, MPI_INT, root, MPI_COMM_WORLD);
+
+      //LES DSM Options
+      MPI_Bcast(&testFilterType, 1, MPI_INT, root, MPI_COMM_WORLD);
+      MPI_Bcast(&useTaukk, 1, MPI_C_BOOL, root, MPI_COMM_WORLD);
+      MPI_Bcast(&dumpCoeffRange, 1, MPI_C_BOOL, root, MPI_COMM_WORLD); 
 
    }	
 

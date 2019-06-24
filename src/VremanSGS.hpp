@@ -27,7 +27,7 @@ class VremanSGS: public AbstractSGS{
 
 	//Vreman SGS Coefficient...
 	//Smag constant...
-	double csma = 0.1; //0.17
+	double csma = 0.17;
 	c = 2.5*csma*csma;
 
 	//initialize mu_sgs

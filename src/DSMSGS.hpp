@@ -12,8 +12,6 @@ class DSMSGS: public AbstractSGS{
 
   public:
 
-    double *C, *CI, *Prt;
-
     double *S00, *S01, *S02;
     double       *S11, *S12;
     double 	       *S22; 
@@ -28,13 +26,17 @@ class DSMSGS: public AbstractSGS{
     double *rhoU_hat, *rhoV_hat, *rhoW_hat;
 
     double testFilterRatioSquare;
+    bool useTaukk, dumpDSMCoeff;
+    int filterType;
 
-    bool coeffRangeFlag;
-
-    DSMSGS(AbstractCSolver *cs){
+    DSMSGS(AbstractCSolver *cs, int filterType, bool useTaukk, bool dumpDSMCoeff){
 	
 	this->mpiRank = cs->mpiRank;
 	this->cs      = cs;
+	
+	this->filterType = filterType;
+        this->useTaukk = useTaukk;
+	this->dumpDSMCoeff = dumpDSMCoeff;
 
 	Nx = cs->dom->gNx;
 	Ny = cs->dom->gNy;
@@ -50,7 +52,6 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->allocY(k_sgs);
 
 	//This should be an input option...
-	int filterType = 1;
 	testFilterRatioSquare = 2.0*2.0;
 
         if(filterType == 1){
@@ -61,6 +62,8 @@ class DSMSGS: public AbstractSGS{
 	    filtX = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcXType, AbstractDerivatives::DIRX);
 	    filtY = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcYType, AbstractDerivatives::DIRY);
 	    filtZ = new CommN5ExpTestFilter(cs->dom, cs->bc, cs->bc->bcZType, AbstractDerivatives::DIRZ);
+	}else{
+	    cout << "ABORT, UNKNOWN TEST FILTER TYPE" << endl;
 	}
 
         cs->c2d->allocY(S00);
@@ -99,8 +102,7 @@ class DSMSGS: public AbstractSGS{
 	cs->c2d->allocY(work18);	   
 
 	//If we want to dump smag coeff ranges...
-	coeffRangeFlag = true;
-	if(coeffRangeFlag){
+	if(dumpDSMCoeff){
 	    cs->c2d->allocY(C);
 	    cs->c2d->allocY(CI);
 	    cs->c2d->allocY(Prt);
@@ -255,24 +257,25 @@ class DSMSGS: public AbstractSGS{
 		L22[ip] -= rhoW_hat[ip]*rhoW_hat[ip]/rho_hat[ip];
 	    } 
 
-
-	    //Get together components for C_I
 	    double *CIdenom, *alpha_hat;
+	    if(useTaukk){
+	        //Get together components for C_I
 
-	    CIdenom   = work13;
-	    alpha_hat = work14;
+	        CIdenom   = work13;
+	        alpha_hat = work14;
 
-	    FOR_XYZ_YPEN{
-		//going to store the alpha info in beta first...
-		CIdenom[ip] = 2.0*rho[ip]*Smag[ip]*Smag[ip];
-	    }
+	        FOR_XYZ_YPEN{
+		    //going to store the alpha info in beta first...
+		    CIdenom[ip] = 2.0*rho[ip]*Smag[ip]*Smag[ip];
+	        }
 
-	    //Do the filtering...
-	    filterQuantity(CIdenom, alpha_hat);
+	        //Do the filtering...
+	        filterQuantity(CIdenom, alpha_hat);
 
-	    //Then actually calculate the denomenator 
-	    FOR_XYZ_YPEN{
-		CIdenom[ip] = 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*Smag_hat[ip] - alpha_hat[ip];
+	        //Then actually calculate the denomenator 
+	        FOR_XYZ_YPEN{
+		    CIdenom[ip] = 2.0*testFilterRatioSquare*rho_hat[ip]*Smag_hat[ip]*Smag_hat[ip] - alpha_hat[ip];
+	        }
 	    }
 
 	    //Need to do some quantity averaging now in whatever kind of averaging we have planned...
@@ -298,11 +301,13 @@ class DSMSGS: public AbstractSGS{
 			     2.0*M12[ip]*M12[ip]; 
 	    }
 
-	    Lkk_avg = work7;
-	    doAveraging(Lkk, Lkk_avg);
+	    if(useTaukk){
+	        Lkk_avg = work7;
+	        doAveraging(Lkk, Lkk_avg);
 
-	    CIdenom_avg = work8;
-	    doAveraging(CIdenom, CIdenom_avg);
+	        CIdenom_avg = work8;
+	        doAveraging(CIdenom, CIdenom_avg);
+	    }
 
 	    LijMij_avg = work9;
 	    doAveraging(LijMij, LijMij_avg);
@@ -312,17 +317,26 @@ class DSMSGS: public AbstractSGS{
 
 	    FOR_XYZ_YPEN{
 		mu_sgs[ip] = rho[ip]*Smag[ip]*LijMij_avg[ip]/MijMij_avg[ip];
-		taukk[ip]  = 2.0*rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
+
+		if(useTaukk){
+		    taukk[ip]  = 2.0*rho[ip]*Smag[ip]*Smag[ip]*Lkk_avg[ip]/CIdenom_avg[ip];
+		}else{
+		    taukk[ip]  = 0.0;
+		}
 	    }
 
 	    //do something here to calculate the actual C & CI and dump it out...
 
-	    if(coeffRangeFlag){	
+	    if(dumpDSMCoeff){	
 		FOR_XYZ_YPEN{
 	            double vol = cs->dom->dx*cs->dom->dy*cs->dom->dz/cs->msh->J[ip];
    	            double del = pow(vol, 1.0/3.0);
 		    C[ip]  = LijMij_avg[ip]/(del*del*MijMij_avg[ip]);
-		    CI[ip] = Lkk_avg[ip]/(del*del*CIdenom_avg[ip]);
+		    if(useTaukk){
+		         CI[ip] = Lkk_avg[ip]/(del*del*CIdenom_avg[ip]);
+		    }else{
+			 CI[ip] = 0.0;
+		    }
 		}
 	    }
 
@@ -414,11 +428,11 @@ class DSMSGS: public AbstractSGS{
 	FOR_XYZ_YPEN{
 	    double C_over_Prt = NiKi_avg[ip]/NiNi_avg[ip];
 	    //Should this be negative? Don't think so...
-	    k_sgs[ip] = cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
+	    k_sgs[ip] = -cs->ig->cp*C_over_Prt*rho[ip]*Smag[ip];
 	}
 
 	
-	if(coeffRangeFlag){	
+	if(dumpDSMCoeff){	
 	    FOR_XYZ_YPEN{
 	        double vol = cs->dom->dx*cs->dom->dy*cs->dom->dz/cs->msh->J[ip];
    	        double del = pow(vol, 1.0/3.0);

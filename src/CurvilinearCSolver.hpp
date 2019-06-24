@@ -238,7 +238,7 @@ class CurvilinearCSolver: public AbstractCSolver{
 		les = new VremanSGS(this);
 	    }else if(opt->lesModel == Options::DSM){
 		LESFlag = true;
-		les = new DSMSGS(this);
+		les = new DSMSGS(this, opt->testFilterType, opt->useTaukk, opt->dumpCoeffRange);
 	    } 
 
 	    t1 = MPI_Wtime();

@@ -1284,7 +1284,7 @@ void CurvilinearCSolver::checkSolution(){
 	    if(opt->lesModel == Options::DSM){
 	    getRange(les->taukk, "TAUKK ", Nx, Ny, Nz, mpiRank);
 	    getRange(les->k_sgs, "K SGS", Nx, Ny, Nz, mpiRank);
-		if(les->coeffRangeFlag){
+		if(opt->dumpCoeffRange){
 		    getRange(les->C, "LES C", Nx, Ny, Nz, mpiRank);
 		    getRange(les->CI, "LES CI", Nx, Ny, Nz, mpiRank);
 		    getRange(les->Prt, "LES Prt", Nx, Ny, Nz, mpiRank);
