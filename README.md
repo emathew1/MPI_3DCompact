@@ -42,15 +42,16 @@ Current default (and only up to date) solver is the `CurvilinearCSolver`, solves
 
 `COMPACT10` - Tenth-order compact filter (Giatonde & Visbal, 2000)
 
-## LES Models
+## LES Model Stuff
 
-`LESMODEL` = `NONE, VREMAN`
+`LESMODEL` = `NONE, VREMAN, DSM`
 
 `NONE` = The special DNS LES model
 
 `VREMAN` = Standard Vreman SGS (Vreman, 2004)
 
 `DSM` = Compressible Dynamic Smagorinsky (Flavor thats in Nagarajan et al., 2003 with some differences from Martin et al., 1999)
+
 
 `LESAVERAGING` = `NONE, XI1_AVG, XI2_AVG, XI3_AVG, LOCAL`
 
